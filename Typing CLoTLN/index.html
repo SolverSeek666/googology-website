@@ -2049,15 +2049,15 @@
 <script>
 if (!localStorage.CLoTLN) {
 	localStorage.CLoTLN = JSON.stringify({
-    	caret: 982,
+    	caret: text.indexOf("Negative five"),
         hits: 0
     });
 }
 let textField = document.getElementById("textField");
 let text = textField.innerHTML.replaceAll("\n", "").trim().replaceAll("<br> ","<br>").replaceAll("<br> ","<br>").replaceAll("  <skip>","<skip>");
 let game = JSON.parse(localStorage.CLoTLN);
-if (game.caret < 982 && prompt("Do you want to reset your cursor position?","yes") == "yes") {
-	game.caret = 982;
+if (game.caret < text.indexOf("Negative five") && prompt("Do you want to reset your cursor position?","yes") == "yes") {
+	game.caret = text.indexOf("Negative five");
 }
 let caretX = 0;
 let caretY = 0;
