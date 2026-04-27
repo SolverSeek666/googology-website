@@ -2098,11 +2098,28 @@ function updateCaret() {
 function update() {
     let thing = text.substring(0,game.caret);
     let thingR = [...thing].reverse();
+    let thingRtxt = thingR.join("")
+    // idk what to name these - typin_
     let stuff = [thingR.indexOf(">"), thingR.indexOf("<")];
+    let stuff2 = [-1,-1];
     let fixStuff = (stuff[0] == -1 ? Infinity : stuff[0]) > stuff[1];
     let fixStuff2 = text[game.caret] == "<";
-    let fixStuff3 = [["",""], ["</sup>","<sup>"], ["</sub>", "<sub>"], ["</p>", (a=thingR.join("").substr(0+stuff[0]),a.substring(0,a.indexOf("<")+1).split("").reverse().join(""))]][[">pus<",">bus<",">\";kc"].indexOf(thingR.join("").substring(0+stuff[0],5+stuff[0]))+1];
-	textField.innerHTML = `${fixStuff && stuff[1] != -1 ? (thingR[stuff[1]] = "&#x003C;", thingR.reverse().join("")) : text.substring(0,game.caret)}${fixStuff3[0]}<span class="untyped">${fixStuff3[1]}<span class="current">${fixStuff2 ? "" : format(text.substring(game.caret,game.caret+1))}</span>${format((fixStuff2 ? "<" : "") + text.substr(game.caret+1))}</span>`;
+    let fixStuff3 = ["",""];
+    let pendFixStuff3 = ["",""];
+    let peakStuff = 0;
+    let dynaStuff = 0;
+    for (let i = 0; i < 10; i++) {
+        stuff2 = [thingRtxt.substr(stuff2[0]+1).indexOf(">")+stuff2[0]+1, thingRtxt.substr(stuff2[1]+1).indexOf("<")+stuff2[1]+1];
+        let fixStuff4 = [["",""], ["</sup>","<sup>"], ["</sub>", "<sub>"], ["<sup>", "</sup>"], ["<sub>", "</sub>"], ["</p>", (a=thingRtxt.substr(stuff2[0]),a.substring(0,a.indexOf("<")+1).split("").reverse().join(""))]][[">pus<",">bus<",">pus/",">bus/",">\";kc"].indexOf(thingRtxt.substring(stuff2[0],5+stuff2[0]))+1];
+        if (["</sup>","</sub>","</p>"].includes(fixStuff4[0])) dynaStuff++;
+        else if (["<sup>","<sub>"].includes(fixStuff4[0]) || fixStuff4.includes("<p s")) dynaStuff--;
+          if (dynaStuff > peakStuff) {
+            peakStuff = dynaStuff;
+            fixStuff3[0] += fixStuff4[0];
+            fixStuff3[1] += fixStuff4[1];
+          }
+    }
+    textField.innerHTML = `${fixStuff && stuff[1] != -1 ? (thingR[stuff[1]] = "&#x003C;", thingR.reverse().join("")) : text.substring(0,game.caret)}${fixStuff3[0]}<span class="untyped">${fixStuff3[1]}<span class="current">${fixStuff2 ? "" : format(text.substring(game.caret,game.caret+1))}</span>${format((fixStuff2 ? "<" : "") + text.substr(game.caret+1))}</span>`;
     requestAnimationFrame(updateCaret);
 }
 update();
