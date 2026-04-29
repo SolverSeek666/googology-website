@@ -2273,25 +2273,6 @@ function format(text) {
   text = text.replaceAll("&#x003C;span class", "<span class");
   return text;
 }
-function format(text) {
-	text = text.replaceAll("&", "&#x0026;");
-	text = text.replaceAll("<", "&#x003C;");
-	// text = text.replaceAll(">", "&#x003E;");
-	text = text.replaceAll("\\", "&#x005C;");
-	text = text.replaceAll("\n", "<br>");
-	text = text.replaceAll("\\n", "<br>");
-	text = text.replaceAll("\\t", "&#x005C;t");
-    text = text.replaceAll("&#x003C;br>","<br>");
-    text = text.replaceAll("&#x003C;sup>","<sup>");
-    text = text.replaceAll("&#x003C;sub>","<sub>");
-    text = text.replaceAll("&#x003C;/sup>","</sup>");
-    text = text.replaceAll("&#x003C;/sub>","</sub>");
-    text = text.replaceAll("&#x003C;skip>","<skip>");
-    text = text.replaceAll("&#x003C;/skip>","</skip>");
-    text = text.replaceAll("&#x003C;p", "<p")
-    text = text.replaceAll("&#x003C;/p", "</p")
-	return text;
-}
 function updateCaret() {
     let current = document.querySelector(".current");
     caretX = current.offsetLeft;
