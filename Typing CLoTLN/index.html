@@ -2326,13 +2326,9 @@ onkeydown = e => {
     if (text[game.caret] == "<") {
         // shouldnttype = true;
         if (text.substr(game.caret).startsWith("<skip>") && !["Shift","<"].includes(e.key)) {
-			while (text.substring(game.caret,game.caret+7) != "</skip>") {
-            	game.caret++;
-            }
+			while (text.substring(game.caret,game.caret+7) != "</skip>") game.caret++;
             game.caret += 8;
-        	while (text[game.caret] == " ") {
-            	game.caret++;
-            }
+        	while (text[game.caret] == " ") game.caret++;
             game.hits++;
             update();
         }
@@ -2353,13 +2349,9 @@ onkeydown = e => {
             update();
         }
 		if (text.substring(game.caret, game.caret+3) == "<p " && !["Shift","<"].includes(e.key)) {
-        	while (text[game.caret] != ">") {
-            	game.caret++;
-            }
+        	while (text[game.caret] != ">") game.caret++;
             game.caret++;
-        	while (text[game.caret] == " ") {
-            	game.caret++;
-            }
+        	while (text[game.caret] == " ") game.caret++;
             game.hits++;
             update();
         }
@@ -2376,6 +2368,18 @@ onkeydown = e => {
             game.hits++;
             update();
         }
+			if (text.substring(game.caret, game.caret+7) == "</span>" && !["Shift","<"].includes(e.key)) {
+				game.caret += 8;
+				while (text[game.caret] != ">") game.caret++;
+				game.caret++;
+        while (text[game.caret] == " ") game.caret++;
+				if (text.substr(game.caret).startsWith("<skip>")) {
+					while (text.substring(game.caret,game.caret+7) != "</skip>") game.caret++;
+					game.caret += 8;
+        			while (text[game.caret] == " ") game.caret++;
+				}
+				game.hits++;
+			}
     }
     // if (shouldnttype) return false;
 	if (text[game.caret].replace("’","'").replace("s","h") == e.key.replace("s","h") || !typableStuff.includes(text[game.caret])) {
