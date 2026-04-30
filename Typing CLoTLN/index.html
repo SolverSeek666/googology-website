@@ -2326,7 +2326,6 @@ let caretDiv = document.createElement("div");
 caretDiv.style = "position: absolute; top: 0px; left: 0px; width: 2px; background: white; border-radius: 1px;";
 document.body.appendChild(caretDiv);
 function format(text) {
-  text = text.replaceAll("&", "&#x0026;");
   text = text.replaceAll("<", "&#x003C;");
   // text = text.replaceAll(">", "&#x003E;");
   text = text.replaceAll("\\", "&#x005C;");
@@ -2361,7 +2360,7 @@ function update() {
     let stuff = [thingR.indexOf(">"), thingR.indexOf("<")];
     let stuff2 = [-1,-1];
     let fixStuff = (stuff[0] == -1 ? Infinity : stuff[0]) > stuff[1];
-    let fixStuff2 = text[game.caret] == "<";
+    let fixStuff2 = ["<","&"].indexOf(text[game.caret])+1;
     let fixStuff3 = ["",""];
     let pendFixStuff3 = ["",""];
     let peakStuff = 0;
@@ -2377,7 +2376,7 @@ function update() {
             fixStuff3[1] += fixStuff4[1];
           }
     }
-    textField.innerHTML = `${fixStuff && stuff[1] != -1 ? (thingR[stuff[1]] = "&#x003C;", thingR.reverse().join("")) : text.substring(0,game.caret)}${fixStuff3[0]}<span class="untyped">${fixStuff3[1]}<span class="current">${fixStuff2 ? "" : format(text.substring(game.caret,game.caret+1))}</span>${format((fixStuff2 ? "<" : "") + text.substr(game.caret+1))}</span>`;
+    textField.innerHTML = `${fixStuff && stuff[1] != -1 ? (thingR[stuff[1]] = "&#x003C;", thingR.reverse().join("")) : text.substring(0,game.caret)}${fixStuff3[0]}<span class="untyped">${fixStuff3[1]}<span class="current">${fixStuff2 ? "" : format(text.substring(game.caret,game.caret+1))}</span>${format((["","<","&"][fixStuff2]) + text.substr(game.caret+1))}</span>`;
     requestAnimationFrame(updateCaret);
 }
 update();
@@ -2452,10 +2451,17 @@ onkeydown = e => {
         			while (text[game.caret] == " ") game.caret++;
 				}
 				game.hits++;
+				update();
 			}
     }
+		if (text[game.caret] == "&") {
+			if (text.substring(game.caret, game.caret+4) == "&gt;" && e.key == ">" || text.substring(game.caret, game.caret+4) == "&lt;" && e.key == "<") {
+				game.caret += 4;
+				update();
+			}
+		}
     // if (shouldnttype) return false;
-	if (text[game.caret].replace("’","'").replace("s","h") == e.key.replace("s","h") || !typableStuff.includes(text[game.caret])) {
+	if (text[game.caret].replace("’","'").replace("s","h").replace("S","H") == e.key.replace("s","h").replace("S","H") || !typableStuff.includes(text[game.caret])) {
 		game.caret++;
         game.hits++;
 		update();
