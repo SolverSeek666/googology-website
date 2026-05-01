@@ -1,0 +1,216 @@
+<html>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+<meta name="format-detection" content="telephone=no">
+<head>
+  <title>Seek's Array Notation</title>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    body {
+      font-family: "JetBrains Mono", monospace;
+      background-color: #434343;
+      color: #ffffff;
+    }
+    a {
+      color: #b4c8ff;
+      text-decoration: none;
+    }
+    .PrAN {
+      color: #ffc0c0;
+    }
+    .LAN {
+      color: #ffd0b0;
+    }
+    .exAN {
+      color: #fffccc;
+    }
+    .NAN {
+      color: #ddffcc;
+    }
+    .EAN {
+      color: #ccffee;
+    }
+    .NEAN {
+      color: #ccffff;
+    }
+    .mEAN {
+      color: #cceeff;
+    }
+    .unknown1 {
+      color: #ccddff;
+    }
+    .unknown2 {
+      color: #ccbbff;
+    }
+    .unknown3 {
+      color: #ddbbff;
+    }
+    .unknown4 {
+      color: #ffbbff;
+    }
+    .unknown5 {
+      color: #ffbbcc;
+    }
+    .unknown6 {
+      color: #ddbbbb;
+    }
+    .unknown7 {
+      color: #ccbbbb;
+    }
+    .unknown8 {
+      color: #bbbbbb;
+    }
+  </style>
+</head>
+<body>
+  <p style="font-size: 48px; text-align: center;"><b>Seek's Array Notation</b></p>
+  <p style="font-size: 36px; text-align: center;"><b>[SkAN]</b></p>
+  <p style="font-size: 24px; text-align: center;"><b><i>by Seek</i></b></p>
+  <h1>Information</h1>
+  I made it while I was at school lol
+  <h1>Notations</h1>
+  <span class=PrAN; text-align: center;">Primitive Array Notation [PrAN]</span><br>
+  <span class=LAN; text-align: center;">Linear Array Notation [LAN]</span><br>
+  <span class=exAN; text-align: center;">Extended Array Notation [exAN]</span><br>
+  <span class=NAN; text-align: center;">Nested Array Notation [NAN]</span><br>
+  <span class=EAN; text-align: center;">Expanding Array Notation [EAN]</span><br>
+  <p style="font-size: 40px; text-align: center;">Primitive Array Notation</p>
+  <p style="font-size: 24px; text-align: center;">[PrAN]</p>
+  <p style="font-size: 24px; text-align: center;">Limit: \(f_{\omega+1}\left( n \right)\)</p>
+  <h1>Definitions</h1>
+  let A be any array<br>
+  R1: Sk<sub>a,b</sub>(0) = ab<br>
+  R2: Sk<sub>a,1</sub>(A) = a<br>
+  R3: Sk<sub>a,b</sub>(c) = Sk<sub>a,Sk<sub>a,b-1</sub>(c)</sub>(c-1)<br>
+  <h1>Examples</h1>
+  <b>Example 1:</b>
+  Sk<sub>3,3</sub>(0) = 9<br>
+  <b>Example 2:</b>
+  Sk<sub>3,3</sub>(1) =<br>
+  Sk<sub>3,Sk<sub>3,2</sub>(1)</sub>(0) =<br>
+  Sk<sub>3,Sk<sub>3,Sk<sub>3,1</sub>(1)</sub>(0)</sub>(0) =<br>
+  Sk<sub>3,Sk<sub>3,3</sub>(0)</sub>(0) =<br>
+  Sk<sub>3,9</sub>(0) = 27<br>
+  <b>Example 3:</b>
+  Sk<sub>3,3</sub>(2) =<br>
+  Sk<sub>3,Sk<sub>3,2</sub>(2)</sub>(1) =<br>
+  Sk<sub>3,Sk<sub>3,Sk<sub>3,1</sub>(2)</sub>(1)</sub>(1) =<br>
+  Sk<sub>3,Sk<sub>3,3</sub>(1)</sub>(1) =<br>
+  Sk<sub>3,27</sub>(1) = 3<sup>27</sup><br>
+  <p style="font-size: 40px; text-align: center;">Linear Array Notation</p>
+  <p style="font-size: 24px; text-align: center;">[LAN]</p>
+  <p style="font-size: 24px; text-align: center;">Limit: \(f_{\omega^\omega}\left( n \right)\)</p>
+  <h1>Definitions</h1>
+  let A be any array<br>
+  R1: Sk<sub>a,b</sub>(0) = ab<br>
+  R2: Sk<sub>a,1</sub>(A) = a<br>
+  R3: Sk<sub>a,b</sub>(A,0) = Sk<sub>a,b</sub>(A)<br>
+  R4: Sk<sub>a,b</sub>(c) = Sk<sub>a,Sk<sub>a,b-1</sub>(c)</sub>(c-1)<br>
+  <br>
+  if the number of the first 3 rule applies, find the first number in the array and start the process below.<br>
+  <br>
+  C1: if the number > 0, repeat after R4. the process ends.<br>
+  C2: if the number = 0, move to the next number and do the process below.<br>
+  &Tab;C2.1: if the number > 0, decrease the number by 1, then change the previous number to iterator, replace the iterator to base. the process ends.<br>
+  &Tab;C2.2: if the number = 0, repeat after C2.<br>
+  <h1>Examples</h1>
+  <b>Example 1:</b>
+  not now.
+  <p style="font-size: 40px; text-align: center;">Extended Array Notation</p>
+  <p style="font-size: 24px; text-align: center;">[exAN]</p>
+  <p style="font-size: 24px; text-align: center;">Limit: \(f_{\omega^\omega+1}\left( n \right)\)</p>
+  <h1>Definitions</h1>
+  let A be any array<br>
+  R1: Sk<sub>a,b</sub>(0) = ab<br>
+  R2: Sk<sub>a,1</sub>(A) = a<br>
+  R3: Sk<sub>a,b</sub>(A Sep 0) = Sk<sub>a,b</sub>(A Sep 0)<br>
+  R4: Sk<sub>a,b</sub>(c Sep A) = Sk<sub>a,Sk<sub>a,b-1</sub>(c Sep A)</sub>(c-1 Sep A)<br>
+  <br>
+  if the number of the first 3 rule applies, find the first number in the array and start the process below.<br>
+  <br>
+  C1: if the number > 0, repeat after R4. the process ends.<br>
+  C2: if the number = 0, look at the separator after the number.<br>
+  &Tab;C2.1: if the separator is the form {n}, do the process below.<br>
+  &Tab;&Tab;C2.1.1: if n > 1, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
+  &Tab;&Tab;C2.1.2: if n = 1, change the separator into ",". the process ends.<br>
+  &Tab;C2.2: otherwise, move on to the next number, and do the process below.<br>
+  &Tab;&Tab;C2.2.1: if the number > 0, decrease the number by 1, then change the previous number to iterator, replace the iterator to base. the process ends.<br>
+  &Tab;&Tab;C2.2.2: if the number = 0, repeat after C2.<br>
+  <h1>Examples</h1>
+  <b>Example 1:</b>
+  not now.
+  <p style="font-size: 40px; text-align: center;">Nested Array Notation</p>
+  <p style="font-size: 24px; text-align: center;">[NAN]</p>
+  <p style="font-size: 24px; text-align: center;">Limit: \(f_{\varepsilon_0}\left( n \right)\)</p>
+  <h1>Definitions</h1>
+  let A be any array<br>
+  let Sep be any separator<br>
+  R1: Sk<sub>a,b</sub>(0) = ab<br>
+  R2: Sk<sub>a,1</sub>(A) = a<br>
+  R3: Sk<sub>a,b</sub>(A Sep 0) = Sk<sub>a,b</sub>(A Sep 0)<br>
+  R4: Sk<sub>a,b</sub>(c Sep A) = Sk<sub>a,Sk<sub>a,b-1</sub>(c Sep A)</sub>(c-1 Sep A)<br>
+  <br>
+  if the number of the first 3 rule applies, find the first number in the array and start the process below.<br>
+  <br>
+  C1: if the number > 0, repeat after R4. the process ends.<br>
+  C2: if the number = 0, look at the separator after the number.<br>
+  &Tab;C2.1: if the separator is the form {n Sep A}, do the process below.<br>
+  &Tab;&Tab;C2.1.1: if A > 0, do the process below.<br>
+  &Tab;&Tab;&Tab;C2.1.1.1: if n > 0, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
+  &Tab;&Tab;&Tab;C2.1.1.2: if n = 0, focus on the array in the separator, repeat after C2.<br>
+  &Tab;&Tab;C2.1.2: if A = 0, do the process below.<br>
+  &Tab;&Tab;&Tab;C2.1.2.1: if n > 1, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
+  &Tab;&Tab;&Tab;C2.1.2.2: if n = 1, change the separator into ",". the process ends.<br>
+  &Tab;C2.2: otherwise, move on to the next number, and do the process below.<br>
+  &Tab;&Tab;C2.2.1: if the number > 0, decrease the number by 1, then change the previous number to iterator, replace the iterator to base. the process ends.<br>
+  &Tab;&Tab;C2.2.2: if the number = 0, repeat after C2.<br>
+  <h1>Examples</h1>
+  <b>Example 1:</b>
+  not now.
+  <p style="font-size: 40px; text-align: center;">Expanding Array Notation</p>
+  <p style="font-size: 24px; text-align: center;">[EAN]</p>
+  <p style="font-size: 24px; text-align: center;">Limit: \(f_{\varphi\left( \omega,0 \right)}\left( n \right)\)</p>
+  <h1>Definitions</h1>
+  let A be any array<br>
+  let Sep be any separator<br>
+  R1: Sk<sub>a,b</sub>(0) = ab<br>
+  R2: Sk<sub>a,1</sub>(A) = a<br>
+  R3: Sk<sub>a,b</sub>(A Sep 0) = Sk<sub>a,b</sub>(A Sep 0)<br>
+  R4: Sk<sub>a,b</sub>(c Sep A) = Sk<sub>a,Sk<sub>a,b-1</sub>(c Sep A)</sub>(c-1 Sep A)<br>
+  <br>
+  if the number of the first 3 rule applies, find the first number in the array and start the process below.<br>
+  <br>
+  C1: if the number > 0, repeat after R4. the process ends.<br>
+  C2: if the number = 0, look at the separator after the number.<br>
+  &Tab;C2.1: if the separator is the form {n Sep A}, do the process below.<br>
+  &Tab;&Tab;C2.1.1: if A > 0, do the process below.<br>
+  &Tab;&Tab;&Tab;C2.1.1.1: if n > 0, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
+  &Tab;&Tab;&Tab;C2.1.1.2: if n = 0, do the process below.<br>
+  &Tab;&Tab;&Tab;&Tab;C2.1.1.2.1: if Sep is the form ",,", decrease the first number of A by 1, then copy the separator and the numbers next to it,<br>
+  &Tab;&Tab;&Tab;&Tab;            then paste it on n and repeat it iterator times, replace the iterator to base. the process ends.<br>
+  &Tab;&Tab;&Tab;&Tab;C2.1.1.2.2: otherwise, focus on the array in the separator, repeat after C2.<br>
+  &Tab;&Tab;C2.1.2: if A = 0, do the process below.<br>
+  &Tab;&Tab;&Tab;C2.1.2.1: if n > 1, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
+  &Tab;&Tab;&Tab;C2.1.2.2: if n = 1, change the separator into ",". the process ends.<br>
+  &Tab;C2.2: otherwise, move on to the next number, and do the process below.<br>
+  &Tab;&Tab;C2.2.1: if the number > 0, decrease the number by 1, then change the previous number to iterator, replace the iterator to base. the process ends.<br>
+  &Tab;&Tab;C2.2.2: if the number = 0, repeat after C2.<br>
+  <h1>Examples</h1>
+  <b>Example 1:</b>
+  not now.
+  <p style="font-size: 40px; text-align: center;">SkAN Numbers</p>
+  <p style="font-size: 24px; text-align: center;">by Seek</p>
+  please wait 0w0<br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+</body>
+</html>
