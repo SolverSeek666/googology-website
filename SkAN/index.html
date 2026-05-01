@@ -110,8 +110,8 @@
   <br>
   C1: if the number > 0, repeat after R4. the process ends.<br>
   C2: if the number = 0, move to the next number and do the process below.<br>
-  &ensp;C2.1: if the number > 0, decrease the number by 1, then change the previous number to iterator, replace the iterator to base. the process ends.<br>
-  &ensp;C2.2: if the number = 0, repeat after C2.<br>
+  C2.1: if the number > 0, decrease the number by 1, then change the previous number to iterator, replace the iterator to base. the process ends.<br>
+  C2.2: if the number = 0, repeat after C2.<br>
   <h1>Examples</h1>
   <b>Example 1:</b><br>
   not now.
@@ -129,12 +129,12 @@
   <br>
   C1: if the number > 0, repeat after R4. the process ends.<br>
   C2: if the number = 0, look at the separator after the number.<br>
-  &ensp;C2.1: if the separator is the form {n}, do the process below.<br>
-  &ensp;&ensp;C2.1.1: if n > 1, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
-  &ensp;&ensp;C2.1.2: if n = 1, change the separator into ",". the process ends.<br>
-  &ensp;C2.2: otherwise, move on to the next number, and do the process below.<br>
-  &ensp;&ensp;C2.2.1: if the number > 0, decrease the number by 1, then change the previous number to iterator, replace the iterator to base. the process ends.<br>
-  &ensp;&ensp;C2.2.2: if the number = 0, repeat after C2.<br>
+  C2.1: if the separator is the form {n}, do the process below.<br>
+  C2.1.1: if n > 1, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
+  C2.1.2: if n = 1, change the separator into ",". the process ends.<br>
+  C2.2: otherwise, move on to the next number, and do the process below.<br>
+  C2.2.1: if the number > 0, decrease the number by 1, then change the previous number to iterator, replace the iterator to base. the process ends.<br>
+  C2.2.2: if the number = 0, repeat after C2.<br>
   <h1>Examples</h1>
   <b>Example 1:</b><br>
   not now.
@@ -153,16 +153,16 @@
   <br>
   C1: if the number > 0, repeat after R4. the process ends.<br>
   C2: if the number = 0, look at the separator after the number.<br>
-  &ensp;C2.1: if the separator is the form {n Sep A}, do the process below.<br>
-  &ensp;&ensp;C2.1.1: if A > 0, do the process below.<br>
-  &ensp;&ensp;&ensp;C2.1.1.1: if n > 0, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
-  &ensp;&ensp;&ensp;C2.1.1.2: if n = 0, focus on the array in the separator, repeat after C2.<br>
-  &ensp;&ensp;C2.1.2: if A = 0, do the process below.<br>
-  &ensp;&ensp;&ensp;C2.1.2.1: if n > 1, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
-  &ensp;&ensp;&ensp;C2.1.2.2: if n = 1, change the separator into ",". the process ends.<br>
-  &ensp;C2.2: otherwise, move on to the next number, and do the process below.<br>
-  &ensp;&ensp;C2.2.1: if the number > 0, decrease the number by 1, then change the previous number to iterator, replace the iterator to base. the process ends.<br>
-  &ensp;&ensp;C2.2.2: if the number = 0, repeat after C2.<br>
+  C2.1: if the separator is the form {n Sep A}, do the process below.<br>
+  C2.1.1: if A > 0, do the process below.<br>
+  C2.1.1.1: if n > 0, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
+  C2.1.1.2: if n = 0, focus on the array in the separator, repeat after C2.<br>
+  C2.1.2: if A = 0, do the process below.<br>
+  C2.1.2.1: if n > 1, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
+  C2.1.2.2: if n = 1, change the separator into ",". the process ends.<br>
+  C2.2: otherwise, move on to the next number, and do the process below.<br>
+  C2.2.1: if the number > 0, decrease the number by 1, then change the previous number to iterator, replace the iterator to base. the process ends.<br>
+  C2.2.2: if the number = 0, repeat after C2.<br>
   <h1>Examples</h1>
   <b>Example 1:</b><br>
   not now.
@@ -181,19 +181,19 @@
   <br>
   C1: if the number > 0, repeat after R4. the process ends.<br>
   C2: if the number = 0, look at the separator after the number.<br>
-  &ensp;C2.1: if the separator is the form {n Sep A}, do the process below.<br>
-  &ensp;&ensp;C2.1.1: if A > 0, do the process below.<br>
-  &ensp;&ensp;&ensp;C2.1.1.1: if n > 0, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
-  &ensp;&ensp;&ensp;C2.1.1.2: if n = 0, do the process below.<br>
-  &ensp;&ensp;&ensp;&ensp;C2.1.1.2.1: if Sep is the form ",,", decrease the first number of A by 1, then copy the separator and the numbers next to it,<br>
-  &ensp;&ensp;&ensp;&ensp;            then paste it on n and repeat it iterator times, replace the iterator to base. the process ends.<br>
-  &ensp;&ensp;&ensp;&ensp;C2.1.1.2.2: otherwise, focus on the array in the separator, repeat after C2.<br>
-  &ensp;&ensp;C2.1.2: if A = 0, do the process below.<br>
-  &ensp;&ensp;&ensp;C2.1.2.1: if n > 1, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
-  &ensp;&ensp;&ensp;C2.1.2.2: if n = 1, change the separator into ",". the process ends.<br>
-  &ensp;C2.2: otherwise, move on to the next number, and do the process below.<br>
-  &ensp;&ensp;C2.2.1: if the number > 0, decrease the number by 1, then change the previous number to iterator, replace the iterator to base. the process ends.<br>
-  &ensp;&ensp;C2.2.2: if the number = 0, repeat after C2.<br>
+  C2.1: if the separator is the form {n Sep A}, do the process below.<br>
+  C2.1.1: if A > 0, do the process below.<br>
+  C2.1.1.1: if n > 0, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
+  C2.1.1.2: if n = 0, do the process below.<br>
+  C2.1.1.2.1: if Sep is the form ",,", decrease the first number of A by 1, then copy the separator and the numbers next to it,<br>
+  &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;then paste it on n and repeat it iterator times, replace the iterator to base. the process ends.<br>
+  C2.1.1.2.2: otherwise, focus on the array in the separator, repeat after C2.<br>
+  C2.1.2: if A = 0, do the process below.<br>
+  C2.1.2.1: if n > 1, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
+  C2.1.2.2: if n = 1, change the separator into ",". the process ends.<br>
+  C2.2: otherwise, move on to the next number, and do the process below.<br>
+  C2.2.1: if the number > 0, decrease the number by 1, then change the previous number to iterator, replace the iterator to base. the process ends.<br>
+  C2.2.2: if the number = 0, repeat after C2.<br>
   <h1>Examples</h1>
   <b>Example 1:</b><br>
   not now.
