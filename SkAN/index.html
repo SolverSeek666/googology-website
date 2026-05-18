@@ -107,14 +107,18 @@
   R1: Sk<sub>a,b</sub>(0) = ab<br>
   R2: Sk<sub>a,1</sub>(A) = a<br>
   R3: Sk<sub>a,b</sub>(A,0) = Sk<sub>a,b</sub>(A)<br>
-  R4: Sk<sub>a,b</sub>(c) = Sk<sub>a,Sk<sub>a,b-1</sub>(c)</sub>(c-1)<br>
+  R4: Sk<sub>a,b</sub>(c,A) = Sk<sub>a,Sk<sub>a,b-1</sub>(c,A)</sub>(c-1,A)<br>
   <br>
-  if the number of the first 3 rule applies, find the first number in the array and start the process below.<br>
+  If none of the first 3 rules above applies, start from the 1st entry in the array and start the process below.<br>
   <br>
-  C1: if the number > 0, repeat after R4. the process ends.<br>
-  C2: if the number = 0, move to the next number and do the process below.<br>
-  &nbsp;C2.1: if the number > 0, decrease the number by 1, then change the previous number to iterator, replace the iterator to base. the process ends.<br>
-  &nbsp;C2.2: if the number = 0, repeat after C2.<br>
+  C1: if the entry > 0, repeat after R4.<br>
+  C2: if the entry = 0, then jump to the next entry.<br>
+  &nbsp;C2.1: if the entry > 0, then<br>
+  &nbsp;&nbsp;1. Decrease the number by 1.<br>
+  &nbsp;&nbsp;2. Change the previous number to iterator.<br>
+  &nbsp;&nbsp;3. Replace the iterator to base.<br>
+  &nbsp;&nbsp;4. The process ends.<br>
+  &nbsp;C2.2: if the entry = 0, repeat after C2.<br>
   <h1>Examples</h1>
   <b>Example 1:</b><br>
   not now.
@@ -128,15 +132,24 @@
   R3: Sk<sub>a,b</sub>(A Sep 0) = Sk<sub>a,b</sub>(A Sep 0)<br>
   R4: Sk<sub>a,b</sub>(c Sep A) = Sk<sub>a,Sk<sub>a,b-1</sub>(c Sep A)</sub>(c-1 Sep A)<br>
   <br>
-  if the number of the first 3 rule applies, find the first number in the array and start the process below.<br>
+  If none of the first 3 rules above applies, start from the 1st number in the array and start the process below.<br>
   <br>
-  C1: if the number > 0, repeat after R4. the process ends.<br>
+  C1: if the number > 0, repeat after R4.<br>
   C2: if the number = 0, look at the separator after the number.<br>
   &nbsp;C2.1: if the separator is the form {n}, do the process below.<br>
-  &nbsp;&nbsp;C2.1.1: if n > 1, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
-  &nbsp;&nbsp;C2.1.2: if n = 1, change the separator into ",". the process ends.<br>
-  &nbsp;C2.2: otherwise, move on to the next number, and do the process below.<br>
-  &nbsp;&nbsp;C2.2.1: if the number > 0, decrease the number by 1, then change the previous number to iterator, replace the iterator to base. the process ends.<br>
+  &nbsp;&nbsp;C2.1.1: if n > 1, then<br>
+  &nbsp;&nbsp;&nbsp;1. Decrease n by 1.<br>
+  &nbsp;&nbsp;&nbsp;2. Add ",0" in front of the separator.<br>
+  &nbsp;&nbsp;&nbsp;3. The process ends.<br>
+  &nbsp;&nbsp;C2.1.2: if n = 1, then<br>
+  &nbsp;&nbsp;&nbsp;1. Change the separator into ",".<br>
+  &nbsp;&nbsp;&nbsp;2. The process ends.<br>
+  &nbsp;C2.2: otherwise, move on to the next number.<br>
+  &nbsp;&nbsp;C2.2.1: if the entry > 0, then<br>
+  &nbsp;&nbsp;&nbsp;1. Decrease the number by 1.<br>
+  &nbsp;&nbsp;&nbsp;2. Change the previous number to iterator.<br>
+  &nbsp;&nbsp;&nbsp;3. Replace the iterator to base.<br>
+  &nbsp;&nbsp;&nbsp;4. The process ends.<br>
   &nbsp;&nbsp;C2.2.2: if the number = 0, repeat after C2.<br>
   <h1>Examples</h1>
   <b>Example 1:</b><br>
@@ -152,19 +165,31 @@
   R3: Sk<sub>a,b</sub>(A Sep 0) = Sk<sub>a,b</sub>(A Sep 0)<br>
   R4: Sk<sub>a,b</sub>(c Sep A) = Sk<sub>a,Sk<sub>a,b-1</sub>(c Sep A)</sub>(c-1 Sep A)<br>
   <br>
-  if the number of the first 3 rule applies, find the first number in the array and start the process below.<br>
+  If none of the first 3 rules above applies, start from the 1st number in the array and start the process below.<br>
   <br>
-  C1: if the number > 0, repeat after R4. the process ends.<br>
+  C1: if the number > 0, repeat after R4.<br>
   C2: if the number = 0, look at the separator after the number.<br>
   &nbsp;C2.1: if the separator is the form {n Sep A}, do the process below.<br>
   &nbsp;&nbsp;C2.1.1: if A > 0, do the process below.<br>
-  &nbsp;&nbsp;&nbsp;C2.1.1.1: if n > 0, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
-  &nbsp;&nbsp;&nbsp;C2.1.1.2: if n = 0, focus on the array in the separator, repeat after C2.<br>
+  &nbsp;&nbsp;&nbsp;C2.1.1.1: if n > 0, then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;1. Decrease n by 1.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;2. Add ",0" in front of the separator.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;3. The process ends.<br>
+  &nbsp;&nbsp;&nbsp;C2.1.1.2: if n = 0, focus on A in the separator and repeat after C2.<br>
   &nbsp;&nbsp;C2.1.2: if A = 0, do the process below.<br>
-  &nbsp;&nbsp;&nbsp;C2.1.2.1: if n > 1, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
-  &nbsp;&nbsp;&nbsp;C2.1.2.2: if n = 1, change the separator into ",". the process ends.<br>
-  &nbsp;C2.2: otherwise, move on to the next number, and do the process below.<br>
-  &nbsp;&nbsp;C2.2.1: if the number > 0, decrease the number by 1, then change the previous number to iterator, replace the iterator to base. the process ends.<br>
+  &nbsp;&nbsp;&nbsp;C2.1.2.1: if n > 1, then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;1. Decrease n by 1.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;2. Add ",0" in front of the separator.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;3. The process ends.<br>
+  &nbsp;&nbsp;&nbsp;C2.1.2.2: if n = 1, then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;1. Change the separator into ",".<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;2. The process ends.<br>
+  &nbsp;C2.2: otherwise, move on to the next number.<br>
+  &nbsp;&nbsp;C2.2.1: if the number > 0, then<br>
+  &nbsp;&nbsp;&nbsp;1. Decrease the number by 1.<br>
+  &nbsp;&nbsp;&nbsp;2. Change the previous number to iterator.<br>
+  &nbsp;&nbsp;&nbsp;3. Replace the iterator to base.<br>
+  &nbsp;&nbsp;&nbsp;4. The process ends.<br>
   &nbsp;&nbsp;C2.2.2: if the number = 0, repeat after C2.<br>
   <h1>Examples</h1>
   <b>Example 1:</b><br>
@@ -180,22 +205,38 @@
   R3: Sk<sub>a,b</sub>(A Sep 0) = Sk<sub>a,b</sub>(A Sep 0)<br>
   R4: Sk<sub>a,b</sub>(c Sep A) = Sk<sub>a,Sk<sub>a,b-1</sub>(c Sep A)</sub>(c-1 Sep A)<br>
   <br>
-  if the number of the first 3 rule applies, find the first number in the array and start the process below.<br>
+  If none of the first 3 rules above applies, start from the 1st number in the array and start the process below.<br>
   <br>
-  C1: if the number > 0, repeat after R4. the process ends.<br>
+  C1: if the number > 0, repeat after R4.<br>
   C2: if the number = 0, look at the separator after the number.<br>
   &nbsp;C2.1: if the separator is the form {n Sep A}, do the process below.<br>
   &nbsp;&nbsp;C2.1.1: if A > 0, do the process below.<br>
-  &nbsp;&nbsp;&nbsp;C2.1.1.1: if n > 0, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
+  &nbsp;&nbsp;&nbsp;C2.1.1.1: if n > 0, then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;1. Decrease n by 1.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;2. Add ",0" in front of the separator.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;3. The process ends.<br>
   &nbsp;&nbsp;&nbsp;C2.1.1.2: if n = 0, do the process below.<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.1: if Sep is the form ",,", decrease the first number of A by 1, then copy the separator and the numbers next to it,<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;then paste it on n and repeat it iterator times, replace the iterator to base. the process ends.<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.2: otherwise, focus on the array in the separator, repeat after C2.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.1: if Sep is the form ",,", then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. decrease the first number of A by 1.
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. Copy the separator and the numbers next to it.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. then paste it on n and repeat it iterator times.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4. replace the iterator to base.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5. the process ends.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.2: otherwise, focus on A in the separator and repeat after C2.<br>
   &nbsp;&nbsp;C2.1.2: if A = 0, do the process below.<br>
-  &nbsp;&nbsp;&nbsp;C2.1.2.1: if n > 1, decrease n by 1, and add ",0" in front of the separator. the process ends.<br>
-  &nbsp;&nbsp;&nbsp;C2.1.2.2: if n = 1, change the separator into ",". the process ends.<br>
+  &nbsp;&nbsp;&nbsp;C2.1.2.1: if n > 1, then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;1. Decrease n by 1.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;2. Add ",0" in front of the separator.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;3. The process ends.<br>
+  &nbsp;&nbsp;&nbsp;C2.1.2.2: if n = 1, then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;1. Change the separator into ",".<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;2. The process ends.<br>
   &nbsp;C2.2: otherwise, move on to the next number, and do the process below.<br>
-  &nbsp;&nbsp;C2.2.1: if the number > 0, decrease the number by 1, then change the previous number to iterator, replace the iterator to base. the process ends.<br>
+  &nbsp;&nbsp;C2.2.1: if the number > 0, then<br>
+  &nbsp;&nbsp;&nbsp;1. Decrease the number by 1.<br>
+  &nbsp;&nbsp;&nbsp;2. Change the previous number to iterator.<br>
+  &nbsp;&nbsp;&nbsp;3. Replace the iterator to base.<br>
+  &nbsp;&nbsp;&nbsp;4. The process ends.<br>
   &nbsp;&nbsp;C2.2.2: if the number = 0, repeat after C2.<br>
   <h1>Examples</h1>
   <b>Example 1:</b><br>
