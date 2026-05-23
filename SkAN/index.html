@@ -127,10 +127,11 @@
   <p style="font-size: 24px; text-align: center;">Limit: \(f_{\omega^\omega+1}\left( n \right)\)</p>
   <h1>Definitions</h1>
   let A be any array<br>
+  let # be any separator<br>
   R1: Sk<sub>a,b</sub>(0) = ab<br>
   R2: Sk<sub>a,1</sub>(A) = a<br>
-  R3: Sk<sub>a,b</sub>(A Sep 0) = Sk<sub>a,b</sub>(A Sep 0)<br>
-  R4: Sk<sub>a,b</sub>(c Sep A) = Sk<sub>a,Sk<sub>a,b-1</sub>(c Sep A)</sub>(c-1 Sep A)<br>
+  R3: Sk<sub>a,b</sub>(A#0) = Sk<sub>a,b</sub>(A#0)<br>
+  R4: Sk<sub>a,b</sub>(c#A) = Sk<sub>a,Sk<sub>a,b-1</sub>(c#A)</sub>(c-1#A)<br>
   <br>
   If none of the first 3 rules above applies, start from the 1st number in the array and start the process below.<br>
   <br>
@@ -159,11 +160,11 @@
   <p style="font-size: 24px; text-align: center;">Limit: \(f_{\varepsilon_0}\left( n \right)\)</p>
   <h1>Definitions</h1>
   let A be any array<br>
-  let Sep be any separator<br>
+  let # be any separator<br>
   R1: Sk<sub>a,b</sub>(0) = ab<br>
   R2: Sk<sub>a,1</sub>(A) = a<br>
-  R3: Sk<sub>a,b</sub>(A Sep 0) = Sk<sub>a,b</sub>(A Sep 0)<br>
-  R4: Sk<sub>a,b</sub>(c Sep A) = Sk<sub>a,Sk<sub>a,b-1</sub>(c Sep A)</sub>(c-1 Sep A)<br>
+  R3: Sk<sub>a,b</sub>(A#0) = Sk<sub>a,b</sub>(A#0)<br>
+  R4: Sk<sub>a,b</sub>(c#A) = Sk<sub>a,Sk<sub>a,b-1</sub>(c#A)</sub>(c-1#A)<br>
   <br>
   If none of the first 3 rules above applies, start from the 1st number in the array and start the process below.<br>
   <br>
@@ -199,29 +200,29 @@
   <p style="font-size: 24px; text-align: center;">Limit: \(f_{\varphi\left( \omega,0 \right)}\left( n \right)\)</p>
   <h1>Definitions</h1>
   let A be any array<br>
-  let Sep be any separator<br>
+  let # be any separator<br>
+  D1: Lv({A}) = ,<br>
   R1: Sk<sub>a,b</sub>(0) = ab<br>
   R2: Sk<sub>a,1</sub>(A) = a<br>
-  R3: Sk<sub>a,b</sub>(A Sep 0) = Sk<sub>a,b</sub>(A Sep 0)<br>
-  R4: Sk<sub>a,b</sub>(c Sep A) = Sk<sub>a,Sk<sub>a,b-1</sub>(c Sep A)</sub>(c-1 Sep A)<br>
+  R3: Sk<sub>a,b</sub>(A#0) = Sk<sub>a,b</sub>(A#0)<br>
+  R4: Sk<sub>a,b</sub>(c#A) = Sk<sub>a,Sk<sub>a,b-1</sub>(c#A)</sub>(c-1#A)<br>
   <br>
   If none of the first 3 rules above applies, start from the 1st number in the array and start the process below.<br>
   <br>
   C1: if the number > 0, repeat after R4.<br>
   C2: if the number = 0, look at the separator after the number.<br>
-  &nbsp;C2.1: if the separator is the form {n Sep A}, do the process below.<br>
+  &nbsp;C2.1: if the separator is the form {n#A}, do the process below.<br>
   &nbsp;&nbsp;C2.1.1: if A > 0, do the process below.<br>
   &nbsp;&nbsp;&nbsp;C2.1.1.1: if n > 0, then<br>
   &nbsp;&nbsp;&nbsp;&nbsp;1. Decrease n by 1.<br>
   &nbsp;&nbsp;&nbsp;&nbsp;2. Add ",0" in front of the separator.<br>
   &nbsp;&nbsp;&nbsp;&nbsp;3. The process ends.<br>
   &nbsp;&nbsp;&nbsp;C2.1.1.2: if n = 0, do the process below.<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.1: if Sep is the form ",,", then<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. decrease the first number of A by 1.<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. Copy the separator and the numbers next to it.<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. then paste it on n and repeat it iterator times.<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4. replace the iterator to base.<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5. the process ends.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.1: if # > Lv(separator), then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. Decrease the first number of A by 1.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. Iterate the separator in "n" with iterator times.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. Replace the iterator to base.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4. The process ends.<br>
   &nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.2: otherwise, focus on A in the separator and repeat after C2.<br>
   &nbsp;&nbsp;C2.1.2: if A = 0, do the process below.<br>
   &nbsp;&nbsp;&nbsp;C2.1.2.1: if n > 1, then<br>
@@ -241,7 +242,162 @@
   <h1>Examples</h1>
   <b>Example 1:</b><br>
   not now.
-  <p style="font-size: 40px; text-align: center;">The End</p>
+  <p style="font-size: 40px; text-align: center;">Extended Expanding Array Notation</p>
+  <p style="font-size: 24px; text-align: center;">[exEAN]</p>
+  <p style="font-size: 24px; text-align: center;">Limit: \(f_{\psi\left(\varepsilon_{\Omega+1} \right)}\left( n \right)\)</p>
+  <h1>Definitions</h1>
+  let A be any array<br>
+  let # be any separator<br>
+  let @ be regular separator<br>
+  regular separators are commas such as ",", and ",,".
+  D1: {A<sup>,</sup>} = {A}
+  D2: Lv({A<sup>@</sup>}) = @<br>
+  R1: Sk<sub>a,b</sub>(0) = ab<br>
+  R2: Sk<sub>a,1</sub>(A) = a<br>
+  R3: Sk<sub>a,b</sub>(A#0) = Sk<sub>a,b</sub>(A#0)<br>
+  R4: Sk<sub>a,b</sub>(c#A) = Sk<sub>a,Sk<sub>a,b-1</sub>(c#A)</sub>(c-1#A)<br>
+  <br>
+  If none of the first 3 rules above applies, start from the 1st number in the array and start the process below.<br>
+  <br>
+  C1: if the number > 0, repeat after R4.<br>
+  C2: if the number = 0, look at the separator after the number.<br>
+  &nbsp;C2.1: if the separator is the form {n#A<sup>@</sup>}, do the process below.<br>
+  &nbsp;&nbsp;C2.1.1: if A > 0, do the process below.<br>
+  &nbsp;&nbsp;&nbsp;C2.1.1.1: if n > 0, then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;1. Decrease n by 1.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;2. Add "@0" in front of the separator.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;3. The process ends.<br>
+  &nbsp;&nbsp;&nbsp;C2.1.1.2: if n = 0, do the process below.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.1: if Lv(#) > Lv(separator), then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. Decrease the first number of A by 1.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. Iterate the separator in "n" with iterator times.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. Replace the iterator to base.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4. The process ends.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.2: otherwise, focus on A in the separator and repeat after C2.<br>
+  &nbsp;&nbsp;C2.1.2: if A = 0, do the process below.<br>
+  &nbsp;&nbsp;&nbsp;C2.1.2.1: if n > 1, then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;1. Decrease n by 1.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;2. Add "@0" in front of the separator.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;3. The process ends.<br>
+  &nbsp;&nbsp;&nbsp;C2.1.2.2: if n = 1, then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;1. Change the separator into "@".<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;2. The process ends.<br>
+  &nbsp;C2.2: otherwise, move on to the next number, and do the process below.<br>
+  &nbsp;&nbsp;C2.2.1: if the number > 0, then<br>
+  &nbsp;&nbsp;&nbsp;1. Decrease the number by 1.<br>
+  &nbsp;&nbsp;&nbsp;2. Change the previous number to iterator.<br>
+  &nbsp;&nbsp;&nbsp;3. Replace the iterator to base.<br>
+  &nbsp;&nbsp;&nbsp;4. The process ends.<br>
+  &nbsp;&nbsp;C2.2.2: if the number = 0, repeat after C2.<br>
+  <h1>Examples</h1>
+  <b>Example 1:</b><br>
+  not now.
+  <p style="font-size: 40px; text-align: center;">Multi-expanding Array Notation</p>
+  <p style="font-size: 24px; text-align: center;">[mEAN]</p>
+  <p style="font-size: 24px; text-align: center;">Limit: \(f_{\psi\left(\Omega_{\omega} \right)}\left( n \right)\)</p>
+  <h1>Definitions</h1>
+  let A be any array<br>
+  let # be any separator<br>
+  let @ be regular separator<br>
+  regular separators are commas such as ",", and ",," etc.
+  D1: {A<sup>,</sup>} = {A}
+  D2: Lv({A<sup>@</sup>}) = @<br>
+  R1: Sk<sub>a,b</sub>(0) = ab<br>
+  R2: Sk<sub>a,1</sub>(A) = a<br>
+  R3: Sk<sub>a,b</sub>(A#0) = Sk<sub>a,b</sub>(A#0)<br>
+  R4: Sk<sub>a,b</sub>(c#A) = Sk<sub>a,Sk<sub>a,b-1</sub>(c#A)</sub>(c-1#A)<br>
+  <br>
+  If none of the first 3 rules above applies, start from the 1st number in the array and start the process below.<br>
+  <br>
+  C1: if the number > 0, repeat after R4.<br>
+  C2: if the number = 0, look at the separator after the number.<br>
+  &nbsp;C2.1: if the separator is the form {n#A<sup>@</sup>}, do the process below.<br>
+  &nbsp;&nbsp;C2.1.1: if A > 0, do the process below.<br>
+  &nbsp;&nbsp;&nbsp;C2.1.1.1: if n > 0, then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;1. Decrease n by 1.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;2. Add "@0" in front of the separator.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;3. The process ends.<br>
+  &nbsp;&nbsp;&nbsp;C2.1.1.2: if n = 0, do the process below.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.1: if Lv(#) > Lv(separator) and a > 0, then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. Decrease the first number of A by 1.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. Iterate the separator in "n" with iterator times.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. Change the iterated separator into separators that satisfies Lv(new separator) = Lv(old separator),<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4. Replace the iterator to base.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5. The process ends.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.2: otherwise, focus on A in the separator and repeat after C2.<br>
+  &nbsp;&nbsp;C2.1.2: if A = 0, do the process below.<br>
+  &nbsp;&nbsp;&nbsp;C2.1.2.1: if n > 1, then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;1. Decrease n by 1.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;2. Add "@0" in front of the separator.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;3. The process ends.<br>
+  &nbsp;&nbsp;&nbsp;C2.1.2.2: if n = 1, then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;1. Change the separator into "@".<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;2. The process ends.<br>
+  &nbsp;C2.2: otherwise, move on to the next number, and do the process below.<br>
+  &nbsp;&nbsp;C2.2.1: if the number > 0, then<br>
+  &nbsp;&nbsp;&nbsp;1. Decrease the number by 1.<br>
+  &nbsp;&nbsp;&nbsp;2. Change the previous number to iterator.<br>
+  &nbsp;&nbsp;&nbsp;3. Replace the iterator to base.<br>
+  &nbsp;&nbsp;&nbsp;4. The process ends.<br>
+  &nbsp;&nbsp;C2.2.2: if the number = 0, repeat after C2.<br>
+  <h1>Examples</h1>
+  <b>Example 1:</b><br>
+  not now.
+  <p style="font-size: 40px; text-align: center;">Nested Expanding Array Notation</p>
+  <p style="font-size: 24px; text-align: center;">[NEAN]</p>
+  <p style="font-size: 24px; text-align: center;">Limit: \(f_{\psi\left(\Lambda \right)}\left( n \right)\)</p>
+  <h1>Definitions</h1>
+  let A be any array<br>
+  let # be any separator<br>
+  let @ be regular separator<br>
+  regular separators are commas such as ",", and ",," etc.
+  D1: [0] = ,
+  D2: [n] = [n-1],
+  D3: {A<sup>,</sup>} = {A}
+  D4: Lv({A<sup>@</sup>}) = @<br>
+  R1: Sk<sub>a,b</sub>(0) = ab<br>
+  R2: Sk<sub>a,1</sub>(A) = a<br>
+  R3: Sk<sub>a,b</sub>(A#0) = Sk<sub>a,b</sub>(A#0)<br>
+  R4: Sk<sub>a,b</sub>(c#A) = Sk<sub>a,Sk<sub>a,b-1</sub>(c#A)</sub>(c-1#A)<br>
+  <br>
+  If none of the first 3 rules above applies, start from the 1st number in the array and start the process below.<br>
+  <br>
+  C1: if the number > 0, repeat after R4.<br>
+  C2: if the number = 0, look at the separator after the number.<br>
+  &nbsp;C2.1: if the separator is the form {n#A<sup>@</sup>}, do the process below.<br>
+  &nbsp;&nbsp;C2.1.1: if A > 0, do the process below.<br>
+  &nbsp;&nbsp;&nbsp;C2.1.1.1: if n > 0, then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;1. Decrease n by 1.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;2. Add "@0" in front of the separator.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;3. The process ends.<br>
+  &nbsp;&nbsp;&nbsp;C2.1.1.2: if n = 0, set @ is the form [n<sub>1</sub>#A<sub>1</sub>] and do the process below.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.1: n<sub>1</sub> > 0, do the process below.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.1.1: if Lv(#) > Lv(separator) and a > 0, then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. Decrease the first number of A by 1.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. Iterate the separator in "n" with iterator times.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. Change the iterated separator into separators that satisfies Lv(new separator) = Lv(old separator),<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4. Replace the iterator to base.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5. The process ends.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.1.2: otherwise, focus on A in the separator and repeat after C2.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.2: n<sub>1</sub> = 0, focus on A in the separator and repeat after C2.<br>
+  &nbsp;&nbsp;C2.1.2: if A = 0, do the process below.<br>
+  &nbsp;&nbsp;&nbsp;C2.1.2.1: if n > 1, then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;1. Decrease n by 1.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;2. Add "@0" in front of the separator.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;3. The process ends.<br>
+  &nbsp;&nbsp;&nbsp;C2.1.2.2: if n = 1, then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;1. Change the separator into "@".<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;2. The process ends.<br>
+  &nbsp;C2.2: otherwise, move on to the next number, and do the process below.<br>
+  &nbsp;&nbsp;C2.2.1: if the number > 0, then<br>
+  &nbsp;&nbsp;&nbsp;1. Decrease the number by 1.<br>
+  &nbsp;&nbsp;&nbsp;2. Change the previous number to iterator.<br>
+  &nbsp;&nbsp;&nbsp;3. Replace the iterator to base.<br>
+  &nbsp;&nbsp;&nbsp;4. The process ends.<br>
+  &nbsp;&nbsp;C2.2.2: if the number = 0, repeat after C2.<br>
+  <h1>Examples</h1>
+  <b>Example 1:</b><br>
+  not now.
   <br>
   <br>
   <br>
@@ -254,55 +410,5 @@
   <br>
   <br>
   <br>
-  <p style="font-size: 40px; text-align: center;">The Void</p>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <p style="font-size: 40px; text-align: center;">The Bottom of the Page :unknown:</p>
 </body>
 </html>
