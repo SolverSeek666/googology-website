@@ -1,44 +1,6 @@
-const PHI = (1 + Math.sqrt(5)) / 2;
-
-document.getElementById('calcInput').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') {
-    const input = this.value.trim();
-    if (input) {
-      processGoogology(input);
-    }
-  }
-});
-
-// Helper function to force your 10^10 formatting rule consistently everywhere
-function formatWithThreshold(display, value, log10Value = null) {
-  let logVal = log10Value !== null ? log10Value : Math.log10(Math.abs(value));
-  
-  // If the value is finite and mathematically below 10^10, print raw decimal string
-  if (value !== null && Number.isFinite(value) && Math.abs(value) < 10000000000) {
-    let outputStr = Number(value.toFixed(10)).toString();
-    renderMath(display, `\\text{Result: } ${outputStr}`);
-  } else {
-    // If it crosses 10^10, force into standard m * 10^n
-    let expOut = Math.floor(logVal);
-    let coeffOut = Math.pow(10, logVal - expOut);
-    
-    // If the exponent itself is massive enough to use JS scientific notation (e.g. 1e+44)
-    if (expOut.toString().includes('e')) {
-      let eNotation = expOut.toExponential(4);
-      let parts = eNotation.split('e');
-      let innerCoeff = parts[0];
-      let innerExp = parts[1].replace('+', '');
-      renderMath(display, `\\text{Result: } ${coeffOut.toFixed(4)} \\times 10^{${innerCoeff} \\times 10^{${innerExp}}}`);
-    } else {
-      renderMath(display, `\\text{Result: } ${coeffOut.toFixed(4)} \\times 10^{${expOut}}`);
-    }
-  }
-}
-
 function processGoogology(rawInput) {
   const display = document.getElementById('outputDisplay');
   
-  // Standard cleanups
   let expr = rawInput.toLowerCase().replace(/x/g, '*').replace(/\s+/g, '');
   expr = expr.replace(/phi/g, `(${PHI})`);
   
@@ -57,16 +19,13 @@ function processGoogology(rawInput) {
       let x = Function(`"use strict"; return (${jsNumExpr})`)();
       
       if (!isNaN(x) && x > -1) {
-        // Compute the precise integer loop up to 20 to preserve precision
         if (Number.isInteger(x) && x <= 20) {
           let result = 1;
           for (let i = 2; i <= x; i++) result *= i;
-          // Pipe it through our formatter check so it gets caught if it's > 10^10!
           formatWithThreshold(display, result);
           return;
         } 
         
-        // Continuous Gamma Curve approximation for larger factorials
         let logFact;
         if (x < 12) {
           let p = 1;
@@ -87,26 +46,21 @@ function processGoogology(rawInput) {
     }
   }
 
-  // 2. CASCADING POWER TOWER & LOG ENGINE
+  // 2. CASCADING POWER TOWER ENGINE
   if (expr.includes('^')) {
     const parts = expr.split('^');
     
     try {
-      // Evaluate components from right to left (standard mathematical tower order)
-      // Example: 10^10^3 means 10^(10^3) = 10^1000
-      let currentLog10 = null;
-      let currentValue = null;
+      // We will track the final value purely in a base-10 log format from the start
+      // currentLog holds the value of log10(current_accumulated_value)
+      let currentLog = null; 
       
-      // Start at the very top of the power tower
-      let topExpr = parts[parts.length - 1];
-      currentValue = Function(`"use strict"; return (${topExpr})`)();
-      
-      // Step downwards through the tower layers
-      for (let i = parts.length - 2; i >= 0; i--) {
+      // Evaluate right-to-left
+      for (let i = parts.length - 1; i >= 0; i--) {
         let baseStr = parts[i];
         let coeffOuter = 1;
         
-        // Pull out front multipliers if present (like 6 * 2^10)
+        // Handle a front multiplier on the very first term (e.g., 6*2^3^4)
         if (i === 0 && baseStr.includes('*')) {
           const multParts = baseStr.split('*');
           coeffOuter = Function(`"use strict"; return (${multParts[0]})`)();
@@ -115,28 +69,34 @@ function processGoogology(rawInput) {
         
         let base = Function(`"use strict"; return (${baseStr})`)();
         
-        if (currentLog10 === null) {
-          // Normal layer calculation
-          if (Number.isFinite(currentValue) && Math.pow(base, currentValue) < 1e300) {
-            currentValue = coeffOuter * Math.pow(base, currentValue);
-          } else {
-            // Drop into log scale if it blows past native memory limit
-            currentLog10 = Math.log10(coeffOuter) + (currentValue * Math.log10(base));
-            currentValue = null;
-          }
+        if (currentLog === null) {
+          // First step: This is just the absolute top of the tower (e.g., the "5" in 4^5)
+          currentLog = Math.log10(base);
         } else {
-          // If a higher layer already forced us into log scale, we do a nested log calculation
-          // log10(base^exponent) = exponent * log10(base)
-          // Since exponent is already tracked as 10^currentLog10, we accumulate!
-          currentLog10 = currentLog10 + Math.log10(Math.log10(base));
+          // Cascading step:
+          // If the previous layer evaluation was X, the new layer is base^X
+          // Thus, the new log10 value is: log10(base^X) = X * log10(base)
+          // Since X is tracked as 10^currentLog, the new log10 becomes:
+          // log10(new) = 10^currentLog * log10(base)
+          
+          let nextLogOfBase = Math.log10(base);
+          
+          // To prevent standard JS floating overflow during multiplication:
+          // log10(10^currentLog * nextLogOfBase) = currentLog + log10(nextLogOfBase)
+          let advancedLog = currentLog + Math.log10(nextLogOfBase);
+          
+          // Apply front coefficients if processing the very last base item
+          if (i === 0 && coeffOuter !== 1) {
+            // log10(coeff * 10^advancedLog)
+            formatWithThreshold(display, null, advancedLog, coeffOuter);
+            return;
+          }
+          
+          currentLog = advancedLog;
         }
       }
       
-      if (currentLog10 !== null) {
-        formatWithThreshold(display, null, currentLog10);
-      } else {
-        formatWithThreshold(display, currentValue);
-      }
+      formatWithThreshold(display, null, currentLog);
       return;
       
     } catch (err) {
@@ -144,7 +104,7 @@ function processGoogology(rawInput) {
     }
   }
 
-  // 3. STANDARD NATIVE ENGINE
+  // 3. STANDARD NATIVE ENGINE (Fallback for basic math expressions)
   let jsExpr = expr.replace(/\^/g, '**');
   try {
     let result = Function(`"use strict"; return (${jsExpr})`)();
@@ -157,7 +117,30 @@ function processGoogology(rawInput) {
   renderMath(display, `\\text{Error: Could not compute.}`);
 }
 
-function renderMath(element, latex) {
-  element.innerHTML = `\\[ ${latex} \\]`;
-  MathJax.typesetPromise([element]).catch((err) => console.log(err));
+// Updated helper handles multiplier offsets cleanly over massive logs
+function formatWithThreshold(display, value, log10Value = null, outerMultiplier = 1) {
+  let logVal = log10Value !== null ? log10Value : Math.log10(Math.abs(value));
+  
+  if (value !== null && Number.isFinite(value) && Math.abs(value) < 10000000000) {
+    let outputStr = Number(value.toFixed(10)).toString();
+    renderMath(display, `\\text{Result: } ${outputStr}`);
+  } else {
+    // Incorporate outer multiplier into log mapping if it exists
+    if (outerMultiplier !== 1) {
+      logVal += Math.log10(outerMultiplier);
+    }
+    
+    let expOut = Math.floor(logVal);
+    let coeffOut = Math.pow(10, logVal - expOut);
+    
+    if (expOut.toString().includes('e')) {
+      let eNotation = expOut.toExponential(4);
+      let parts = eNotation.split('e');
+      let innerCoeff = parts[0];
+      let innerExp = parts[1].replace('+', '');
+      renderMath(display, `\\text{Result: } ${coeffOut.toFixed(4)} \\times 10^{${innerCoeff} \\times 10^{${innerExp}}}`);
+    } else {
+      renderMath(display, `\\text{Result: } ${coeffOut.toFixed(4)} \\times 10^{${expOut}}`);
+    }
+  }
 }
