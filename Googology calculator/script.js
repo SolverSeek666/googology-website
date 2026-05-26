@@ -27,36 +27,54 @@ function processGoogology(rawInput) {
     return renderMath(display, `\\text{Result: } 1 \\times 10^{10^{100}}`); 
   }
 
-  // 2. FACTORIAL ENGINE
+  // 2. HYPERCALC-STYLE FACTORIAL ENGINE (Supports both integers and decimals)
   if (expr.endsWith('!')) {
     let numStr = expr.slice(0, -1);
     
-    // Evaluate the inner string first in case they passed something like "(5)" or "phi"
     try {
       let jsNumExpr = numStr.replace(/\^/g, '**');
-      let n = Function(`"use strict"; return (${jsNumExpr})`)();
+      let x = Function(`"use strict"; return (${jsNumExpr})`)();
       
-      if (!isNaN(n) && n >= 0) {
-        // Round to nearest integer for standard factorial execution
-        n = Math.round(n);
+      if (!isNaN(x) && x > -1) {
+        let logFact;
         
-        if (n <= 13) {
-          let result = 1;
-          for (let i = 2; i <= n; i++) result *= i;
-          renderMath(display, `\\text{Result: } ${result.toString()}`);
+        // Exact Stirling-Lanczos log-gamma approximation for decimals & integers
+        if (x < 12) {
+          // For small decimals, shift them up using the rule: x! = (x+1)! / (x+1)
+          let shift = 0;
+          let originalX = x;
+          let p = 1;
+          while (x < 12) {
+            x++;
+            p *= x;
+          }
+          // Calculate for the higher value, then scale back down
+          let logG = 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(x) - x + (1 / (12 * x)) - (1 / (360 * Math.pow(x, 3)));
+          logFact = logG - Math.log(p);
+          // Convert natural log to log10
+          logFact = logFact * Math.LOG10E;
+        } else {
+          // Direct approximation for larger inputs
+          let logG = 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(x) - x + (1 / (12 * x)) - (1 / (360 * Math.pow(x, 3)));
+          logFact = logG * Math.LOG10E;
+        }
+        
+        // Output breakdown based on scale
+        if (logFact < 10) {
+          let finalAns = Math.pow(10, logFact);
+          // Clean up rounding floats
+          let outputStr = Number(finalAns.toFixed(10)).toString();
+          renderMath(display, `\\text{Result: } ${outputStr}`);
           return;
         } else {
-          // Stirling's Log10 calculation using native Math.E and Math.PI
-          let logFact = n * Math.log10(n / Math.E) + 0.5 * Math.log10(2 * Math.PI * n);
           let expOut = Math.floor(logFact);
           let coeffOut = Math.pow(10, logFact - expOut);
-          
           renderMath(display, `\\text{Result: } ${coeffOut.toFixed(4)} \\times 10^{${expOut}}`);
           return;
         }
       }
     } catch(err) {
-      renderMath(display, `\\text{Error: Invalid factorial input.}`);
+      renderMath(display, `\\text{Error: Invalid factorial calculation.}`);
       return;
     }
   }
