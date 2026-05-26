@@ -1,3 +1,5 @@
+// I use gemini to help me lmao
+
 const PHI = (1 + Math.sqrt(5)) / 2;
 
 document.getElementById('calcInput').addEventListener('keydown', function(e) {
@@ -8,6 +10,28 @@ document.getElementById('calcInput').addEventListener('keydown', function(e) {
     }
   }
 });
+
+// RECURSIVE EXPONENT COMPRESSOR (Eliminates the giant walls of zeros!)
+function formatValueClean(v) {
+  if (v < 1e10) {
+    return Math.floor(v).toString();
+  }
+  let log = Math.log10(v);
+  let exp = Math.floor(log);
+  let coeff = Math.pow(10, log - exp);
+  
+  // Guard against floating-point rounding errors (e.g., 9.9999 rounding up)
+  if (coeff.toFixed(4) === "10.0000") {
+    coeff = 1;
+    exp += 1;
+  }
+  
+  let coeffStr = coeff.toFixed(4);
+  if (coeffStr === "1.0000") {
+    return `10^{${formatValueClean(exp)}}`;
+  }
+  return `${coeffStr} \\times 10^{${formatValueClean(exp)}}`;
+}
 
 // THE UNIFIED TOWER FORMATTER
 function formatTower(display, current) {
@@ -20,60 +44,48 @@ function formatTower(display, current) {
     }
   } else if (current.height === 1) {
     renderHeight1(display, current.value);
-  } else if (current.height === 2) {
-    let exp = Math.floor(current.value);
-    let coeff = Math.pow(10, current.value - exp);
-    let coeffStr = coeff.toFixed(4);
-    
-    // BUG FIX: Drop 1.0000 multiplier from height 2 towers
-    if (coeffStr === "1.0000") {
-      renderMath(display, `\\text{Result: } 10^{10^{${exp}}}`);
-    } else {
-      renderMath(display, `\\text{Result: } 10^{${coeffStr} \\times 10^{${exp}}}`);
-    }
   } else {
-    // Height 3+ Towers
+    // Height 2+ Towers (e.g., 10^10^20, 10^10^10^20, 2^3^4^5)
     let exp = Math.floor(current.value);
     let coeff = Math.pow(10, current.value - exp);
+    
+    if (coeff.toFixed(4) === "10.0000") {
+      coeff = 1;
+      exp += 1;
+    }
+    
     let coeffStr = coeff.toFixed(4);
+    let latex = "";
     
-    let topStr = (coeffStr === "1.0000") ? `10^{${exp}}` : `${coeffStr} \\times 10^{${exp}}`;
-    let latex = topStr;
+    if (coeffStr === "1.0000") {
+      latex = formatValueClean(exp);
+    } else {
+      latex = `${coeffStr} \\times 10^{${formatValueClean(exp)}}`;
+    }
     
-    for (let h = 0; h < current.height - 1; h++) {
+    // Nest the tower base powers iteratively
+    for (let h = 0; h < current.height; h++) {
       latex = `10^{${latex}}`;
     }
     renderMath(display, `\\text{Result: } ${latex}`);
   }
 }
 
-// Helper for standard 10^n scientific calculations
+// Helper for single-layer scientific formatting
 function renderHeight1(display, logVal) {
   let exp = Math.floor(logVal);
   let coeff = Math.pow(10, logVal - exp);
-  let coeffStr = coeff.toFixed(4);
   
-  // If the exponent itself is massive enough to use JS scientific notation
-  if (exp.toString().includes('e')) {
-    let eNotation = exp.toExponential(4);
-    let parts = eNotation.split('e');
-    let innerCoeff = parseFloat(parts[0]).toFixed(4);
-    let innerExp = parts[1].replace('+', '');
-    
-    let expStr = (innerCoeff === "1.0000") ? `10^{${innerExp}}` : `${innerCoeff} \\times 10^{${innerExp}}`;
-    
-    if (coeffStr === "1.0000") {
-      renderMath(display, `\\text{Result: } 10^{${expStr}}`);
-    } else {
-      renderMath(display, `\\text{Result: } ${coeffStr} \\times 10^{${expStr}}`);
-    }
+  if (coeff.toFixed(4) === "10.0000") {
+    coeff = 1;
+    exp += 1;
+  }
+  
+  let coeffStr = coeff.toFixed(4);
+  if (coeffStr === "1.0000") {
+    renderMath(display, `\\text{Result: } 10^{${formatValueClean(exp)}}`);
   } else {
-    // BUG FIX: Drop 1.0000 multiplier from standard logs
-    if (coeffStr === "1.0000") {
-      renderMath(display, `\\text{Result: } 10^{${exp}}`);
-    } else {
-      renderMath(display, `\\text{Result: } ${coeffStr} \\times 10^{${exp}}`);
-    }
+    renderMath(display, `\\text{Result: } ${coeffStr} \\times 10^{${formatValueClean(exp)}}`);
   }
 }
 
@@ -158,10 +170,8 @@ function processGoogology(rawInput) {
             }
             current.height = 1;
           }
-        } else if (current.height === 1) {
-          current.value = Math.log10(Math.log10(b)) + current.value;
-          current.height = 2;
         } else {
+          current.value = Math.log10(Math.log10(b)) + current.value;
           current.height += 1;
         }
       }
@@ -187,6 +197,7 @@ function processGoogology(rawInput) {
   renderMath(display, `\\text{Error: Could not compute.}`);
 }
 
+// MathJax Renderer
 function renderMath(element, latex) {
   element.innerHTML = `\\[ ${latex} \\]`;
   MathJax.typesetPromise([element]).catch((err) => console.log(err));
