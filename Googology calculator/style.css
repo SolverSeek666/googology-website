@@ -1,0 +1,42 @@
+/* General page styles */
+body {
+  font-family: "JetBrains Mono", monospace;
+  background-color: #434343;
+  color: #ffffff;
+  margin: 0;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Link styles */
+a {
+  color: #b4c8ff;
+  text-decoration: none;
+}
+
+/* Header Styles */
+.calc-title {
+  font-size: 48px;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 0;
+}
+
+.calc-author {
+  font-size: 24px;
+  text-align: center;
+  font-weight: bold;
+  font-style: italic;
+  margin-top: 5px;
+  color: #b4c8ff; /* Highlighted author name slightly */
+}
+
+/* WIP Status message styling */
+.status-msg {
+  margin-top: 40px;
+  font-size: 18px;
+  letter-spacing: 1px;
+  opacity: 0.8;
+}
