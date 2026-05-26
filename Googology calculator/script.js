@@ -11,7 +11,6 @@ document.getElementById('calcInput').addEventListener('keydown', function(e) {
   }
 });
 
-// RECURSIVE EXPONENT COMPRESSOR (Eliminates the giant walls of zeros!)
 function formatValueClean(v) {
   if (v < 1e10) {
     return Math.floor(v).toString();
@@ -20,7 +19,6 @@ function formatValueClean(v) {
   let exp = Math.floor(log);
   let coeff = Math.pow(10, log - exp);
   
-  // Guard against floating-point rounding errors (e.g., 9.9999 rounding up)
   if (coeff.toFixed(4) === "10.0000") {
     coeff = 1;
     exp += 1;
@@ -33,8 +31,29 @@ function formatValueClean(v) {
   return `${coeffStr} \\times 10^{${formatValueClean(exp)}}`;
 }
 
-// THE UNIFIED TOWER FORMATTER
 function formatTower(display, current) {
+  // AUTOMATIC TETRATION SWITCH (Triggered at 10^^6 and above)
+  if (current.height >= 6) {
+    let a = current.height;
+    let b = current.value;
+    
+    // Normalize: if the top value rounds to 10, absorb it into the tower height
+    if (Math.abs(b - 10) < 1e-4 || b.toFixed(4) === "10.0000") {
+      a += 1;
+      b = 1;
+    }
+    
+    // 10^^a>1 collapse rule -> 10^^a rendered with proper Knuth Up-Arrows
+    if (Math.abs(b - 1) < 1e-4 || b.toFixed(4) === "1.0000") {
+      renderMath(display, `\\text{Result: } 10 \\uparrow\\uparrow ${a}`);
+    } else {
+      let bStr = b < 1e10 ? Number(b.toFixed(4)).toString() : formatValueClean(b);
+      renderMath(display, `\\text{Result: } 10 \\uparrow\\uparrow ${a} > ${bStr}`);
+    }
+    return;
+  }
+
+  // STANDARD POWER TOWERS (For heights below 6)
   if (current.height === 0) {
     if (current.value < 10000000000) {
       let outputStr = Number(current.value.toFixed(10)).toString();
@@ -45,7 +64,6 @@ function formatTower(display, current) {
   } else if (current.height === 1) {
     renderHeight1(display, current.value);
   } else {
-    // Height 2+ Towers (e.g., 10^10^20, 10^10^10^20, 2^3^4^5)
     let exp = Math.floor(current.value);
     let coeff = Math.pow(10, current.value - exp);
     
@@ -63,7 +81,6 @@ function formatTower(display, current) {
       latex = `${coeffStr} \\times 10^{${formatValueClean(exp)}}`;
     }
     
-    // Nest the tower base powers iteratively
     for (let h = 0; h < current.height; h++) {
       latex = `10^{${latex}}`;
     }
@@ -71,7 +88,6 @@ function formatTower(display, current) {
   }
 }
 
-// Helper for single-layer scientific formatting
 function renderHeight1(display, logVal) {
   let exp = Math.floor(logVal);
   let coeff = Math.pow(10, logVal - exp);
@@ -102,7 +118,67 @@ function processGoogology(rawInput) {
     return renderMath(display, `\\text{Result: } 10^{10^{100}}`); 
   }
 
-  // 1. FACTORIAL ENGINE
+  // 1. DYNAMIC BASE TETRATION & BARRIER ENGINE
+  if (expr.includes('^^')) {
+    try {
+      const parts = expr.split('^^');
+      // Default to base 10 if omitted (e.g., "^^6")
+      let baseExpr = parts[0] === "" ? "10" : parts[0]; 
+      let base = Function(`"use strict"; return (${baseExpr.replace(/\^/g, '**')})`)();
+      
+      let rest = parts[1];
+      let y, barrier = 1;
+      
+      if (rest.includes('>')) {
+        const subParts = rest.split('>');
+        y = Function(`"use strict"; return (${subParts[0].replace(/\^/g, '**')})`)();
+        barrier = Function(`"use strict"; return (${subParts[1].replace(/\^/g, '**')})`)();
+      } else {
+        y = Function(`"use strict"; return (${rest.replace(/\^/g, '**')})`)();
+      }
+      
+      if (!isNaN(base) && !isNaN(y) && !isNaN(barrier)) {
+        
+        // If the base is exactly 10, skip iteration and apply structural height directly
+        if (Math.abs(base - 10) < 1e-7) {
+           formatTower(display, { value: barrier, height: y });
+           return;
+        }
+        
+        // LIMIT ITERATIONS: Calculate true power tower up to 10 layers deep
+        let iters = Math.min(y, 10);
+        let current = { value: barrier, height: 0 };
+        
+        for (let i = 0; i < iters; i++) {
+          if (current.height === 0) {
+            let next = Math.pow(base, current.value);
+            if (Number.isFinite(next) && next < 1e300) {
+              current.value = next;
+            } else {
+              current.value = current.value * Math.log10(base);
+              current.height = 1;
+            }
+          } else {
+            current.value = Math.log10(Math.log10(base)) + current.value;
+            current.height += 1;
+          }
+        }
+        
+        // ANTI-CRASH OPTIMIZATION: If y > 10, just tack the remainder onto the base-10 height
+        if (y > 10) {
+          current.height += (y - 10);
+        }
+        
+        formatTower(display, current);
+        return;
+      }
+    } catch (err) {
+      renderMath(display, `\\text{Error: Invalid tetration syntax.}`);
+      return;
+    }
+  }
+
+  // 2. FACTORIAL ENGINE
   if (expr.endsWith('!')) {
     let numStr = expr.slice(0, -1);
     try {
@@ -131,19 +207,14 @@ function processGoogology(rawInput) {
         formatTower(display, { value: logFact, height: 1 });
         return;
       }
-    } catch(err) {
-      renderMath(display, `\\text{Error: Invalid factorial input.}`);
-      return;
-    }
+    } catch(err) { }
   }
 
-  // 2. STRUCTURAL POWER TOWER ENGINE
+  // 3. STRUCTURAL POWER TOWER ENGINE
   if (expr.includes('^')) {
     const parts = expr.split('^');
-    
     try {
       let current = { value: null, height: 0 };
-      
       let topExpr = parts[parts.length - 1];
       current.value = Function(`"use strict"; return (${topExpr})`)();
       
@@ -178,13 +249,10 @@ function processGoogology(rawInput) {
       
       formatTower(display, current);
       return;
-      
-    } catch (err) {
-      // Fall through if parsing fails
-    }
+    } catch (err) { }
   }
 
-  // 3. STANDARD NATIVE ENGINE
+  // 4. STANDARD NATIVE ENGINE
   let jsExpr = expr.replace(/\^/g, '**');
   try {
     let result = Function(`"use strict"; return (${jsExpr})`)();
@@ -197,7 +265,6 @@ function processGoogology(rawInput) {
   renderMath(display, `\\text{Error: Could not compute.}`);
 }
 
-// MathJax Renderer
 function renderMath(element, latex) {
   element.innerHTML = `\\[ ${latex} \\]`;
   MathJax.typesetPromise([element]).catch((err) => console.log(err));
