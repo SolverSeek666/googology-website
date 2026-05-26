@@ -24,15 +24,6 @@ a {
   margin-bottom: 0;
 }
 
-.link {
-  font-size: 24px;
-  text-align: center;
-  font-weight: bold;
-  font-style: italic;
-  margin-top: 5px;
-  color: #b4c8ff; /* link */
-}
-
 /* WIP Status message styling */
 .status-msg {
   margin-top: 40px;
