@@ -9,6 +9,74 @@ document.getElementById('calcInput').addEventListener('keydown', function(e) {
   }
 });
 
+// THE UNIFIED TOWER FORMATTER
+function formatTower(display, current) {
+  if (current.height === 0) {
+    if (current.value < 10000000000) {
+      let outputStr = Number(current.value.toFixed(10)).toString();
+      renderMath(display, `\\text{Result: } ${outputStr}`);
+    } else {
+      renderHeight1(display, Math.log10(current.value));
+    }
+  } else if (current.height === 1) {
+    renderHeight1(display, current.value);
+  } else if (current.height === 2) {
+    let exp = Math.floor(current.value);
+    let coeff = Math.pow(10, current.value - exp);
+    let coeffStr = coeff.toFixed(4);
+    
+    // BUG FIX: Drop 1.0000 multiplier from height 2 towers
+    if (coeffStr === "1.0000") {
+      renderMath(display, `\\text{Result: } 10^{10^{${exp}}}`);
+    } else {
+      renderMath(display, `\\text{Result: } 10^{${coeffStr} \\times 10^{${exp}}}`);
+    }
+  } else {
+    // Height 3+ Towers
+    let exp = Math.floor(current.value);
+    let coeff = Math.pow(10, current.value - exp);
+    let coeffStr = coeff.toFixed(4);
+    
+    let topStr = (coeffStr === "1.0000") ? `10^{${exp}}` : `${coeffStr} \\times 10^{${exp}}`;
+    let latex = topStr;
+    
+    for (let h = 0; h < current.height - 1; h++) {
+      latex = `10^{${latex}}`;
+    }
+    renderMath(display, `\\text{Result: } ${latex}`);
+  }
+}
+
+// Helper for standard 10^n scientific calculations
+function renderHeight1(display, logVal) {
+  let exp = Math.floor(logVal);
+  let coeff = Math.pow(10, logVal - exp);
+  let coeffStr = coeff.toFixed(4);
+  
+  // If the exponent itself is massive enough to use JS scientific notation
+  if (exp.toString().includes('e')) {
+    let eNotation = exp.toExponential(4);
+    let parts = eNotation.split('e');
+    let innerCoeff = parseFloat(parts[0]).toFixed(4);
+    let innerExp = parts[1].replace('+', '');
+    
+    let expStr = (innerCoeff === "1.0000") ? `10^{${innerExp}}` : `${innerCoeff} \\times 10^{${innerExp}}`;
+    
+    if (coeffStr === "1.0000") {
+      renderMath(display, `\\text{Result: } 10^{${expStr}}`);
+    } else {
+      renderMath(display, `\\text{Result: } ${coeffStr} \\times 10^{${expStr}}`);
+    }
+  } else {
+    // BUG FIX: Drop 1.0000 multiplier from standard logs
+    if (coeffStr === "1.0000") {
+      renderMath(display, `\\text{Result: } 10^{${exp}}`);
+    } else {
+      renderMath(display, `\\text{Result: } ${coeffStr} \\times 10^{${exp}}`);
+    }
+  }
+}
+
 function processGoogology(rawInput) {
   const display = document.getElementById('outputDisplay');
   
@@ -16,10 +84,10 @@ function processGoogology(rawInput) {
   expr = expr.replace(/phi/g, `(${PHI})`);
   
   if (expr === 'googol') { 
-    return renderMath(display, `\\text{Result: } 1 \\times 10^{100}`); 
+    return renderMath(display, `\\text{Result: } 10^{100}`); 
   }
   if (expr === 'googolplex') { 
-    return renderMath(display, `\\text{Result: } 1 \\times 10^{10^{100}}`); 
+    return renderMath(display, `\\text{Result: } 10^{10^{100}}`); 
   }
 
   // 1. FACTORIAL ENGINE
@@ -33,7 +101,7 @@ function processGoogology(rawInput) {
         if (Number.isInteger(x) && x <= 20) {
           let result = 1;
           for (let i = 2; i <= x; i++) result *= i;
-          formatWithThreshold(display, result);
+          formatTower(display, { value: result, height: 0 });
           return;
         } 
         
@@ -48,7 +116,7 @@ function processGoogology(rawInput) {
           logFact = logG * Math.LOG10E;
         }
         
-        formatWithThreshold(display, null, logFact);
+        formatTower(display, { value: logFact, height: 1 });
         return;
       }
     } catch(err) {
@@ -57,16 +125,16 @@ function processGoogology(rawInput) {
     }
   }
 
-  // 2. CASCADING POWER TOWER ENGINE
+  // 2. STRUCTURAL POWER TOWER ENGINE
   if (expr.includes('^')) {
     const parts = expr.split('^');
     
     try {
-      // Evaluate the absolute top element first (e.g., 5 in 3^4^5)
-      let topExpr = parts[parts.length - 1];
-      let val = Function(`"use strict"; return (${topExpr})`)();
+      let current = { value: null, height: 0 };
       
-      // Process downward through the tower layers step-by-step
+      let topExpr = parts[parts.length - 1];
+      current.value = Function(`"use strict"; return (${topExpr})`)();
+      
       for (let i = parts.length - 2; i >= 0; i--) {
         let baseStr = parts[i];
         let coeffOuter = 1;
@@ -77,22 +145,32 @@ function processGoogology(rawInput) {
           baseStr = multParts[1];
         }
         
-        let base = Function(`"use strict"; return (${baseStr})`)();
+        let b = Function(`"use strict"; return (${baseStr})`)();
         
-        // Calculate log10(base^val) = val * log10(base)
-        let log10Base = Math.log10(base);
-        val = val * log10Base;
-        
-        if (i === 0 && coeffOuter !== 1) {
-          val += Math.log10(coeffOuter);
+        if (current.height === 0) {
+          let next = Math.pow(b, current.value);
+          if (Number.isFinite(next) && next < 1e300) {
+            current.value = next * coeffOuter;
+          } else {
+            current.value = current.value * Math.log10(b);
+            if (i === 0 && coeffOuter !== 1) {
+              current.value += Math.log10(coeffOuter);
+            }
+            current.height = 1;
+          }
+        } else if (current.height === 1) {
+          current.value = Math.log10(Math.log10(b)) + current.value;
+          current.height = 2;
+        } else {
+          current.height += 1;
         }
       }
       
-      formatWithThreshold(display, null, val);
+      formatTower(display, current);
       return;
       
     } catch (err) {
-      // Fall through if standard parsing fails
+      // Fall through if parsing fails
     }
   }
 
@@ -101,41 +179,12 @@ function processGoogology(rawInput) {
   try {
     let result = Function(`"use strict"; return (${jsExpr})`)();
     if (Number.isFinite(result)) {
-      formatWithThreshold(display, result);
+      formatTower(display, { value: result, height: 0 });
       return;
     }
   } catch (e) {}
 
   renderMath(display, `\\text{Error: Could not compute.}`);
-}
-
-function formatWithThreshold(display, value, log10Value = null) {
-  let logVal = log10Value !== null ? log10Value : Math.log10(Math.abs(value));
-  
-  if (value !== null && Number.isFinite(value) && Math.abs(value) < 10000000000) {
-    let outputStr = Number(value.toFixed(10)).toString();
-    renderMath(display, `\\text{Result: } ${outputStr}`);
-  } else {
-    let expOut = Math.floor(logVal);
-    let coeffOut = Math.pow(10, logVal - expOut);
-    
-    // Hardening check: If the exponent is huge, render it as a nested power tower format
-    if (expOut > 1000000) {
-      let superLog = Math.log10(logVal);
-      let superExp = Math.floor(superLog);
-      let superCoeff = Math.pow(10, superLog - superExp);
-      
-      renderMath(display, `\\text{Result: } 1.0000 \\times 10^{${superCoeff.toFixed(4)} \\times 10^{${superExp}}}`);
-    } else if (expOut.toString().includes('e')) {
-      let eNotation = expOut.toExponential(4);
-      let parts = eNotation.split('e');
-      let innerCoeff = parts[0];
-      let innerExp = parts[1].replace('+', '');
-      renderMath(display, `\\text{Result: } ${coeffOut.toFixed(4)} \\times 10^{${innerCoeff} \\times 10^{${innerExp}}}`);
-    } else {
-      renderMath(display, `\\text{Result: } ${coeffOut.toFixed(4)} \\times 10^{${expOut}}`);
-    }
-  }
 }
 
 function renderMath(element, latex) {
