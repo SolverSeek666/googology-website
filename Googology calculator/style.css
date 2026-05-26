@@ -24,13 +24,13 @@ a {
   margin-bottom: 0;
 }
 
-.calc-author {
+.link {
   font-size: 24px;
   text-align: center;
   font-weight: bold;
   font-style: italic;
   margin-top: 5px;
-  color: #b4c8ff; /* Highlighted author name slightly */
+  color: #b4c8ff; /* link */
 }
 
 /* WIP Status message styling */
