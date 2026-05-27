@@ -31,7 +31,7 @@ function formatValueClean(v) {
   return `${coeffStr} \\times 10^{${formatValueClean(exp)}}`;
 }
 
-// Parses any expression or sub-expression structurally using logs to avoid the 10^308 Infinity wall
+// Parses any expression or sub-expression structurally using logs
 function parseToStructural(rawStr) {
   let expr = rawStr.trim().toLowerCase().replace(/\s+/g, '').replace(/x/g, '*');
   
@@ -108,56 +108,33 @@ function parseToStructural(rawStr) {
   return { value: current.value, height: current.height, latex: latex };
 }
 
-// Unified renderer supporting structural tetration data and power tower fallbacks
 function formatTower(display, data) {
   const toLatexSci = (num) => {
     if (num === Infinity || num === "Infinity") return "\\infty";
-    
     let str = String(num);
     if (str.includes('e')) {
       let [coeff, exp] = str.split('e');
       exp = exp.replace('+', '');
-      
       let cNum = parseFloat(coeff);
-      if (Math.abs(cNum - 1) < 1e-10) {
-        return `10^{${exp}}`;
-      }
-      
+      if (Math.abs(cNum - 1) < 1e-10) return `10^{${exp}}`;
       let roundedCoeff = Number(cNum.toFixed(4));
       if (roundedCoeff === 1) return `10^{${exp}}`;
       return `${roundedCoeff} \\times 10^{${exp}}`;
     }
-    
     let n = Number(num);
-    if (!isNaN(n) && Math.abs(n - Math.round(n)) < 1e-10) {
-      return String(Math.round(n));
-    }
-    
+    if (!isNaN(n) && Math.abs(n - Math.round(n)) < 1e-10) return String(Math.round(n));
     return typeof formatValueClean === 'function' ? formatValueClean(num) : str;
   };
 
+  let current = data; 
+  let isTetration = current.forceTetration || (current.height !== undefined && current.height >= 6);
+
   // 1. TETRATION RENDERING PATH
-  if (data.heightStruct !== undefined || data.heightNum !== undefined) {
-    let heightStr = "";
-    let isAstronomical = false;
+  if (isTetration) {
+    let heightStr = current.forceTetration ? current.tetraHeightStr : toLatexSci(current.height);
+    let b = current.value;
     
-    if (data.heightStruct) {
-      heightStr = data.heightStruct.latex;
-      if (data.heightStruct.height > 0 || data.heightStruct.value >= 1e10) {
-        isAstronomical = true;
-      }
-    } else {
-      if (data.heightNum >= 1e10) {
-        isAstronomical = true;
-        heightStr = toLatexSci(data.heightNum);
-      } else {
-        heightStr = String(data.heightNum);
-      }
-    }
-    
-    let b = data.value;
-    
-    if (isAstronomical || Math.abs(b - 1) < 1e-4 || b.toFixed(4) === "1.0000") {
+    if (Math.abs(b - 1) < 1e-4 || b.toFixed(4) === "1.0000") {
       renderMath(display, `10 \\uparrow\\uparrow {${heightStr}}`);
     } else {
       let bStr = b < 1e10 ? Number(b.toFixed(4)).toString() : toLatexSci(b);
@@ -170,8 +147,7 @@ function formatTower(display, data) {
     return;
   }
 
-  // 2. STANDARD POWER TOWERS PATH (Fallback)
-  let current = data; 
+  // 2. STANDARD POWER TOWERS PATH
   if (current.height === 0) {
     if (current.value < 10000000000) {
       let outputStr = Number(current.value.toFixed(10)).toString();
@@ -194,13 +170,22 @@ function formatTower(display, data) {
     let latex = "";
     
     if (coeffStr === "1.0000") {
-      latex = toLatexSci(exp);
+      if (exp === 1) {
+         latex = "10";
+         for (let h = 1; h < current.height; h++) {
+            latex = `10^{${latex}}`;
+         }
+      } else {
+         latex = toLatexSci(exp);
+         for (let h = 0; h < current.height; h++) {
+            latex = `10^{${latex}}`;
+         }
+      }
     } else {
       latex = `${coeffStr} \\times 10^{${toLatexSci(exp)}}`;
-    }
-    
-    for (let h = 0; h < current.height; h++) {
-      latex = `10^{${latex}}`;
+      for (let h = 0; h < current.height; h++) {
+        latex = `10^{${latex}}`;
+      }
     }
     renderMath(display, `${latex}`);
   }
@@ -224,14 +209,10 @@ function processGoogology(rawInput) {
   let expr = rawInput.toLowerCase().replace(/x/g, '*').replace(/\s+/g, '');
   expr = expr.replace(/phi/g, `(${PHI})`);
   
-  if (expr === 'googol') { 
-    return renderMath(display, `\\text{Result: } 10^{100}`); 
-  }
-  if (expr === 'googolplex') { 
-    return renderMath(display, `\\text{Result: } 10^{10^{100}}`); 
-  }
+  if (expr === 'googol') return renderMath(display, `\\text{Result: } 10^{100}`); 
+  if (expr === 'googolplex') return renderMath(display, `\\text{Result: } 10^{10^{100}}`); 
 
-  // 1. DYNAMIC BASE TETRATION ENGINE (FLAWLESS TRACKING)
+  // 1. DYNAMIC BASE TETRATION ENGINE
   if (expr.includes('^^')) {
     try {
       const parts = expr.split('^^');
@@ -241,7 +222,6 @@ function processGoogology(rawInput) {
       
       let rest = parts[parts.length - 1];
       let yExpr, barrierExpr = "1";
-      
       if (rest.includes('>')) {
         const subParts = rest.split('>');
         yExpr = subParts[0];
@@ -254,9 +234,13 @@ function processGoogology(rawInput) {
       let barrierStruct = parseToStructural(barrierExpr);
       let barrier = (barrierStruct.height === 0) ? barrierStruct.value : 1;
       
-      // Shortcut: Base 10 needs zero loop translations
+      // Shortcut: Base 10 exact tower construction
       if (Math.abs(base - 10) < 1e-7) {
-         formatTower(display, { heightStruct: yStruct, value: barrier });
+         if (yStruct.height === 0) {
+             formatTower(display, { value: barrier, height: yStruct.value });
+         } else {
+             formatTower(display, { forceTetration: true, tetraHeightStr: yStruct.latex, value: barrier });
+         }
          return;
       }
       
@@ -267,7 +251,7 @@ function processGoogology(rawInput) {
       function applyBase(b, curr) {
         if (curr.height === 0) {
           let next = Math.pow(b, curr.value);
-          if (Number.isFinite(next) && next < 1e10) {
+          if (Number.isFinite(next) && next < 1e300) {
             return { value: next, height: 0 };
           } else {
             return { value: curr.value * Math.log10(b), height: 1 };
@@ -284,8 +268,12 @@ function processGoogology(rawInput) {
           }
         }
         if (curr.height === 2) {
-          let nextVal = Math.log10(Math.pow(10, curr.value) + Math.log10(Math.log10(b)));
-          return { value: nextVal, height: 3 };
+          if (curr.value > 15) {
+            return { value: curr.value, height: 3 };
+          } else {
+            let nextVal = Math.log10(Math.pow(10, curr.value) + Math.log10(Math.log10(b)));
+            return { value: nextVal, height: 3 };
+          }
         }
         return { value: curr.value, height: curr.height + 1 };
       }
@@ -294,15 +282,17 @@ function processGoogology(rawInput) {
         current = applyBase(base, current);
       }
       
-      if (isYHuge) {
-        formatTower(display, { heightStruct: yStruct, value: current.value });
+      let finalHeight = current.height;
+      let targetY = Math.floor(yStruct.value);
+      if (yStruct.height === 0 && targetY > iters) {
+        finalHeight += (targetY - iters);
+      }
+      
+      if (isYHuge || finalHeight >= 6) {
+         let hStr = yStruct.height > 0 ? yStruct.latex : String(finalHeight);
+         formatTower(display, { forceTetration: true, tetraHeightStr: hStr, value: current.value });
       } else {
-        let finalHeight = current.height;
-        let targetY = Math.floor(yStruct.value);
-        if (targetY > iters) {
-          finalHeight += (targetY - iters);
-        }
-        formatTower(display, { heightNum: finalHeight, value: current.value });
+         formatTower(display, { value: current.value, height: finalHeight });
       }
       return;
     } catch (err) {
@@ -336,7 +326,6 @@ function processGoogology(rawInput) {
           let logG = 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(x) - x + (1 / (12 * x)) - (1 / (360 * Math.pow(x, 3)));
           logFact = logG * Math.LOG10E;
         }
-        
         formatTower(display, { value: logFact, height: 1 });
         return;
       }
