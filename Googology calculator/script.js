@@ -111,35 +111,89 @@ function parseToStructural(rawStr) {
   return { value: current.value, height: current.height, latex: latex };
 }
 
-function formatTower(display, data) {
-  let heightStr = "";
-  let isAstronomical = false;
-  
-  // Determine if the height configuration passes your 10^^10^10 threshold
-  if (data.heightStruct) {
-    heightStr = data.heightStruct.latex;
-    if (data.heightStruct.height > 0 || data.heightStruct.value >= 1e10) {
-      isAstronomical = true;
+function formatTower(display, current) {
+  // HELPER: Intercepts raw JS scientific notation, clears float noise, forces LaTeX
+  const toLatexSci = (num) => {
+    if (num === Infinity || num === "Infinity") return "\\infty";
+    
+    let str = String(num);
+    if (str.includes('e')) {
+      let [coeff, exp] = str.split('e');
+      exp = exp.replace('+', '');
+      
+      let cNum = parseFloat(coeff);
+      // Aggressive check: if coefficient is microscopically close to 1, snap it to 1
+      if (Math.abs(cNum - 1) < 1e-10) {
+        return `10^{${exp}}`;
+      }
+      
+      let roundedCoeff = Number(cNum.toFixed(4));
+      if (roundedCoeff === 1) return `10^{${exp}}`;
+      return `${roundedCoeff} \\times 10^{${exp}}`;
     }
-  } else {
-    heightStr = data.heightStr;
-    if (data.heightNum >= 1e10) {
-      isAstronomical = true;
+    
+    // Clean up floating point noise for non-scientific notation integers
+    let n = Number(num);
+    if (!isNaN(n) && Math.abs(n - Math.round(n)) < 1e-10) {
+      return String(Math.round(n));
     }
-  }
-  
-  let b = data.value;
-  
-  // CONDITIONAL AUTO-SWITCH: If height >= 10^10, completely drop the barrier suffix
-  if (isAstronomical || Math.abs(b - 1) < 1e-4 || b.toFixed(4) === "1.0000") {
-    renderMath(display, `10 \\uparrow\\uparrow {${heightStr}}`);
-  } else {
-    let bStr = b < 1e10 ? Number(b.toFixed(4)).toString() : (typeof formatValueClean === 'function' ? formatValueClean(b) : String(b));
-    if (bStr.includes('1.0000') || bStr === "1") {
+    
+    return typeof formatValueClean === 'function' ? formatValueClean(num) : str;
+  };
+
+  // AUTOMATIC TETRATION SWITCH (Triggered at 10^^6 and above)
+  if (current.height >= 6) {
+    let a = current.height;
+    let b = current.value;
+    
+    if (Math.abs(b - 10) < 1e-4 || b.toFixed(4) === "10.0000") {
+      a += 1;
+      b = 1;
+    }
+    
+    let heightStr = toLatexSci(a);
+    
+    if (Math.abs(b - 1) < 1e-4 || b.toFixed(4) === "1.0000") {
       renderMath(display, `10 \\uparrow\\uparrow {${heightStr}}`);
     } else {
+      let bStr = b < 1e10 ? Number(b.toFixed(4)).toString() : toLatexSci(b);
       renderMath(display, `10 \\uparrow\\uparrow {${heightStr}} > ${bStr}`);
     }
+    return;
+  }
+
+  // STANDARD POWER TOWERS (For heights below 6)
+  if (current.height === 0) {
+    if (current.value < 10000000000) {
+      let outputStr = Number(current.value.toFixed(10)).toString();
+      renderMath(display, `${outputStr}`);
+    } else {
+      renderHeight1(display, Math.log10(current.value));
+    }
+  } else if (current.height === 1) {
+    renderHeight1(display, current.value);
+  } else {
+    let exp = Math.floor(current.value);
+    let coeff = Math.pow(10, current.value - exp);
+    
+    if (coeff.toFixed(4) === "10.0000") {
+      coeff = 1;
+      exp += 1;
+    }
+    
+    let coeffStr = coeff.toFixed(4);
+    let latex = "";
+    
+    if (coeffStr === "1.0000") {
+      latex = toLatexSci(exp);
+    } else {
+      latex = `${coeffStr} \\times 10^{${toLatexSci(exp)}}`;
+    }
+    
+    for (let h = 0; h < current.height; h++) {
+      latex = `10^{${latex}}`;
+    }
+    renderMath(display, `${latex}`);
   }
 }
 
