@@ -31,11 +31,10 @@ function formatValueClean(v) {
   return `${coeffStr} \\times 10^{${formatValueClean(exp)}}`;
 }
 
-// NEW HELPER: Parses any expression or sub-expression structurally using logs to avoid the 10^308 Infinity wall
+// Parses any expression or sub-expression structurally using logs to avoid the 10^308 Infinity wall
 function parseToStructural(rawStr) {
   let expr = rawStr.trim().toLowerCase().replace(/\s+/g, '').replace(/x/g, '*');
   
-  // If it's a flat number or simple scientific notation, handle safely
   if (!expr.includes('^')) {
     if (expr.includes('e')) {
       let [c, e] = expr.split('e');
@@ -50,7 +49,6 @@ function parseToStructural(rawStr) {
     return { value: Infinity, height: 0, latex: "\\infty" };
   }
 
-  // If it's a power tower (like 2^1024 or 10^10^10), parse from right to left using log-space
   const parts = expr.split('^');
   let current = { value: null, height: 0 };
   let topExpr = parts[parts.length - 1].replace(/\*\*/g, '^');
@@ -85,7 +83,6 @@ function parseToStructural(rawStr) {
     }
   }
   
-  // Build pristine LaTeX representation of the parsed argument
   let latex = "";
   if (current.height === 0) {
     latex = String(current.value);
@@ -111,8 +108,8 @@ function parseToStructural(rawStr) {
   return { value: current.value, height: current.height, latex: latex };
 }
 
-function formatTower(display, current) {
-  // HELPER: Intercepts raw JS scientific notation, clears float noise, forces LaTeX
+// Unified renderer supporting structural tetration data and power tower fallbacks
+function formatTower(display, data) {
   const toLatexSci = (num) => {
     if (num === Infinity || num === "Infinity") return "\\infty";
     
@@ -122,7 +119,6 @@ function formatTower(display, current) {
       exp = exp.replace('+', '');
       
       let cNum = parseFloat(coeff);
-      // Aggressive check: if coefficient is microscopically close to 1, snap it to 1
       if (Math.abs(cNum - 1) < 1e-10) {
         return `10^{${exp}}`;
       }
@@ -132,7 +128,6 @@ function formatTower(display, current) {
       return `${roundedCoeff} \\times 10^{${exp}}`;
     }
     
-    // Clean up floating point noise for non-scientific notation integers
     let n = Number(num);
     if (!isNaN(n) && Math.abs(n - Math.round(n)) < 1e-10) {
       return String(Math.round(n));
@@ -141,28 +136,42 @@ function formatTower(display, current) {
     return typeof formatValueClean === 'function' ? formatValueClean(num) : str;
   };
 
-  // AUTOMATIC TETRATION SWITCH (Triggered at 10^^6 and above)
-  if (current.height >= 6) {
-    let a = current.height;
-    let b = current.value;
+  // 1. TETRATION RENDERING PATH
+  if (data.heightStruct !== undefined || data.heightNum !== undefined) {
+    let heightStr = "";
+    let isAstronomical = false;
     
-    if (Math.abs(b - 10) < 1e-4 || b.toFixed(4) === "10.0000") {
-      a += 1;
-      b = 1;
+    if (data.heightStruct) {
+      heightStr = data.heightStruct.latex;
+      if (data.heightStruct.height > 0 || data.heightStruct.value >= 1e10) {
+        isAstronomical = true;
+      }
+    } else {
+      if (data.heightNum >= 1e10) {
+        isAstronomical = true;
+        heightStr = toLatexSci(data.heightNum);
+      } else {
+        heightStr = String(data.heightNum);
+      }
     }
     
-    let heightStr = toLatexSci(a);
+    let b = data.value;
     
-    if (Math.abs(b - 1) < 1e-4 || b.toFixed(4) === "1.0000") {
+    if (isAstronomical || Math.abs(b - 1) < 1e-4 || b.toFixed(4) === "1.0000") {
       renderMath(display, `10 \\uparrow\\uparrow {${heightStr}}`);
     } else {
       let bStr = b < 1e10 ? Number(b.toFixed(4)).toString() : toLatexSci(b);
-      renderMath(display, `10 \\uparrow\\uparrow {${heightStr}} > ${bStr}`);
+      if (bStr === "1" || bStr.includes("1.0000")) {
+        renderMath(display, `10 \\uparrow\\uparrow {${heightStr}}`);
+      } else {
+        renderMath(display, `10 \\uparrow\\uparrow {${heightStr}} > ${bStr}`);
+      }
     }
     return;
   }
 
-  // STANDARD POWER TOWERS (For heights below 6)
+  // 2. STANDARD POWER TOWERS PATH (Fallback)
+  let current = data; 
   if (current.height === 0) {
     if (current.value < 10000000000) {
       let outputStr = Number(current.value.toFixed(10)).toString();
@@ -197,7 +206,6 @@ function formatTower(display, current) {
   }
 }
 
-// Ensure renderHeight1 also has no hardcoded prefix text leaks
 function renderHeight1(display, logVal) {
   let exp = Math.floor(logVal);
   let coeff = Math.pow(10, logVal - exp);
@@ -223,7 +231,7 @@ function processGoogology(rawInput) {
     return renderMath(display, `\\text{Result: } 10^{10^{100}}`); 
   }
 
-    // 1. DYNAMIC BASE TETRATION & BARRIER ENGINE (BYPASSES NATIVE FLOATS)
+  // 1. DYNAMIC BASE TETRATION ENGINE (FLAWLESS TRACKING)
   if (expr.includes('^^')) {
     try {
       const parts = expr.split('^^');
@@ -231,7 +239,7 @@ function processGoogology(rawInput) {
       let baseStruct = parseToStructural(baseExpr);
       let base = (baseStruct.height === 0) ? baseStruct.value : Infinity;
       
-      let rest = parts[1];
+      let rest = parts[parts.length - 1];
       let yExpr, barrierExpr = "1";
       
       if (rest.includes('>')) {
@@ -242,44 +250,59 @@ function processGoogology(rawInput) {
         yExpr = rest;
       }
       
-      // Safely parse potentially massive structural inputs
       let yStruct = parseToStructural(yExpr);
       let barrierStruct = parseToStructural(barrierExpr);
       let barrier = (barrierStruct.height === 0) ? barrierStruct.value : 1;
       
-      let isYHuge = (yStruct.height > 0 || yStruct.value > 10);
-      
-      // If base is exactly 10, skip loops entirely and project directly
+      // Shortcut: Base 10 needs zero loop translations
       if (Math.abs(base - 10) < 1e-7) {
          formatTower(display, { heightStruct: yStruct, value: barrier });
          return;
       }
       
-      // Base-conversion cycle limited to a maximum of 10 structural layers
       let current = { value: barrier, height: 0 };
-      let iters = isYHuge ? 10 : Math.min(yStruct.value, 10);
+      let isYHuge = (yStruct.height > 0 || yStruct.value > 20);
+      let iters = isYHuge ? 5 : Math.floor(yStruct.value);
+      
+      function applyBase(b, curr) {
+        if (curr.height === 0) {
+          let next = Math.pow(b, curr.value);
+          if (Number.isFinite(next) && next < 1e10) {
+            return { value: next, height: 0 };
+          } else {
+            return { value: curr.value * Math.log10(b), height: 1 };
+          }
+        }
+        if (curr.height === 1) {
+          let innerExp = curr.value + Math.log10(Math.log10(b));
+          if (innerExp >= 10) {
+            return { value: Math.log10(innerExp), height: 3 };
+          } else if (innerExp >= 1) {
+            return { value: innerExp, height: 2 };
+          } else {
+            return { value: Math.pow(10, innerExp), height: 1 };
+          }
+        }
+        if (curr.height === 2) {
+          let nextVal = Math.log10(Math.pow(10, curr.value) + Math.log10(Math.log10(b)));
+          return { value: nextVal, height: 3 };
+        }
+        return { value: curr.value, height: curr.height + 1 };
+      }
       
       for (let i = 0; i < iters; i++) {
-        if (current.height === 0) {
-          let next = Math.pow(base, current.value);
-          if (Number.isFinite(next) && next < 1e300) {
-            current.value = next;
-          } else {
-            current.value = current.value * Math.log10(base);
-            current.height = 1;
-          }
-        } else {
-          current.value = Math.log10(Math.log10(base)) + current.value;
-          current.height += 1;
-        }
+        current = applyBase(base, current);
       }
       
       if (isYHuge) {
         formatTower(display, { heightStruct: yStruct, value: current.value });
       } else {
         let finalHeight = current.height;
-        if (yStruct.value > 10) finalHeight += (yStruct.value - 10);
-        formatTower(display, { heightStr: String(finalHeight), value: current.value, heightNum: finalHeight });
+        let targetY = Math.floor(yStruct.value);
+        if (targetY > iters) {
+          finalHeight += (targetY - iters);
+        }
+        formatTower(display, { heightNum: finalHeight, value: current.value });
       }
       return;
     } catch (err) {
