@@ -43,12 +43,14 @@ function formatTower(display, current) {
       b = 1;
     }
     
-    // 10^^a>1 collapse rule -> 10^^a rendered with proper Knuth Up-Arrows
+    // FIX: Wrap 'a' in formatValueClean() so giant heights look pristine in LaTeX
+    let heightStr = formatValueClean(a);
+    
     if (Math.abs(b - 1) < 1e-4 || b.toFixed(4) === "1.0000") {
-      renderMath(display, `\\text{Result: } 10 \\uparrow\\uparrow ${a}`);
+      renderMath(display, `\\text{Result: } 10 \\uparrow\\uparrow {${heightStr}}`);
     } else {
       let bStr = b < 1e10 ? Number(b.toFixed(4)).toString() : formatValueClean(b);
-      renderMath(display, `\\text{Result: } 10 \\uparrow\\uparrow ${a} > ${bStr}`);
+      renderMath(display, `\\text{Result: } 10 \\uparrow\\uparrow {${heightStr}} > ${bStr}`);
     }
     return;
   }
