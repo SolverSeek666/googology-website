@@ -32,16 +32,32 @@ function formatValueClean(v) {
 }
 
 function formatTower(display, current) {
-  // HELPER: Intercepts raw JS scientific notation (1e+25) and forces it into LaTeX (10^{25})
+  // HELPER: Intercepts raw JS scientific notation, clears float noise, forces LaTeX
   const toLatexSci = (num) => {
+    if (num === Infinity || num === "Infinity") return "\\infty";
+    
     let str = String(num);
     if (str.includes('e')) {
       let [coeff, exp] = str.split('e');
-      exp = exp.replace('+', ''); // Clean up the '+' sign JS adds
-      if (coeff === '1') return `10^{${exp}}`;
-      return `${coeff} \\times 10^{${exp}}`;
+      exp = exp.replace('+', '');
+      
+      let cNum = parseFloat(coeff);
+      // Aggressive check: if coefficient is microscopically close to 1, snap it to 1
+      if (Math.abs(cNum - 1) < 1e-10) {
+        return `10^{${exp}}`;
+      }
+      
+      let roundedCoeff = Number(cNum.toFixed(4));
+      if (roundedCoeff === 1) return `10^{${exp}}`;
+      return `${roundedCoeff} \\times 10^{${exp}}`;
     }
-    // Fallback to your existing clean function for normal numbers
+    
+    // Clean up floating point noise for non-scientific notation integers
+    let n = Number(num);
+    if (!isNaN(n) && Math.abs(n - Math.round(n)) < 1e-10) {
+      return String(Math.round(n));
+    }
+    
     return typeof formatValueClean === 'function' ? formatValueClean(num) : str;
   };
 
@@ -50,17 +66,14 @@ function formatTower(display, current) {
     let a = current.height;
     let b = current.value;
     
-    // Normalize: if the top value rounds to 10, absorb it into the tower height
     if (Math.abs(b - 10) < 1e-4 || b.toFixed(4) === "10.0000") {
       a += 1;
       b = 1;
     }
     
-    // Apply our new forced-LaTeX string converter to the height
     let heightStr = toLatexSci(a);
     
     if (Math.abs(b - 1) < 1e-4 || b.toFixed(4) === "1.0000") {
-      // "Result:" text removed!
       renderMath(display, `10 \\uparrow\\uparrow {${heightStr}}`);
     } else {
       let bStr = b < 1e10 ? Number(b.toFixed(4)).toString() : toLatexSci(b);
