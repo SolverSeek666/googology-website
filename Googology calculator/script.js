@@ -2,7 +2,7 @@
 
 const PHI = (1 + Math.sqrt(5)) / 2;
 
-// 1. Core Event Listener
+// 1. Unified Event Hook
 document.getElementById('calcInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') {
     const input = this.value.trim();
@@ -12,31 +12,31 @@ document.getElementById('calcInput').addEventListener('keydown', function(e) {
   }
 });
 
-// 2. Main Processing Pipeline
+// 2. Core Processing Pipeline
 function processGoogology(rawInput) {
   const display = document.getElementById('outputDisplay');
   if (!display) return;
   
-  // Clean up and normalize input text string
+  // Normalize and clean up text strings
   let expr = rawInput.toLowerCase().replace(/x/g, '*').replace(/\s+/g, '');
   expr = expr.replace(/phi/g, `(${PHI})`);
   
-  // Hardcoded Googology Landmarks
+  // Instant Named Landmarks
   if (expr === 'googol') return renderMath(display, `10^{100}`); 
   if (expr === 'googolplex') return renderMath(display, `10^{10^{100}}`); 
 
   try {
-    // Pass to our secure break_eternity evaluation chain
+    // Run string through the safe break_eternity evaluation hierarchy
     let result = parseAddSub(expr);
     
-    // Render clean LaTeX output
+    // Safely format the output directly into clean LaTeX
     renderMath(display, formatDecimalToLatex(result));
   } catch (err) {
     renderMath(display, `\\text{Error: Could not compute.}`);
   }
 }
 
-// 3. Mathematical Parser Chain (Right-Associative & Safe)
+// 3. Recursive Binary Splitter (Ensures plain numbers pass safely through)
 function findSplit(s, opArray, rightAssociative = false) {
   let depth = 0;
   if (rightAssociative) {
@@ -98,31 +98,9 @@ function parseExponent(s) {
 function parseTetration(s) {
   let split = findSplit(s, ['^^'], true);
   if (split) {
-    let left = parseFactorial(s.substring(0, split.index));
+    let left = parsePrimary(s.substring(0, split.index));
     let right = parseTetration(s.substring(split.index + 2));
-    // break_eternity requires height parameter to be a regular JS float number
     return left.tetrate(right.toNumber());
-  }
-  return parseFactorial(s);
-}
-
-function parseFactorial(s) {
-  s = s.trim();
-  if (s.endsWith('!')) {
-    let inner = s.slice(0, -1);
-    let val = parseFactorial(inner);
-    if (val.lt(0)) return new Decimal(NaN);
-    
-    if (val.lt(21) && val.eq(val.round())) {
-      let res = new Decimal(1);
-      for (let i = 2; i <= val.toNumber(); i++) res = res.mul(i);
-      return res;
-    } else {
-      // High-precision Stirling's Approximation using native Decimals
-      let n = val;
-      let lnFact = n.mul(n.ln()).sub(n).add(n.mul(2 * Math.PI).ln().mul(0.5));
-      return Decimal.pow(Math.E, lnFact);
-    }
   }
   return parsePrimary(s);
 }
@@ -132,48 +110,49 @@ function parsePrimary(s) {
   if (s.startsWith('(') && s.endsWith(')')) {
     return parseAddSub(s.substring(1, s.length - 1));
   }
+  // If it's just a raw number, it falls cleanly into here and creates a valid Decimal object!
   let d = new Decimal(s);
   if (d.isNaN()) throw new Error("Invalid Input");
   return d;
 }
 
-// 4. Clean, Unified LaTeX Formatter
+// 4. Responsive LaTeX Layout Engine
 function formatDecimalToLatex(d) {
   if (d.isNaN()) return "\\text{NaN}";
   if (!d.isFinite()) return "\\infty";
 
-  // Layer 0: Flat numbers and standard scientific values
+  // Layer 0: Flat integers and standard scientific values
   if (d.layer === 0) {
     if (d.mag < 100000) {
-      return String(Math.round(d.mag * 10000) / 10000);
+      return String(parseFloat(d.mag.toFixed(4)));
     }
     let exp = Math.floor(Math.log10(d.mag));
     let mantissa = d.mag / Math.pow(10, exp);
     if (mantissa.toFixed(4) === "10.0000") { mantissa = 1; exp += 1; }
     if (mantissa.toFixed(4) === "1.0000") return `10^{${exp}}`;
-    return `${mantissa.toFixed(4)} \\times 10^{${exp}}`;
+    return `${mantissa.toFixed(4).replace(/\.?0+$/, "")} \\times 10^{${exp}}`;
   }
 
-  // Layer 1: Single exponential tower (10^x)
+  // Layer 1: Clean single exponential tower (10^x)
   if (d.layer === 1) {
     let exp = d.mag;
     if (exp < 100000) {
-      return `10^{${exp.toFixed(4).replace(/\.?0+$/, "")}}`;
+      return `10^{${parseFloat(exp.toFixed(4))}}`;
     }
     return `10^{${formatDecimalToLatex(new Decimal(exp))}}`;
   }
 
-  // Layer 2: Double exponential tower (10^10^x)
+  // Layer 2: Clean double exponential tower (10^10^x)
   if (d.layer === 2) {
     let exp = d.mag;
     if (exp < 100000) {
-      return `10^{10^{${exp.toFixed(4).replace(/\.?0+$/, "")}}}`;
+      return `10^{10^{${parseFloat(exp.toFixed(4))}}}`;
     }
     return `10^{10^{${formatDecimalToLatex(new Decimal(exp))}}}`;
   }
 
-  // Layer 3+: Auto-format to Up-Arrow Notation
-  return `10 \\uparrow\\uparrow ${d.layer}`;
+  // Layer 3+: Converts automatically to clean Up-Arrow Notation to stay inside screen margins!
+  return `10 \\uparrow\\uparrow ${parseFloat((d.layer + Math.log10(d.mag)).toFixed(4))}`;
 }
 
 function renderMath(element, latex) {
