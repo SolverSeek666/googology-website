@@ -1,10 +1,10 @@
 // I use gemini to help me lmao
 
-// Ensure OmegaNum is safely accessible
-const OmegaNum = window.OmegaNum || require("omega-num");
+const Decimal = window.Decimal || require("break_eternity.js");
 
-// Pass a string or number to initialize properly
-const PHI = new OmegaNum((1 + Math.sqrt(5)) / 2);
+const Pi = Decimal.dPi;
+const E = Decimal.dE;
+const Phi = Decimal.fromComponents(1, 0, (1 + Math.sqrt(5)) / 2);
 
 document.getElementById('calcInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') {
@@ -16,132 +16,123 @@ document.getElementById('calcInput').addEventListener('keydown', function(e) {
 });
 
 /**
- * FIXED LATEX FORMATTER FOR OMEGANUM
- * Parses OmegaNum's native string format into clean MathJax symbols.
+ * CLEAN LATEX FORMATTER USING BREAK_ETERNITY NATIVE CAPABILITIES
+ * Automatically converts extremely large values into clean LaTeX power towers.
  */
-function renderOmegaNumResult(display, omniValue) {
+function renderDecimalResult(display, decimalValue) {
   let latex = "";
 
-  if (omniValue.lt(1e10)) {
-    latex = Math.floor(omniValue.toNumber()).toString();
+  // If it's a standard/small number, show cleanly
+  if (decimalValue.lt(1e10)) {
+    latex = Math.floor(decimalValue.toNumber()).toString();
   } else {
-    // Using string output which produces configurations like "10^^5" or "e100"
-    let rawStr = omniValue.toString();
-    
-    if (rawStr.includes('e')) {
-      // Formats e.g. "e1e100" into 10^{10^{100}}
-      let parts = rawStr.split('e');
-      if (parts[0] === "" || parts[0] === "1") {
-        latex = "10^{" + parts.slice(1).join('10^{') + "}".repeat(parts.length - 1);
-      } else {
-        latex = `${parts[0]} \\times 10^{` + parts.slice(1).join('10^{') + "}".repeat(parts.length - 1);
-      }
-    } else if (rawStr.includes('^')) {
-      // Formats OmegaNum's arrow outputs (e.g., "10^^5" -> "10 \uparrow\uparrow 5")
-      latex = rawStr.replace(/\^\^\^/g, ' \\uparrow\\uparrow\\uparrow ')
-                    .replace(/\^\^/g, ' \\uparrow\\uparrow ')
-                    .replace(/\^/g, ' \\uparrow ');
-    } else {
-      latex = rawStr;
-    }
+    // break_eternity has built-in LaTeX generation for layer-1, layer-2, and layer-3+ numbers!
+    latex = decimalValue.toLatex();
   }
 
-  renderMath(display, `\\text{Result: } ${latex}`);
+  renderMath(display, `${latex}`);
 }
 
 /**
- * FIXED FACTORIAL ENGINE
- * Replaced the manual .pi lookup with standard float approximation mapped cleanly to OmegaNum.
+ * BREAK_ETERNITY FACTORIAL ENGINE
+ * Uses Stirling's approximation optimized for Decimal types.
  */
-function omegaFactorial(n) {
-  if (n.lt(0)) return new OmegaNum(NaN);
-  if (n.isZero()) return new OmegaNum(1);
+function decimalFactorial(n) {
+  if (n.lt(0)) return new Decimal(NaN);
+  if (n.isZero()) return new Decimal(1);
   if (n.lte(20)) {
-    let result = new OmegaNum(1);
+    // Exact calculation for small numbers
+    let result = new Decimal(1);
     for (let i = 2; i <= n.toNumber(); i++) {
       result = result.times(i);
     }
     return result;
   }
 
-  // Stirling's Approximation using explicitly supported OmegaNum operations:
-  // ln(n!) ≈ 0.5 * ln(2 * pi * n) + n * ln(n) - n
-  const piOM = new OmegaNum(Math.PI);
+  // Stirling's Approximation: n! ≈ sqrt(2 * pi * n) * (n / e)^n
+  // In logarithmic space for huge numbers: ln(n!) ≈ 0.5 * ln(2 * pi * n) + n * ln(n) - n
   
-  const part1 = n.times(piOM).times(2).ln().times(0.5);
-  const part2 = n.times(n.ln());
+  const part1 = Decimal.ln(n.times(Pi).times(2)).times(0.5);
+  const part2 = n.times(Decimal.ln(n));
   const lnFact = part1.plus(part2).minus(n);
 
-  return lnFact.exp();
+  return Decimal.exp(lnFact);
 }
 
 /**
- * RIGHT-TO-LEFT MATH EXPRESSION PARSER
- * Evaluates inputs ensuring power towers evaluate correctly.
+ * SAFE MATHEMATICAL EXPRESSION EVALUATOR
+ * Safely parses basic tokens (+, -, *, /, ^) using Decimal functions.
  */
-function evaluateOmegaExpression(expr) {
+function evaluateDecimalExpression(expr) {
+  // Handle power towers properly by parsing right-to-left (Right-Associative)
   if (expr.includes('^')) {
     const parts = expr.split('^');
-    let current = evaluateOmegaExpression(parts[parts.length - 1]);
+    let current = evaluateDecimalExpression(parts[parts.length - 1]);
     
     for (let i = parts.length - 2; i >= 0; i--) {
-      let base = evaluateOmegaExpression(parts[i]);
+      let base = evaluateDecimalExpression(parts[i]);
       current = base.pow(current);
     }
     return current;
   }
 
+  // Handle Multiplication
   if (expr.includes('*')) {
     return expr.split('*')
-               .map(evaluateOmegaExpression)
+               .map(evaluateDecimalExpression)
                .reduce((a, b) => a.times(b));
   }
 
+  // Handle Division
   if (expr.includes('/')) {
     return expr.split('/')
-               .map(evaluateOmegaExpression)
+               .map(evaluateDecimalExpression)
                .reduce((a, b) => a.div(b));
   }
 
+  // Handle Addition
   if (expr.includes('+')) {
     return expr.split('+')
-               .map(evaluateOmegaExpression)
+               .map(evaluateDecimalExpression)
                .reduce((a, b) => a.plus(b));
   }
 
-  if (expr === 'phi') return PHI;
+  // Base Case: Convert raw number or constants to Decimal
+  if (expr === 'pi') return Pi;
+  if (expr === 'e') return E;
+  if (expr === 'phi') return Phi;
   
+  // Clean up remaining brackets if any
   let cleanExpr = expr.replace(/[()]/g, '');
-  return new OmegaNum(cleanExpr);
+  return new Decimal(cleanExpr);
 }
 
 /**
- * MAIN INPUT PROCESSOR
+ * MAIN GOOGOLOGY PROCESSOR
  */
 function processGoogology(rawInput) {
   const display = document.getElementById('outputDisplay');
   
+  // Normalize string inputs
   let expr = rawInput.toLowerCase().replace(/x/g, '*').replace(/\s+/g, '');
   
-  // Explicit assignments using strings so JS numbers don't lose precision or throw errors
+  // Named Googology Constants
   if (expr === 'googol') { 
-    return renderOmegaNumResult(display, new OmegaNum("1e100")); 
+    return renderDecimalResult(display, new Decimal("1e100")); 
   }
   if (expr === 'googolplex') { 
-    return renderOmegaNumResult(display, OmegaNum.pow("10", "1e100")); 
-  }
-  if (expr === 'googolduplex') {
-    return renderOmegaNumResult(display, OmegaNum.pow("10", OmegaNum.pow("10", "1e100")));
+    return renderDecimalResult(display, new Decimal("1e100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")); 
+    // Or natively via layer components: Decimal.fromComponents(1, 2, 100) -> 10^10^100
   }
 
-  // Factorials
+  // 1. FACTORIAL SYSTEM
   if (expr.endsWith('!')) {
     let numStr = expr.slice(0, -1);
     try {
-      let innerValue = evaluateOmegaExpression(numStr);
+      let innerValue = evaluateDecimalExpression(numStr);
       if (!innerValue.isNaN()) {
-        let result = omegaFactorial(innerValue);
-        renderOmegaNumResult(display, result);
+        let result = decimalFactorial(innerValue);
+        renderDecimalResult(display, result);
         return;
       }
     } catch(err) {
@@ -150,20 +141,21 @@ function processGoogology(rawInput) {
     }
   }
 
-  // Base Numbers and Power Towers
+  // 2. STANDARD & POWER TOWER SYSTEM
   try {
-    let result = evaluateOmegaExpression(expr);
+    let result = evaluateDecimalExpression(expr);
     if (!result.isNaN() && result.isFinite()) {
-      renderOmegaNumResult(display, result);
+      renderDecimalResult(display, result);
       return;
     }
   } catch (e) {
-    // Fail silently to render error
+    // Fall through to error
   }
 
   renderMath(display, `\\text{Error: Could not compute.}`);
 }
 
+// MathJax Renderer
 function renderMath(element, latex) {
   element.innerHTML = `\\[ ${latex} \\]`;
   MathJax.typesetPromise([element]).catch((err) => console.log(err));
