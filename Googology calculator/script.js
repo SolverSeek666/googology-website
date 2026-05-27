@@ -2,41 +2,47 @@
 
 const PHI = (1 + Math.sqrt(5)) / 2;
 
-// 1. Unified Event Hook
-document.getElementById('calcInput').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') {
-    const input = this.value.trim();
-    if (input) {
-      processGoogology(input);
+// 1. Safe Initialization Hook (Prevents null script crashes on load)
+function initCalculator() {
+  const inputEl = document.getElementById('calcInput');
+  if (!inputEl) return;
+
+  inputEl.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      const input = this.value.trim();
+      if (input) {
+        processGoogology(input);
+      }
     }
-  }
-});
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initCalculator);
+} else {
+  initCalculator();
+}
 
 // 2. Core Processing Pipeline
 function processGoogology(rawInput) {
   const display = document.getElementById('outputDisplay');
   if (!display) return;
   
-  // Normalize and clean up text strings
   let expr = rawInput.toLowerCase().replace(/x/g, '*').replace(/\s+/g, '');
   expr = expr.replace(/phi/g, `(${PHI})`);
   
-  // Instant Named Landmarks
   if (expr === 'googol') return renderMath(display, `10^{100}`); 
   if (expr === 'googolplex') return renderMath(display, `10^{10^{100}}`); 
 
   try {
-    // Run string through the safe break_eternity evaluation hierarchy
     let result = parseAddSub(expr);
-    
-    // Safely format the output directly into clean LaTeX
     renderMath(display, formatDecimalToLatex(result));
   } catch (err) {
     renderMath(display, `\\text{Error: Could not compute.}`);
   }
 }
 
-// 3. Recursive Binary Splitter (Ensures plain numbers pass safely through)
+// 3. Recursive Binary Splitter
 function findSplit(s, opArray, rightAssociative = false) {
   let depth = 0;
   if (rightAssociative) {
@@ -45,7 +51,13 @@ function findSplit(s, opArray, rightAssociative = false) {
       else if (s[i] === ')') depth--;
       else if (depth === 0) {
         for (let op of opArray) {
-          if (s.substring(i, i + op.length) === op) return { index: i, op: op };
+          if (s.substring(i, i + op.length) === op) {
+            // CRITICAL FIX: Ignore single '^' matches if they are actually sitting inside a '^^'
+            if (op === '^' && (s[i + 1] === '^' || (i > 0 && s[i - 1] === '^'))) {
+              continue;
+            }
+            return { index: i, op: op };
+          }
         }
       }
     }
@@ -110,7 +122,6 @@ function parsePrimary(s) {
   if (s.startsWith('(') && s.endsWith(')')) {
     return parseAddSub(s.substring(1, s.length - 1));
   }
-  // If it's just a raw number, it falls cleanly into here and creates a valid Decimal object!
   let d = new Decimal(s);
   if (d.isNaN()) throw new Error("Invalid Input");
   return d;
@@ -121,7 +132,6 @@ function formatDecimalToLatex(d) {
   if (d.isNaN()) return "\\text{NaN}";
   if (!d.isFinite()) return "\\infty";
 
-  // Layer 0: Flat integers and standard scientific values
   if (d.layer === 0) {
     if (d.mag < 100000) {
       return String(parseFloat(d.mag.toFixed(4)));
@@ -133,7 +143,6 @@ function formatDecimalToLatex(d) {
     return `${mantissa.toFixed(4).replace(/\.?0+$/, "")} \\times 10^{${exp}}`;
   }
 
-  // Layer 1: Clean single exponential tower (10^x)
   if (d.layer === 1) {
     let exp = d.mag;
     if (exp < 100000) {
@@ -142,7 +151,6 @@ function formatDecimalToLatex(d) {
     return `10^{${formatDecimalToLatex(new Decimal(exp))}}`;
   }
 
-  // Layer 2: Clean double exponential tower (10^10^x)
   if (d.layer === 2) {
     let exp = d.mag;
     if (exp < 100000) {
@@ -151,7 +159,6 @@ function formatDecimalToLatex(d) {
     return `10^{10^{${formatDecimalToLatex(new Decimal(exp))}}}`;
   }
 
-  // Layer 3+: Converts automatically to clean Up-Arrow Notation to stay inside screen margins!
   return `10 \\uparrow\\uparrow ${parseFloat((d.layer + Math.log10(d.mag)).toFixed(4))}`;
 }
 
