@@ -32,6 +32,19 @@ function formatValueClean(v) {
 }
 
 function formatTower(display, current) {
+  // HELPER: Intercepts raw JS scientific notation (1e+25) and forces it into LaTeX (10^{25})
+  const toLatexSci = (num) => {
+    let str = String(num);
+    if (str.includes('e')) {
+      let [coeff, exp] = str.split('e');
+      exp = exp.replace('+', ''); // Clean up the '+' sign JS adds
+      if (coeff === '1') return `10^{${exp}}`;
+      return `${coeff} \\times 10^{${exp}}`;
+    }
+    // Fallback to your existing clean function for normal numbers
+    return typeof formatValueClean === 'function' ? formatValueClean(num) : str;
+  };
+
   // AUTOMATIC TETRATION SWITCH (Triggered at 10^^6 and above)
   if (current.height >= 6) {
     let a = current.height;
@@ -43,14 +56,15 @@ function formatTower(display, current) {
       b = 1;
     }
     
-    // FIX: Wrap 'a' in formatValueClean() so giant heights look pristine in LaTeX
-    let heightStr = formatValueClean(a);
+    // Apply our new forced-LaTeX string converter to the height
+    let heightStr = toLatexSci(a);
     
     if (Math.abs(b - 1) < 1e-4 || b.toFixed(4) === "1.0000") {
-      renderMath(display, `\\text{Result: } 10 \\uparrow\\uparrow {${heightStr}}`);
+      // "Result:" text removed!
+      renderMath(display, `10 \\uparrow\\uparrow {${heightStr}}`);
     } else {
-      let bStr = b < 1e10 ? Number(b.toFixed(4)).toString() : formatValueClean(b);
-      renderMath(display, `\\text{Result: } 10 \\uparrow\\uparrow {${heightStr}} > ${bStr}`);
+      let bStr = b < 1e10 ? Number(b.toFixed(4)).toString() : toLatexSci(b);
+      renderMath(display, `10 \\uparrow\\uparrow {${heightStr}} > ${bStr}`);
     }
     return;
   }
@@ -59,7 +73,7 @@ function formatTower(display, current) {
   if (current.height === 0) {
     if (current.value < 10000000000) {
       let outputStr = Number(current.value.toFixed(10)).toString();
-      renderMath(display, `\\text{Result: } ${outputStr}`);
+      renderMath(display, `${outputStr}`);
     } else {
       renderHeight1(display, Math.log10(current.value));
     }
@@ -78,15 +92,15 @@ function formatTower(display, current) {
     let latex = "";
     
     if (coeffStr === "1.0000") {
-      latex = formatValueClean(exp);
+      latex = toLatexSci(exp);
     } else {
-      latex = `${coeffStr} \\times 10^{${formatValueClean(exp)}}`;
+      latex = `${coeffStr} \\times 10^{${toLatexSci(exp)}}`;
     }
     
     for (let h = 0; h < current.height; h++) {
       latex = `10^{${latex}}`;
     }
-    renderMath(display, `\\text{Result: } ${latex}`);
+    renderMath(display, `${latex}`);
   }
 }
 
