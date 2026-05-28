@@ -31,6 +31,38 @@ function formatValueClean(v) {
   return `${coeffStr} \\times 10^{${formatValueClean(exp)}}`;
 }
 
+function renderHeight1(display, val) {
+  const toLatexSci = (num) => {
+    let str = String(num);
+    if (str.includes('e')) {
+      let [coeff, exp] = str.split('e');
+      exp = exp.replace('+', '');
+      if (coeff === '1') return `10^{${exp}}`;
+      return `${coeff} \\times 10^{${exp}}`;
+    }
+    return typeof formatValueClean === 'function' ? formatValueClean(num) : str;
+  };
+
+  let exp = Math.floor(val);
+  let coeff = Math.pow(10, val - exp);
+  
+  if (coeff.toFixed(4) === "10.0000") {
+    coeff = 1;
+    exp += 1;
+  }
+  
+  let coeffStr = coeff.toFixed(4);
+  let latex = "";
+  
+  if (coeffStr === "1.0000") {
+    latex = `10^{${toLatexSci(exp)}}`;
+  } else {
+    latex = `${coeffStr} \\times 10^{${toLatexSci(exp)}}`;
+  }
+  
+  renderMath(display, latex);
+}
+
 function formatTower(display, current) {
   // HELPER: Intercepts raw JS scientific notation (1e+25) and forces it into LaTeX (10^{25})
   const toLatexSci = (num) => {
