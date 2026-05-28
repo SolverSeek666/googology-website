@@ -46,9 +46,8 @@ function formatTower(display, current) {
         return `10^{${exp}}`;
       }
       
-      let roundedCoeff = Number(cNum.toFixed(4));
-      if (roundedCoeff === 1) return `10^{${exp}}`;
-      return `${roundedCoeff} \\times 10^{${exp}}`;
+      if (coeff === 1) return `10^{${exp}}`;
+      return `${coeff} \\times 10^{${exp}}`;
     }
 
     // Clean up floating point noise for non-scientific notation integers
