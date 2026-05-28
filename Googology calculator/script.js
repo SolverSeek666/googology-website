@@ -392,6 +392,17 @@ function formatTower(display, current) {
     return typeof formatValueClean === 'function' ? formatValueClean(num) : str;
   };
 
+  // ============================================================================
+  // FIXED: Tower Shifting (Normalization)
+  // If a height-1 tower has a value >= 1e10, standard scientific notation
+  // breaks down and outputs an inaccurate front coefficient. Shifting it up
+  // to a height-2 tower eliminates 'a' and cleanly yields 10^{b * 10^c}.
+  // ============================================================================
+  if (current.height === 1 && current.value >= 1e10) {
+    current.height = 2;
+    current.value = Math.log10(current.value);
+  }
+
   if (current.height >= 6) {
     let a = current.height;
     let b = current.value;
@@ -433,7 +444,7 @@ function formatTower(display, current) {
     let coeffStr = coeff.toFixed(4);
     let latex = coeffStr === "1.0000" ? `10^{${toLatexSci(exp)}}` : `${coeffStr} \\times 10^{${toLatexSci(exp)}}`;
     
-    // FIX: Loop height - 1 times, because the 'latex' string already absorbed the first base-10!
+    // Loop height - 1 times, because the 'latex' string already absorbed the first base-10!
     for (let h = 0; h < current.height - 1; h++) {
       latex = `10^{${latex}}`;
     }
