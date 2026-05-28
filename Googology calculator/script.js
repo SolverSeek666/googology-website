@@ -119,11 +119,17 @@ function processGoogology(rawInput) {
           if (Number.isFinite(next) && next < 1e300) {
             current.value = next * coeffOuter;
           } else {
+            // Shift to base-10 exponent tracking level 1
             current.value = current.value * Math.log10(b);
             if (i === 0 && coeffOuter !== 1) current.value += Math.log10(coeffOuter);
             current.height = 1;
           }
+        } else if (current.height === 1) {
+          // Precise layer-2 conversion: b^(10^v) = 10^(10^v * log10(b)) = 10^10^(v + log10(log10(b)))
+          current.value = current.value + Math.log10(Math.log10(b));
+          current.height = 2;
         } else {
+          // For taller structures, standard top tower adjustments stack linearly
           current.value = Math.log10(Math.log10(b)) + current.value;
           current.height += 1;
         }
@@ -133,7 +139,6 @@ function processGoogology(rawInput) {
       return;
     } catch (err) { }
   }
-
   // --- ENGINE 4: STANDARD NATIVE MATH ---
   let jsExpr = expr.replace(/\^/g, '**');
   try {
