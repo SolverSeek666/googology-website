@@ -29,10 +29,14 @@ a {
   margin-bottom: 0;
 }
 
-.calc-info {
+.calc-heading {
   font-size: 24px;
   text-align: center;
-  margin-bottom: 0;
+}
+
+.calc-info {
+  font-size: 20px;
+  text-align: center;
 }
 
 .calc-container {
