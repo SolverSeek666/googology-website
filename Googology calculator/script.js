@@ -69,8 +69,11 @@ function processGoogology(rawInput) {
               current.value = current.value * Math.log10(base);
               current.height = 1;
             }
+          } else if (current.height === 1) {
+            current.value = current.value + Math.log10(Math.log10(base));
+            current.height = 2;
           } else {
-            current.value = Math.log10(Math.log10(base)) + current.value;
+             // Lock the value, just climb
             current.height += 1;
           }
         }
@@ -119,18 +122,16 @@ function processGoogology(rawInput) {
           if (Number.isFinite(next) && next < 1e300) {
             current.value = next * coeffOuter;
           } else {
-            // Shift to base-10 exponent tracking level 1
             current.value = current.value * Math.log10(b);
             if (i === 0 && coeffOuter !== 1) current.value += Math.log10(coeffOuter);
             current.height = 1;
           }
         } else if (current.height === 1) {
-          // Precise layer-2 conversion: b^(10^v) = 10^(10^v * log10(b)) = 10^10^(v + log10(log10(b)))
           current.value = current.value + Math.log10(Math.log10(b));
           current.height = 2;
         } else {
-          // For taller structures, standard top tower adjustments stack linearly
-          current.value = Math.log10(Math.log10(b)) + current.value;
+          // FIX: Once height >= 2, adding log10(log10(b)) to 10^V does nothing!
+          // We lock the value and ONLY increase the tower height.
           current.height += 1;
         }
       }
@@ -289,7 +290,8 @@ function formatTower(display, current) {
     let coeffStr = coeff.toFixed(4);
     let latex = coeffStr === "1.0000" ? toLatexSci(exp) : `${coeffStr} \\times 10^{${toLatexSci(exp)}}`;
     
-    for (let h = 0; h < current.height; h++) {
+    // FIX: Loop height - 1 times, because the 'latex' string already absorbed the first base-10!
+    for (let h = 0; h < current.height - 1; h++) {
       latex = `10^{${latex}}`;
     }
     renderMath(display, `${latex}`);
