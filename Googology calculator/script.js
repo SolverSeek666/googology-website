@@ -145,12 +145,31 @@ function parseFactorial() {
     k++;
   }
   if (k > 0) {
-    if (node.height > 0) {
-      node = createTower(node.value, node.height + 1);
-    } else {
-      let factRes = solveMultifactorial(node.value, k);
-      if (!factRes || isNaN(factRes.value)) throw new Error("Invalid factorial target");
-      node = factRes;
+    for (let j = 0; j < k; j++) {
+      if (node.height === 0) {
+        // Standard numbers run through the multi-factorial logic
+        let factRes = solveMultifactorial(node.value, (j === 0 ? k : 1));
+        if (!factRes || isNaN(factRes.value)) throw new Error("Invalid factorial target");
+        node = factRes;
+        if (j === 0) break; // Multi-factorial handled all exclamation marks at once
+      } else if (node.height === 1) {
+        // High Precision Stirling transformation for a height-1 tower: (10^v)!
+        // log10((10^v)!) = 10^v * (v - log10(e))
+        // Turning this back into a height-2 tower top value: v + log10(v - log10(e))
+        if (node.value > Math.LOG10E) {
+          node = createTower(node.value + Math.log10(node.value - Math.LOG10E), 2);
+        } else {
+          node = createTower(node.value, node.height + 1);
+        }
+      } else if (node.height === 2) {
+        // High Precision Stirling transformation for a height-2 tower: (10^10^v)!
+        // This shifts the top value slightly based on the layer below it
+        node = createTower(Math.log10(Math.pow(10, node.value) + node.value), 3);
+      } else {
+        // For height >= 3, the factorial value shift is so microscopically tiny 
+        // on a log-scale that growing the tower height by 1 is perfectly accurate.
+        node = createTower(node.value, node.height + 1);
+      }
     }
   }
   return node;
