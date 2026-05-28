@@ -17,31 +17,33 @@ document.getElementById('calcInput').addEventListener('keydown', function(e) {
 });
 
 // ============================================================================
-// SECTION 2: THE MATH BRAIN
-// Parses the user's input and routes it to the specialized engines.
+// SECTION 2: THE MATH BRAIN (ROBUST PARSER ENGINE)
+// Uses a Recursive Descent Parser to enforce true mathematical precedence.
 // ============================================================================
 
-// Helper function to safely strip outer wrapping parentheses if they span the entire expression
-function stripOuterParentheses(s) {
-  while (s.startsWith('(') && s.endsWith(')')) {
-    let depth = 0;
-    let balanced = true;
-    // Check if the opening parenthesis closes before the end of the string
-    for (let i = 0; i < s.length - 1; i++) {
-      if (s[i] === '(') depth++;
-      else if (s[i] === ')') depth--;
-      if (depth === 0) {
-        balanced = false; // Closed early, e.g., (2^3)^(2^3)
-        break;
-      }
-    }
-    if (balanced) {
-      s = s.slice(1, -1);
-    } else {
-      break;
-    }
+// Global parser state
+let tokens = [];
+let tokenIndex = 0;
+
+function peek() {
+  return tokens[tokenIndex] || null;
+}
+
+function consume() {
+  return tokens[tokenIndex++];
+}
+
+function match(t) {
+  if (peek() === t) {
+    consume();
+    return true;
   }
-  return s;
+  return false;
+}
+
+// Helper to initialize a Tower structure
+function createTower(val, height = 0) {
+  return { value: val, height: height };
 }
 
 function processGoogology(rawInput) {
@@ -51,134 +53,230 @@ function processGoogology(rawInput) {
   let expr = rawInput.toLowerCase().replace(/x/g, '*').replace(/\s+/g, '');
   expr = expr.replace(/phi/g, `(${PHI})`);
   
-  // FIXED: Strip outer balanced parentheses so wrapping whole expressions doesn't break parsing
-  expr = stripOuterParentheses(expr);
-  
-  // Handle hardcoded Easter eggs / specific words
+  // Hardcoded Easter eggs
   if (expr === 'googol') return renderMath(display, `\\text{Result: } 10^{100}`); 
   if (expr === 'googolplex') return renderMath(display, `\\text{Result: } 10^{10^{100}}`); 
 
-  // --- ENGINE 1: TETRATION (^^) ---
-  if (expr.includes('^^')) {
-    try {
-      const parts = expr.split('^^');
-      let baseExpr = parts[0] === "" ? "10" : parts[0]; 
-      let base = Function(`"use strict"; return (${baseExpr.replace(/\^/g, '**')})`)();
-    
-      let rest = parts[1];
-      let y, barrier = 1;
-    
-      if (rest.includes('>')) {
-        const subParts = rest.split('>');
-        y = Function(`"use strict"; return (${subParts[0].replace(/\^/g, '**')})`)();
-        barrier = Function(`"use strict"; return (${subParts[1].replace(/\^/g, '**')})`)();
-      } else {
-        y = Function(`"use strict"; return (${rest.replace(/\^/g, '**')})`)();
-      }
-    
-      if (!isNaN(base) && !isNaN(y) && !isNaN(barrier)) {
-        if (Math.abs(base - 10) < 1e-7) {
-           if (barrier === 1 && y > 0 && y < 6) {
-              formatTower(display, { value: 10, height: y - 1 });
-           } else {
-              formatTower(display, { value: barrier, height: y });
-           }
-           return;
-        }
-      
-        let iters = Math.min(y, 10);
-        let current = { value: barrier, height: 0 };
-      
-        for (let i = 0; i < iters; i++) {
-          if (current.height === 0) {
-            let next = Math.pow(base, current.value);
-            if (Number.isFinite(next) && next < 1e300) {
-              current.value = next;
-            } else {
-              current.value = current.value * Math.log10(base);
-              current.height = 1;
-            }
-          } else if (current.height === 1) {
-            current.value = current.value + Math.log10(Math.log10(base));
-            current.height = 2;
-          } else {
-            current.height += 1;
-          }
-        }
-      
-        if (y > 10) current.height += (y - 10);
-      
-        formatTower(display, current);
-        return;
-      }
-    } catch (err) {
-      return renderMath(display, `\\text{Error: Invalid tetration syntax.}`);
-    }
-  }
-  
-  // --- ENGINE 2: NESTED & MULTI-FACTORIALS (!) ---
-  if (expr.includes('!')) {
-    let factorialResult = parseFactorialExpression(expr);
-    if (factorialResult && !isNaN(factorialResult.value)) {
-      formatTower(display, factorialResult);
-      return;
-    }
-  }
-
-  // --- ENGINE 3: STRUCTURAL POWER TOWERS (^) ---
-  if (expr.includes('^')) {
-    const parts = expr.split('^');
-    try {
-      let current = { value: null, height: 0 };
-      let topExpr = parts[parts.length - 1];
-      current.value = Function(`"use strict"; return (${topExpr})`)();
-      
-      for (let i = parts.length - 2; i >= 0; i--) {
-        let baseStr = parts[i];
-        let coeffOuter = 1;
-        
-        if (i === 0 && baseStr.includes('*')) {
-          const multParts = baseStr.split('*');
-          coeffOuter = Function(`"use strict"; return (${multParts[0]})`)();
-          baseStr = multParts[1];
-        }
-        
-        let b = Function(`"use strict"; return (${baseStr})`)();
-        
-        if (current.height === 0) {
-          let next = Math.pow(b, current.value);
-          if (Number.isFinite(next) && next < 1e300) {
-            current.value = next * coeffOuter;
-          } else {
-            current.value = current.value * Math.log10(b);
-            if (i === 0 && coeffOuter !== 1) current.value += Math.log10(coeffOuter);
-            current.height = 1;
-          }
-        } else if (current.height === 1) {
-          current.value = current.value + Math.log10(Math.log10(b));
-          current.height = 2;
-        } else {
-          current.height += 1;
-        }
-      }
-      
-      formatTower(display, current);
-      return;
-    } catch (err) { }
-  }
-  
-  // --- ENGINE 4: STANDARD NATIVE MATH ---
-  let jsExpr = expr.replace(/\^/g, '**');
   try {
-    let result = Function(`"use strict"; return (${jsExpr})`)();
-    if (Number.isFinite(result)) {
-      formatTower(display, { value: result, height: 0 });
-      return;
-    }
-  } catch (e) {}
+    // Tokenize the expression into numbers, operators, and structural elements
+    const tokenRegex = /\d+(?:\.\d+)?(?:e[+-]?\d+)?|\^\^|\^|!|[-+*/()>]|[a-z]+/g;
+    tokens = expr.match(tokenRegex) || [];
+    tokenIndex = 0;
 
-  // Global Fallback Error
-  renderMath(display, `\\text{Error: Could not compute.}`);
+    if (tokens.length === 0) throw new Error("Empty expression");
+
+    // Start parsing from lowest precedence (addition/subtraction)
+    let finalTower = parseExpression();
+
+    if (tokenIndex < tokens.length) {
+      throw new Error("Unparsed tokens remaining");
+    }
+
+    formatTower(display, finalTower);
+    return;
+  } catch (err) {
+    return renderMath(display, `\\text{Error: Could not compute expression.}`);
+  }
+}
+
+// 1. Precedence Level: Addition & Subtraction
+function parseExpression() {
+  let node = parseTerm();
+  while (true) {
+    if (match('+')) {
+      let right = parseTerm();
+      node = addTowers(node, right);
+    } else if (match('-')) {
+      let right = parseTerm();
+      node = subtractTowers(node, right);
+    } else {
+      break;
+    }
+  }
+  return node;
+}
+
+// 2. Precedence Level: Multiplication & Division
+function parseTerm() {
+  let node = parsePower();
+  while (true) {
+    if (match('*')) {
+      let right = parsePower();
+      node = multiplyTowers(node, right);
+    } else if (match('/')) {
+      let right = parsePower();
+      node = divideTowers(node, right);
+    } else {
+      break;
+    }
+  }
+  return node;
+}
+
+// 3. Precedence Level: Powers (^) - Right Associative
+function parsePower() {
+  let node = parseTetration();
+  if (match('^')) {
+    let right = parsePower(); 
+    node = powerTowers(node, right);
+  }
+  return node;
+}
+
+// 4. Precedence Level: Tetration (^^) and Barrier (>) - Right Associative
+function parseTetration() {
+  let node = parseFactorial();
+  if (match('^^')) {
+    let right = parseTetration(); 
+    let barrier = createTower(1, 0);
+    if (match('>')) {
+      barrier = parseFactorial();
+    }
+    node = computeTetration(node, right, barrier);
+  }
+  return node;
+}
+
+// 5. Precedence Level: Postfix Factorials (!)
+function parseFactorial() {
+  let node = parsePrimary();
+  let k = 0;
+  while (match('!')) {
+    k++;
+  }
+  if (k > 0) {
+    if (node.height > 0) {
+      node = createTower(node.value, node.height + 1);
+    } else {
+      let factRes = solveMultifactorial(node.value, k);
+      if (!factRes || isNaN(factRes.value)) throw new Error("Invalid factorial target");
+      node = factRes;
+    }
+  }
+  return node;
+}
+
+// 6. Core Elements: Numbers, Constants, Parentheses, Unary signs
+function parsePrimary() {
+  let t = peek();
+  if (!t) throw new Error("Unexpected end of expression");
+
+  if (t === '(') {
+    consume();
+    let node = parseExpression();
+    if (!match(')')) throw new Error("Missing closing parenthesis");
+    return node;
+  }
+
+  if (t === '-') {
+    consume();
+    let node = parsePrimary();
+    if (node.height === 0) return createTower(-node.value, 0);
+    return node; 
+  }
+  if (t === '+') {
+    consume();
+    return parsePrimary();
+  }
+
+  consume();
+  if (t === 'googol') return createTower(100, 1);
+  if (t === 'googolplex') return createTower(100, 2);
+  if (t === 'phi') return createTower(PHI, 0);
+
+  let num = Number(t);
+  if (!isNaN(num)) {
+    return createTower(num, 0);
+  }
+
+  throw new Error("Unknown token");
+}
+
+// ============================================================================
+// SECTION 2.2: TOWER ARITHMETIC UTILITIES
+// Handles interactions between high towers and low mathematical numbers.
+// ============================================================================
+
+function addTowers(A, B) {
+  if (A.height === 0 && B.height === 0) return createTower(A.value + B.value, 0);
+  return A.height >= B.height ? A : B; // Tower completely dominates standard addition
+}
+
+function subtractTowers(A, B) {
+  if (A.height === 0 && B.height === 0) return createTower(A.value - B.value, 0);
+  return A; // Tower dominates subtraction
+}
+
+function multiplyTowers(A, B) {
+  if (A.height === 0 && B.height === 0) return createTower(A.value * B.value, 0);
+  if (A.height === 1 && B.height === 0) return createTower(A.value + Math.log10(B.value), 1);
+  if (B.height === 1 && A.height === 0) return createTower(B.value + Math.log10(A.value), 1);
+  return A.height >= B.height ? A : B;
+}
+
+function divideTowers(A, B) {
+  if (A.height === 0 && B.height === 0) return createTower(A.value / B.value, 0);
+  if (A.height === 1 && B.height === 0) return createTower(A.value - Math.log10(B.value), 1);
+  return A;
+}
+
+function powerTowers(A, B) {
+  let b = A.height === 0 ? A.value : 10;
+  if (B.height === 0) {
+    let next = Math.pow(b, B.value);
+    if (Number.isFinite(next) && next < 1e300) {
+      return createTower(next, 0);
+    } else {
+      return createTower(B.value * Math.log10(b), 1);
+    }
+  } else if (B.height === 1) {
+    return createTower(B.value + Math.log10(Math.log10(b)), 2);
+  } else {
+    return createTower(B.value, B.height + 1);
+  }
+}
+
+function computeTetration(A, B, Barrier) {
+  let base = A.height === 0 ? A.value : 10;
+  let barrier = Barrier.height === 0 ? Barrier.value : 1;
+  
+  if (Math.abs(base - 10) < 1e-7) {
+     if (barrier === 1 && B.height === 0 && B.value > 0 && B.value < 6) {
+        return createTower(10, B.value - 1);
+     } else if (B.height === 0) {
+        return createTower(barrier, B.value);
+     } else {
+        return createTower(B.value, B.height + 1);
+     }
+  }
+  
+  if (B.height === 0) {
+    let y = B.value;
+    let iters = Math.min(y, 10);
+    let current = createTower(barrier, 0);
+    
+    for (let i = 0; i < iters; i++) {
+      if (current.height === 0) {
+        let next = Math.pow(base, current.value);
+        if (Number.isFinite(next) && next < 1e300) {
+          current.value = next;
+        } else {
+          current.value = current.value * Math.log10(base);
+          current.height = 1;
+        }
+      } else if (current.height === 1) {
+        current.value = current.value + Math.log10(Math.log10(base));
+        current.height = 2;
+      } else {
+        current.height += 1;
+      }
+    }
+    
+    if (y > 10) current.height += (y - 10);
+    return current;
+  } else {
+    return createTower(B.value, B.height + 1);
+  }
 }
 
 // ============================================================================
