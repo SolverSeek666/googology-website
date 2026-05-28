@@ -16,11 +16,33 @@ document.getElementById('calcInput').addEventListener('keydown', function(e) {
   }
 });
 
-
 // ============================================================================
 // SECTION 2: THE MATH BRAIN
 // Parses the user's input and routes it to the specialized engines.
 // ============================================================================
+
+// Helper function to safely strip outer wrapping parentheses if they span the entire expression
+function stripOuterParentheses(s) {
+  while (s.startsWith('(') && s.endsWith(')')) {
+    let depth = 0;
+    let balanced = true;
+    // Check if the opening parenthesis closes before the end of the string
+    for (let i = 0; i < s.length - 1; i++) {
+      if (s[i] === '(') depth++;
+      else if (s[i] === ')') depth--;
+      if (depth === 0) {
+        balanced = false; // Closed early, e.g., (2^3)^(2^3)
+        break;
+      }
+    }
+    if (balanced) {
+      s = s.slice(1, -1);
+    } else {
+      break;
+    }
+  }
+  return s;
+}
 
 function processGoogology(rawInput) {
   const display = document.getElementById('outputDisplay');
@@ -28,6 +50,9 @@ function processGoogology(rawInput) {
   // Clean up the input: convert to lowercase, swap 'x' for '*', remove spaces
   let expr = rawInput.toLowerCase().replace(/x/g, '*').replace(/\s+/g, '');
   expr = expr.replace(/phi/g, `(${PHI})`);
+  
+  // FIXED: Strip outer balanced parentheses so wrapping whole expressions doesn't break parsing
+  expr = stripOuterParentheses(expr);
   
   // Handle hardcoded Easter eggs / specific words
   if (expr === 'googol') return renderMath(display, `\\text{Result: } 10^{100}`); 
@@ -52,7 +77,6 @@ function processGoogology(rawInput) {
       }
     
       if (!isNaN(base) && !isNaN(y) && !isNaN(barrier)) {
-        // FIXED: Smoothly absorb the "1" for explicit towers under height 6
         if (Math.abs(base - 10) < 1e-7) {
            if (barrier === 1 && y > 0 && y < 6) {
               formatTower(display, { value: 10, height: y - 1 });
@@ -134,8 +158,6 @@ function processGoogology(rawInput) {
           current.value = current.value + Math.log10(Math.log10(b));
           current.height = 2;
         } else {
-          // FIX: Once height >= 2, adding log10(log10(b)) to 10^V does nothing!
-          // We lock the value and ONLY increase the tower height.
           current.height += 1;
         }
       }
@@ -144,6 +166,7 @@ function processGoogology(rawInput) {
       return;
     } catch (err) { }
   }
+  
   // --- ENGINE 4: STANDARD NATIVE MATH ---
   let jsExpr = expr.replace(/\^/g, '**');
   try {
@@ -157,7 +180,6 @@ function processGoogology(rawInput) {
   // Global Fallback Error
   renderMath(display, `\\text{Error: Could not compute.}`);
 }
-
 
 // ============================================================================
 // SECTION 2.5: FACTORIAL CORE ENGINE HELPERS
@@ -342,7 +364,6 @@ function renderHeight1(display, val) {
   let latex = coeffStr === "1.0000" ? `10^{${toLatexSci(exp)}}` : `${coeffStr} \\times 10^{${toLatexSci(exp)}}`;
   renderMath(display, latex);
 }
-
 
 // ============================================================================
 // SECTION 4: THE OUTPUT RENDERING
