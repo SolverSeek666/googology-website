@@ -34,28 +34,13 @@ function formatValueClean(v) {
 function formatTower(display, current) {
   // HELPER: Intercepts raw JS scientific notation (1e+25) and forces it into LaTeX (10^{25})
   const toLatexSci = (num) => {
-    if (num === Infinity || num === "Infinity") return "\\infty";
     let str = String(num);
     if (str.includes('e')) {
       let [coeff, exp] = str.split('e');
       exp = exp.replace('+', ''); // Clean up the '+' sign JS adds
-
-      let cNum = parseFloat(coeff);
-      // Aggressive check: if coefficient is microscopically close to 1, snap it to 1
-      if (Math.abs(cNum - 1) < 1e-10) {
-        return `10^{${exp}}`;
-      }
-      
-      if (coeff === 1) return `10^{${exp}}`;
+      if (coeff === '1') return `10^{${exp}}`;
       return `${coeff} \\times 10^{${exp}}`;
     }
-
-    // Clean up floating point noise for non-scientific notation integers
-    let n = Number(num);
-    if (!isNaN(n) && Math.abs(n - Math.round(n)) < 1e-10) {
-      return String(Math.round(n));
-    }
-    
     // Fallback to your existing clean function for normal numbers
     return typeof formatValueClean === 'function' ? formatValueClean(num) : str;
   };
