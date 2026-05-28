@@ -60,7 +60,7 @@ function processGoogology(rawInput) {
         let iters = Math.min(y, 10);
         let current = { value: barrier, height: 0 };
         
-        for (let i = 1; i < iters; i++) {
+        for (let i = 0; i < iters; i++) {
           if (current.height === 0) {
             let next = Math.pow(base, current.value);
             if (Number.isFinite(next) && next < 1e300) {
