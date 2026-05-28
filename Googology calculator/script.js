@@ -39,10 +39,10 @@ function processGoogology(rawInput) {
       const parts = expr.split('^^');
       let baseExpr = parts[0] === "" ? "10" : parts[0]; 
       let base = Function(`"use strict"; return (${baseExpr.replace(/\^/g, '**')})`)();
-      
+    
       let rest = parts[1];
       let y, barrier = 1;
-      
+    
       if (rest.includes('>')) {
         const subParts = rest.split('>');
         y = Function(`"use strict"; return (${subParts[0].replace(/\^/g, '**')})`)();
@@ -50,16 +50,21 @@ function processGoogology(rawInput) {
       } else {
         y = Function(`"use strict"; return (${rest.replace(/\^/g, '**')})`)();
       }
-      
+    
       if (!isNaN(base) && !isNaN(y) && !isNaN(barrier)) {
+        // FIXED: Smoothly absorb the "1" for explicit towers under height 6
         if (Math.abs(base - 10) < 1e-7) {
-           formatTower(display, { value: barrier, height: y });
+           if (barrier === 1 && y > 0 && y < 6) {
+              formatTower(display, { value: 10, height: y - 1 });
+           } else {
+              formatTower(display, { value: barrier, height: y });
+           }
            return;
         }
-        
+      
         let iters = Math.min(y, 10);
         let current = { value: barrier, height: 0 };
-        
+      
         for (let i = 0; i < iters; i++) {
           if (current.height === 0) {
             let next = Math.pow(base, current.value);
@@ -73,13 +78,12 @@ function processGoogology(rawInput) {
             current.value = current.value + Math.log10(Math.log10(base));
             current.height = 2;
           } else {
-             // Lock the value, just climb
             current.height += 1;
           }
         }
-        
+      
         if (y > 10) current.height += (y - 10);
-        
+      
         formatTower(display, current);
         return;
       }
@@ -87,7 +91,7 @@ function processGoogology(rawInput) {
       return renderMath(display, `\\text{Error: Invalid tetration syntax.}`);
     }
   }
-
+  
   // --- ENGINE 2: NESTED & MULTI-FACTORIALS (!) ---
   if (expr.includes('!')) {
     let factorialResult = parseFactorialExpression(expr);
