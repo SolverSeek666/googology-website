@@ -19,7 +19,7 @@ document.getElementById('calcInput').addEventListener('keydown', function(e) {
 
 // ============================================================================
 // SECTION 2: THE MATH BRAIN
-// Parses the user's input and calculates the base value and tower height.
+// Parses the user's input and routes it to the specialized engines.
 // ============================================================================
 
 function processGoogology(rawInput) {
@@ -43,7 +43,6 @@ function processGoogology(rawInput) {
       let rest = parts[1];
       let y, barrier = 1;
       
-      // Check if there is a barrier target (>)
       if (rest.includes('>')) {
         const subParts = rest.split('>');
         y = Function(`"use strict"; return (${subParts[0].replace(/\^/g, '**')})`)();
@@ -53,13 +52,11 @@ function processGoogology(rawInput) {
       }
       
       if (!isNaN(base) && !isNaN(y) && !isNaN(barrier)) {
-        // Fast-track if the base is exactly 10
         if (Math.abs(base - 10) < 1e-7) {
            formatTower(display, { value: barrier, height: y });
            return;
         }
         
-        // Calculate true power tower up to 10 layers deep
         let iters = Math.min(y, 10);
         let current = { value: barrier, height: 0 };
         
@@ -78,7 +75,6 @@ function processGoogology(rawInput) {
           }
         }
         
-        // Tack on remaining height if we capped at 10 iterations
         if (y > 10) current.height += (y - 10);
         
         formatTower(display, current);
@@ -89,38 +85,13 @@ function processGoogology(rawInput) {
     }
   }
 
-  // --- ENGINE 2: FACTORIALS (!) ---
-  if (expr.endsWith('!')) {
-    let numStr = expr.slice(0, -1);
-    try {
-      let jsNumExpr = numStr.replace(/\^/g, '**');
-      let x = Function(`"use strict"; return (${jsNumExpr})`)();
-      
-      if (!isNaN(x) && x > -1) {
-        // Simple factorial for small numbers
-        if (Number.isInteger(x) && x <= 20) {
-          let result = 1;
-          for (let i = 2; i <= x; i++) result *= i;
-          formatTower(display, { value: result, height: 0 });
-          return;
-        } 
-        
-        // Stirling's Approximation for massive factorials
-        let logFact;
-        if (x < 12) {
-          let p = 1;
-          while (x < 12) { x++; p *= x; }
-          let logG = 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(x) - x + (1 / (12 * x)) - (1 / (360 * Math.pow(x, 3)));
-          logFact = (logG - Math.log(p)) * Math.LOG10E;
-        } else {
-          let logG = 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(x) - x + (1 / (12 * x)) - (1 / (360 * Math.pow(x, 3)));
-          logFact = logG * Math.LOG10E;
-        }
-        
-        formatTower(display, { value: logFact, height: 1 });
-        return;
-      }
-    } catch(err) { }
+  // --- ENGINE 2: NESTED & MULTI-FACTORIALS (!) ---
+  if (expr.includes('!')) {
+    let factorialResult = parseFactorialExpression(expr);
+    if (factorialResult && !isNaN(factorialResult.value)) {
+      formatTower(display, factorialResult);
+      return;
+    }
   }
 
   // --- ENGINE 3: STRUCTURAL POWER TOWERS (^) ---
@@ -131,7 +102,6 @@ function processGoogology(rawInput) {
       let topExpr = parts[parts.length - 1];
       current.value = Function(`"use strict"; return (${topExpr})`)();
       
-      // Work top-down through the exponents
       for (let i = parts.length - 2; i >= 0; i--) {
         let baseStr = parts[i];
         let coeffOuter = 1;
@@ -164,7 +134,7 @@ function processGoogology(rawInput) {
     } catch (err) { }
   }
 
-  // --- ENGINE 4: STANDARD MATH (Fallback) ---
+  // --- ENGINE 4: STANDARD NATIVE MATH ---
   let jsExpr = expr.replace(/\^/g, '**');
   try {
     let result = Function(`"use strict"; return (${jsExpr})`)();
@@ -174,19 +144,94 @@ function processGoogology(rawInput) {
     }
   } catch (e) {}
 
-  // If all engines fail
+  // Global Fallback Error
   renderMath(display, `\\text{Error: Could not compute.}`);
 }
 
 
 // ============================================================================
+// SECTION 2.5: FACTORIAL CORE ENGINE HELPERS
+// Recursively unwraps strings like ((10!)!) and computes multifactorials.
+// ============================================================================
+
+function parseFactorialExpression(s) {
+  s = s.trim();
+  
+  // Count consecutive trailing exclamation marks (e.g., !! is step 2, !!! is step 3)
+  let k = 0;
+  while (s.endsWith('!')) {
+    k++;
+    s = s.slice(0, -1).trim();
+  }
+  
+  // Remove wrapping parentheses if they surround the remaining expression
+  if (s.startsWith('(') && s.endsWith(')')) {
+    s = s.slice(1, -1).trim();
+  }
+  
+  // If exclamation marks were processed, solve recursively
+  if (k > 0) {
+    let inner = parseFactorialExpression(s);
+    if (!inner || isNaN(inner.value)) return null;
+    
+    // If the inner value is already a giant tower, an additional factorial
+    // scales it up by another tower level layer.
+    if (inner.height > 0) {
+      return { value: inner.value, height: inner.height + 1 };
+    }
+    
+    return solveMultifactorial(inner.value, k);
+  }
+  
+  // Base case: No exclamation marks left, evaluate standard math block
+  try {
+    let jsExpr = s.replace(/\^/g, '**');
+    let val = Function(`"use strict"; return (${jsExpr})`)();
+    if (!isNaN(val) && Number.isFinite(val)) {
+      return { value: val, height: 0 };
+    }
+  } catch (e) {}
+  
+  return null;
+}
+
+function solveMultifactorial(x, k) {
+  if (x < 0 || isNaN(x)) return { value: NaN, height: 0 };
+  x = Math.round(x);
+  
+  // Case A: Number is small enough to evaluate cleanly without hitting Infinity
+  if (x <= 170) {
+    let res = 1;
+    for (let i = x; i > 0; i -= k) {
+      res *= i;
+    }
+    if (Number.isFinite(res) && res < 1e300) {
+      return { value: res, height: 0 };
+    }
+  }
+  
+  // Case B: Medium numbers (up to 500,000). Loop via log10 for perfect precision.
+  if (x <= 500000) {
+    let logSum = 0;
+    for (let i = x; i > 0; i -= k) {
+      logSum += Math.log10(i);
+    }
+    return { value: logSum, height: 1 };
+  }
+  
+  // Case C: Gigantic numbers. Use Generalized Stirling Approximation to prevent browser lag.
+  const log10e = Math.LOG10E;
+  let part1 = (x / k) * (Math.log10(x) - log10e);
+  let part2 = 0.5 * Math.log10(2 * Math.PI * x / k);
+  return { value: part1 + part2, height: 1 };
+}
+
+
+// ============================================================================
 // SECTION 3: DISPLAY FORMATTING ROUTER
-// Takes the raw height and value, formats them, and passes them to output
 // ============================================================================
 
 function formatTower(display, current) {
-  
-  // Helper to force numbers into nice LaTeX scientific notation
   const toLatexSci = (num) => {
     let str = String(num);
     if (str.includes('e')) {
@@ -198,12 +243,10 @@ function formatTower(display, current) {
     return typeof formatValueClean === 'function' ? formatValueClean(num) : str;
   };
 
-  // 1. TETRATION DISPLAY (Height 6 or higher)
   if (current.height >= 6) {
     let a = current.height;
     let b = current.value;
     
-    // Normalize target values near 10
     if (Math.abs(b - 10) < 1e-4 || b.toFixed(4) === "10.0000") {
       a += 1;
       b = 1;
@@ -220,7 +263,6 @@ function formatTower(display, current) {
     return;
   }
 
-  // 2. SMALL NUMBERS DISPLAY (Height 0)
   if (current.height === 0) {
     if (current.value < 10000000000) {
       let outputStr = Number(current.value.toFixed(10)).toString();
@@ -228,12 +270,8 @@ function formatTower(display, current) {
     } else {
       renderHeight1(display, Math.log10(current.value));
     }
-  
-  // 3. SINGLE TOWER DISPLAY (Height 1)
   } else if (current.height === 1) {
     renderHeight1(display, current.value);
-  
-  // 4. MEDIUM POWER TOWER DISPLAY (Heights 2 through 5)
   } else {
     let exp = Math.floor(current.value);
     let coeff = Math.pow(10, current.value - exp);
@@ -246,7 +284,6 @@ function formatTower(display, current) {
     let coeffStr = coeff.toFixed(4);
     let latex = coeffStr === "1.0000" ? toLatexSci(exp) : `${coeffStr} \\times 10^{${toLatexSci(exp)}}`;
     
-    // Stack the 10s based on the height
     for (let h = 0; h < current.height; h++) {
       latex = `10^{${latex}}`;
     }
@@ -254,10 +291,8 @@ function formatTower(display, current) {
   }
 }
 
-// Helper: Formats basic numbers cleanly
 function formatValueClean(v) {
   if (v < 1e10) return Math.floor(v).toString();
-  
   let log = Math.log10(v);
   let exp = Math.floor(log);
   let coeff = Math.pow(10, log - exp);
@@ -269,11 +304,9 @@ function formatValueClean(v) {
   
   let coeffStr = coeff.toFixed(4);
   if (coeffStr === "1.0000") return `10^{${formatValueClean(exp)}}`;
-  
   return `${coeffStr} \\times 10^{${formatValueClean(exp)}}`;
 }
 
-// Helper: Specific styling for height-1 numbers
 function renderHeight1(display, val) {
   const toLatexSci = (num) => {
     let str = String(num);
@@ -296,14 +329,12 @@ function renderHeight1(display, val) {
   
   let coeffStr = coeff.toFixed(4);
   let latex = coeffStr === "1.0000" ? `10^{${toLatexSci(exp)}}` : `${coeffStr} \\times 10^{${toLatexSci(exp)}}`;
-  
   renderMath(display, latex);
 }
 
 
 // ============================================================================
-// SECTION 4: THE OUTPUT
-// Pushes the final string to the DOM and renders it visually
+// SECTION 4: THE OUTPUT RENDERING
 // ============================================================================
 
 function renderMath(element, latex) {
