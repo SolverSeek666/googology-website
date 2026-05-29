@@ -459,8 +459,16 @@ function formatTower(display, current) {
     if (str.includes('e')) {
       let [coeff, exp] = str.split('e');
       exp = exp.replace('+', ''); 
-      if (coeff === '1') return `10^{${exp}}`;
-      return `${coeff} \\times 10^{${exp}}`;
+      
+      // Parse the coefficient and force it to 4 decimal places
+      let parsedCoeff = parseFloat(coeff);
+      let coeffStr = parsedCoeff.toFixed(4);
+      
+      // Keep the clean clean 10^{exp} look if it's a perfect power of 10
+      if (coeff === '1' || coeffStr === '1.0000') return `10^{${exp}}`;
+      
+      // Otherwise, return it with its beautiful trailing zeros!
+      return `${coeffStr} \\times 10^{${exp}}`;
     }
     return typeof formatValueClean === 'function' ? formatValueClean(num) : str;
   };
