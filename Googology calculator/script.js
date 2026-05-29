@@ -317,6 +317,16 @@ function computeTetration(A, B, Barrier) {
         // Base is a height-1 tower: (10^v) ^^ y > Barrier
         if (bHeight === 0) {
           let topVal = A.value * bVal + (A.value > 0 ? Math.log10(A.value) : 0);
+          
+          // FIXED: Collapse to height-1 notation if the value is small and y === 2
+          // Prevents outputting 10^(2.000*10^4) and instead gives a clean 10^20000
+          if (y === 2) {
+            let collapsedExponent = Math.pow(10, topVal);
+            if (Number.isFinite(collapsedExponent) && collapsedExponent < 1e300) {
+              return createTower(collapsedExponent, 1);
+            }
+          }
+          
           return createTower(topVal, y);
         } else {
           return createTower(bVal, bHeight + y);
@@ -332,10 +342,22 @@ function computeTetration(A, B, Barrier) {
         } else {
           return createTower(bVal, bHeight + y);
         }
-      } else {
-        // Base is a height >= 3 tower: (10^10^10^...^v) ^^ y > Barrier
+      } else if (A.height === 3) {
+        // Base is a height-3 tower: (10^10^10^v) ^^ y > Barrier
         if (bHeight === 0 && A.value <= 308) {
           let topVal = Math.pow(10, A.value) + Math.log10(bVal);
+          return createTower(topVal, A.height + y - 2);
+        } else if (bHeight > 0) {
+          return createTower(bVal, bHeight + y);
+        } else {
+          return createTower(A.value, A.height + y - 1);
+        }
+      } else {
+        // FIXED: Base is a height >= 4 tower: (10^^a > v) ^^ y > Barrier
+        // At height 4+, Math.log10(bVal) is completely swallowed by the scale of lower layers.
+        // Dropping it prevents messy decimals like 100.30103 and outputs exactly 100.
+        if (bHeight === 0 && A.value <= 308) {
+          let topVal = Math.pow(10, A.value); 
           return createTower(topVal, A.height + y - 2);
         } else if (bHeight > 0) {
           return createTower(bVal, bHeight + y);
@@ -352,17 +374,10 @@ function computeTetration(A, B, Barrier) {
   // Case 2: Base A is a standard number (height === 0)
   let base = A.value;
   
-  // ============================================================================
-  // FIXED: Native Tower Barrier Support for Base 10
-  // Instead of flattening the barrier to 1, we read its full tower properties.
-  // A high barrier adds its own height layers to the final tetration tower.
-  // ============================================================================
-  
   if (Math.abs(base - 10) < 1e-7) {
      if (Barrier.height === 0 && Barrier.value === 1 && B.height === 0 && B.value > 0 && B.value < 6) {
         return createTower(10, B.value - 1);
      } else if (B.height === 0) {
-        // 10 ^^ y > Barrier -> The result total height expands by the barrier's height layers!
         return createTower(Barrier.value, B.value + Barrier.height);
      } else {
         return createTower(B.value, B.height + 1);
@@ -373,7 +388,6 @@ function computeTetration(A, B, Barrier) {
     let y = B.value;
     let iters = Math.min(y, 10);
     
-    // FIXED: Non-base-10 towers now also inherit the incoming barrier tower height correctly
     let current = createTower(Barrier.value, Barrier.height);
     
     for (let i = 0; i < iters; i++) {
