@@ -301,6 +301,7 @@ function powerTowers(A, B) {
 
   return A;
 }
+
 function computeTetration(A, B, Barrier) {
   let base = A.height === 0 ? A.value : 10;
   let barrier = Barrier.height === 0 ? Barrier.value : 1;
