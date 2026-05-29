@@ -240,19 +240,47 @@ function divideTowers(A, B) {
 }
 
 function powerTowers(A, B) {
-  let b = A.height === 0 ? A.value : 10;
-  if (B.height === 0) {
-    let next = Math.pow(b, B.value);
+  // Case 1: Both are standard numbers (height 0)
+  if (A.height === 0 && B.height === 0) {
+    let next = Math.pow(A.value, B.value);
     if (Number.isFinite(next) && next < 1e300) {
       return createTower(next, 0);
     } else {
-      return createTower(B.value * Math.log10(b), 1);
+      return createTower(B.value * Math.log10(A.value), 1);
     }
-  } else if (B.height === 1) {
-    return createTower(B.value + Math.log10(Math.log10(b)), 2);
-  } else {
+  }
+
+  // Case 2: Base A is a height-1 tower (10^A.value), Exponent B is a standard number
+  // (10^A.value)^B = 10^(A.value * B)
+  if (A.height === 1 && B.height === 0) {
+    return createTower(A.value * B.value, 1);
+  }
+
+  // Case 3: Base A is a height-2 tower (10^10^A.value), Exponent B is a standard number
+  // (10^10^A.value)^B = 10^(10^A.value * B) = 10^10^(A.value + log10(B))
+  if (A.height === 2 && B.height === 0) {
+    return createTower(A.value + Math.log10(B.value), 2);
+  }
+
+  // Case 4: Base A is a massive tower (height >= 3), small exponent B is completely negligible
+  if (A.height >= 3 && B.height === 0) {
+    return A;
+  }
+
+  // Case 5: Exponent B is a tower (height >= 1), Base A is a standard number
+  if (A.height === 0 && B.height >= 1) {
+    if (B.height === 1) {
+      return createTower(B.value + Math.log10(Math.log10(A.value)), 2);
+    }
     return createTower(B.value, B.height + 1);
   }
+
+  // Case 6: Both are towers (height >= 1) - The taller tower completely dominates
+  if (A.height >= 1 && B.height >= 1) {
+    return B.height >= A.height ? createTower(B.value, B.height + 1) : createTower(A.value, A.height + 1);
+  }
+
+  return A;
 }
 
 function computeTetration(A, B, Barrier) {
