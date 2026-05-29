@@ -130,7 +130,8 @@ function parseTetration() {
     let right = parseTetration(); 
     let barrier = createTower(1, 0);
     if (match('>')) {
-      barrier = parseFactorial();
+      // FIXED: Grab the entire remaining expression as the barrier block
+      barrier = parseExpression();
     }
     node = computeTetration(node, right, barrier);
   }
