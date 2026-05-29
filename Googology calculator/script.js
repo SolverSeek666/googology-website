@@ -316,19 +316,16 @@ function computeTetration(A, B, Barrier) {
       if (A.height === 1) {
         // Base is a height-1 tower: (10^v) ^^ y > Barrier
         if (bHeight === 0) {
-          // Exact law: (10^v)^(10^v)^b = 10^(v * 10^(v*b))
           let topVal = A.value * bVal + (A.value > 0 ? Math.log10(A.value) : 0);
           return createTower(topVal, y);
         } else {
-          // If the barrier itself is a tower, its height completely dominates
           return createTower(bVal, bHeight + y);
         }
       } else if (A.height === 2) {
         // Base is a height-2 tower: (10^10^v) ^^ y > Barrier
         if (bHeight === 0) {
-          // Exact law: (10^10^v)^(10^10^v)^b = 10^10^(v + b * 10^v)
           let topVal = A.value;
-          if (A.value <= 308) { // Prevent JS Infinity overflow during Math.pow
+          if (A.value <= 308) { 
             topVal = A.value + bVal * Math.pow(10, A.value);
           }
           return createTower(topVal, y);
@@ -336,9 +333,15 @@ function computeTetration(A, B, Barrier) {
           return createTower(bVal, bHeight + y);
         }
       } else {
-        // For height >= 3, structural layers completely dwarf any standard barrier.
-        // Stacking the tower y times simply adds exactly (y - 1) layers.
-        return createTower(A.value, A.height + y - 1);
+        // Base is a height >= 3 tower: (10^10^10^...^v) ^^ y > Barrier
+        if (bHeight === 0 && A.value <= 308) {
+          let topVal = Math.pow(10, A.value) + Math.log10(bVal);
+          return createTower(topVal, A.height + y - 2);
+        } else if (bHeight > 0) {
+          return createTower(bVal, bHeight + y);
+        } else {
+          return createTower(A.value, A.height + y - 1);
+        }
       }
     } else {
       // Exponent B is also a tower.
