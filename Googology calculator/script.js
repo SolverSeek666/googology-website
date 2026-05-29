@@ -328,15 +328,21 @@ function computeTetration(A, B, Barrier) {
     }
   }
 
-  // Case 2: Base A is a standard number (height === 0) - Original logic preserved
+  // Case 2: Base A is a standard number (height === 0)
   let base = A.value;
-  let barrier = Barrier.height === 0 ? Barrier.value : 1;
+  
+  // ============================================================================
+  // FIXED: Native Tower Barrier Support for Base 10
+  // Instead of flattening the barrier to 1, we read its full tower properties.
+  // A high barrier adds its own height layers to the final tetration tower.
+  // ============================================================================
   
   if (Math.abs(base - 10) < 1e-7) {
-     if (barrier === 1 && B.height === 0 && B.value > 0 && B.value < 6) {
+     if (Barrier.height === 0 && Barrier.value === 1 && B.height === 0 && B.value > 0 && B.value < 6) {
         return createTower(10, B.value - 1);
      } else if (B.height === 0) {
-        return createTower(barrier, B.value);
+        // 10 ^^ y > Barrier -> The result total height expands by the barrier's height layers!
+        return createTower(Barrier.value, B.value + Barrier.height);
      } else {
         return createTower(B.value, B.height + 1);
      }
@@ -345,7 +351,9 @@ function computeTetration(A, B, Barrier) {
   if (B.height === 0) {
     let y = B.value;
     let iters = Math.min(y, 10);
-    let current = createTower(barrier, 0);
+    
+    // FIXED: Non-base-10 towers now also inherit the incoming barrier tower height correctly
+    let current = createTower(Barrier.value, Barrier.height);
     
     for (let i = 0; i < iters; i++) {
       if (current.height === 0) {
