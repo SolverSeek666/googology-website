@@ -474,14 +474,16 @@ function formatTower(display, current) {
   };
 
   // ============================================================================
-  // FIXED: Tower Shifting (Normalization)
-  // If a height-1 tower has a value >= 1e10, standard scientific notation
-  // breaks down and outputs an inaccurate front coefficient. Shifting it up
-  // to a height-2 tower eliminates 'a' and cleanly yields 10^{b * 10^c}.
+  // FIXED: Generalized Tower Shifting (Normalization)
+  // If any tower (height >= 1) has a top value >= 1e10, we continuously shift 
+  // it up into the tower height layers until the remaining top value 'd' 
+  // is nicely compressed below 10^10. This transforms 10^^a>b into 10^^c>d.
   // ============================================================================
-  if (current.height === 1 && current.value >= 1e10) {
-    current.height = 2;
-    current.value = Math.log10(current.value);
+  if (current.height >= 1) {
+    while (current.value >= 1e10) {
+      current.height += 1;
+      current.value = Math.log10(current.value);
+    }
   }
 
   if (current.height >= 6) {
