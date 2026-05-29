@@ -270,19 +270,37 @@ function powerTowers(A, B) {
   // Case 5: Exponent B is a tower (height >= 1), Base A is a standard number
   if (A.height === 0 && B.height >= 1) {
     if (B.height === 1) {
-      return createTower(B.value + Math.log10(Math.log10(A.value)), 2);
+      let logBase = Math.log10(A.value);
+      return createTower(B.value + (logBase > 0 ? Math.log10(logBase) : 0), 2);
     }
     return createTower(B.value, B.height + 1);
   }
 
-  // Case 6: Both are towers (height >= 1) - The taller tower completely dominates
+  // Case 6: Both are towers (height >= 1)
   if (A.height >= 1 && B.height >= 1) {
-    return B.height >= A.height ? createTower(B.value, B.height + 1) : createTower(A.value, A.height + 1);
+    // Subcase 6a: Both are height 1. 
+    // (10^v)^(10^w) = 10^(v * 10^w) = 10^(10^(w + log10(v)))
+    if (A.height === 1 && B.height === 1) {
+      return createTower(B.value + Math.log10(A.value), 2);
+    }
+    
+    // Subcase 6b: Base is height 2, Exponent is height 1
+    // (10^10^v)^(10^w) = 10^(10^v * 10^w) = 10^(10^(v + w))
+    if (A.height === 2 && B.height === 1) {
+      return createTower(A.value + B.value, 2);
+    }
+
+    // Subcase 6c: Ultra-high towers. The taller or larger tower completely dominates.
+    // The result climbs exactly 1 level higher than the dominant tower.
+    if (B.height >= A.height) {
+      return createTower(B.value, B.height + 1);
+    } else {
+      return createTower(A.value, A.height + 1);
+    }
   }
 
   return A;
 }
-
 function computeTetration(A, B, Barrier) {
   let base = A.height === 0 ? A.value : 10;
   let barrier = Barrier.height === 0 ? Barrier.value : 1;
