@@ -303,7 +303,33 @@ function powerTowers(A, B) {
 }
 
 function computeTetration(A, B, Barrier) {
-  let base = A.height === 0 ? A.value : 10;
+  // Case 1: Base A is already a giant tower (height >= 1)
+  if (A.height >= 1) {
+    if (B.height === 0) {
+      let y = B.value;
+      if (y === 1) return A; // X ^^ 1 = X
+      
+      if (A.height === 1) {
+        // Base is a height-1 tower: (10^v) ^^ y 
+        // Stacking it y times increases the final tower height to y
+        // and scales the top value slightly by its own log.
+        let logSum = A.value + (A.value > 0 ? Math.log10(A.value) : 0);
+        return createTower(logSum, y);
+      } else {
+        // For height >= 2, the value change at the very top is microscopically 
+        // negligible on a log scale. Stacking the tower y times simply adds 
+        // exactly (y - 1) layers to its structural height.
+        return createTower(A.value, A.height + y - 1);
+      }
+    } else {
+      // Exponent B is also a tower. The extreme height of tower B completely 
+      // dominates the expression, pushing the result 1 layer higher than B.
+      return createTower(B.value, B.height + 1);
+    }
+  }
+
+  // Case 2: Base A is a standard number (height === 0) - Original logic preserved
+  let base = A.value;
   let barrier = Barrier.height === 0 ? Barrier.value : 1;
   
   if (Math.abs(base - 10) < 1e-7) {
