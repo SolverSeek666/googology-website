@@ -354,6 +354,25 @@ function parsePrimary() {
 // Handles interactions between high towers and low mathematical numbers.
 // ============================================================================
 
+// Converts a decimal into the closest whole-number fraction a/b
+function getFractionComponents(decimal) {
+  let bestA = 1, bestB = 1;
+  let minDiff = Infinity;
+  
+  // Scan denominators up to 1000 to find the perfect match
+  for (let b = 1; b <= 1000; b++) {
+    let a = Math.round(decimal * b);
+    let diff = Math.abs(decimal - (a / b));
+    if (diff < minDiff) {
+      minDiff = diff;
+      bestA = a;
+      bestB = b;
+      if (diff < 1e-6) break; // Found an exact match
+    }
+  }
+  return { a: bestA, b: bestB };
+}
+
 // Operators===================================================================
 
 function addTowers(A, B) {
@@ -485,6 +504,31 @@ function computeTetration(A, B, Barrier) {
   // FIXED: Check if the height B is itself an ultra-giant tower structure
   let isBTower = (typeof B.height === 'object' && B.height !== null) || (typeof B.height === 'number' && B.height >= 1);
 
+  // ==========================================
+  // PURE FRACTIONAL TETRATION INTERCEPTOR
+  // Formula: x ^^ (a/b) = superroot(b, x) ^^ a
+  // ==========================================
+  if (A.height === 0 && B.height === 0 && !Number.isInteger(B.value)) {
+    let base = A.value;
+    let exponent = B.value;
+    if (exponent < 0) return createTower(NaN, 0);
+
+    // 1. Convert decimal to its fractional components (a / b)
+    let frac = getFractionComponents(exponent);
+    
+    // 2. Compute the superroot base: superroot(b, x) using your Lambert code
+    let superRootBase = superRoot(frac.b, base);
+    
+    // 3. Stack it 'a' times: superroot(b, x) ^^ a
+    // We create a new base node and feed it into your existing integer engine!
+    let newBaseNode = createTower(superRootBase, 0);
+    let newHeightNode = createTower(frac.a, 0);
+    let emptyBarrier = createTower(1, 0); // Standard barrier of 1 for normal integer tetration
+    
+    return computeTetration(newBaseNode, newHeightNode, emptyBarrier);
+  }
+  // ==========================================
+  
   // Case 1: Base A is already a giant tower (height >= 1)
   if (A.height >= 1) {
     if (!isBTower) {
@@ -614,7 +658,7 @@ function computeTetration(A, B, Barrier) {
   }
 }
 
-// Decimal Tetration===========================================================
+//Tetration Inverses===========================================================
 
 // 1. The Forward Stack: Computes n * e^(n * e^(n...)) for height k
 function lambertStack(k, n) {
@@ -650,47 +694,6 @@ function superRoot(k, a) {
   // x = e^W(k, ln(a))
   let wVal = extendedLambertW(k, Math.log(a));
   return Math.exp(wVal);
-}
-
-function decimalTetration(base, exponent) {
-  // 1. Standard integer towers (e.g., x^^3)
-  if (Number.isInteger(exponent)) {
-    if (exponent === 0) return 1;
-    if (exponent < 0) return NaN; // Standard tetration doesn't allow integer negatives
-    let res = base;
-    for (let i = 1; i < exponent; i++) res = Math.pow(base, res);
-    return res;
-  }
-
-  let intPart = Math.floor(exponent);
-  let fracPart = exponent - intPart;
-  
-  // 2. Check if it's a clean fraction for your Lambert Super-Root! (like 0.5, 0.333, 0.25)
-  let inverseFrac = 1 / fracPart;
-  // If it's within 0.001 of a whole number, we consider it a clean 1/n fraction
-  if (Math.abs(inverseFrac - Math.round(inverseFrac)) < 0.001) {
-    let k = Math.round(inverseFrac);
-    let fractionalBase = superRoot(k, base);
-    
-    let res = fractionalBase;
-    for (let i = 0; i < intPart; i++) {
-      res = Math.pow(base, res);
-    }
-    return res;
-  }
-
-  // 3. Fallback: Linear Approximation for chaotic decimals (like 0.767 or 3/5)
-  // Step A: Calculate the base layer (height between -1 and 0)
-  // Since fracPart is between 0 and 1, (fracPart - 1) is between -1 and 0.
-  let baseLayer = (fracPart - 1) + 1; // Which simplifies to just fracPart!
-  
-  // Step B: Stack it back up! (+1 for the fraction, +intPart for the integers)
-  let res = baseLayer;
-  for (let i = 0; i < intPart + 1; i++) {
-    res = Math.pow(base, res);
-  }
-  
-  return res;
 }
 
 // Hyper-E=====================================================================
