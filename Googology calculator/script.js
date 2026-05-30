@@ -57,8 +57,8 @@ function calculate() {
   // 1. Clean up & Normalize input (Lowercases words, swaps 'x' to '*', removes white-spaces)
   let expr = inputEl.value.toLowerCase().replace(/x/g, '*').replace(/\s+/g, '');
 
-  // 2. Tokenize using the upgraded, symbol-aware Regex layout (added ∞ and comma)
-  tokens = expr.match(/\d+(?:\.\d+)?|\^\^|[a-z]+|[-+*/^()!>√πϕ∞,]/g) || [];
+  // 2. Tokenize using the upgraded, symbol-aware Regex layout (added Γ and γ)
+  tokens = expr.match(/\d+(?:\.\d+)?|\^\^|[a-z]+|[-+*/^()!>√πϕ∞,Γγ]/g) || [];
   tokenIndex = 0; // Reset pointer for the fresh execution descent
 
   try {
