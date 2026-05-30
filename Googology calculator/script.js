@@ -212,11 +212,11 @@ function parsePrimary() {
   let t = peek();
   if (!t) throw new Error("Unexpected end of expression");
 
-  // NEW: Standalone Hyper-E notation (Ea syntax, e.g., E3 = 10^3)
+  // Standalone Hyper-E notation (Ea syntax, e.g., E3 = 10^3)
   if (t === 'E') {
     consume();
-    // Base defaults to 1 when 'E' is used as a prefix (1 * 10^exponent)
-    let exponent = parseUnary(); 
+    // Changed from parseUnary to parsePrimary
+    let exponent = parsePrimary(); 
     return computeHyperE(createTower(1, 0), exponent); 
   }
 
@@ -324,7 +324,7 @@ function parsePrimary() {
   else if (t === 'infinity' || t === '∞') node = createTower(Infinity, 0);
   else if (t === 'phi' || t === 'ϕ') node = createTower((1 + Math.sqrt(5)) / 2, 0);
   else if (t === 'pi' || t === 'π') node = createTower(Math.PI, 0);
-  else if (t === 'e') node = createTower(Math.E, 0); // Strictly handles lowercase e (Euler's)
+  else if (t === 'e') node = createTower(Math.E, 0); 
   else {
     // Standard Numeric Fallback
     let num = Number(t);
@@ -338,7 +338,8 @@ function parsePrimary() {
   // Catch Hyper-E trailing notation (aEb syntax, e.g., 5E3)
   while (peek() === 'E') {
     consume(); // eat the uppercase 'E'
-    let exponent = parseUnary(); 
+    // Changed from parseUnary to parsePrimary
+    let exponent = parsePrimary(); 
     node = computeHyperE(node, exponent);
   }
 
