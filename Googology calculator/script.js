@@ -505,9 +505,8 @@ function computeTetration(A, B, Barrier) {
   let isBTower = (typeof B.height === 'object' && B.height !== null) || (typeof B.height === 'number' && B.height >= 1);
 
   // ==========================================
-  // HYBRID DECIMAL TETRATION INTERCEPTOR
-  // Clean 1/n fractions -> Extended Lambert W Super-Root
-  // Chaotic decimals -> Linear Approximation Baseline
+  // PURE LINEAR FRACTIONAL TETRATION INTERCEPTOR
+  // Ensures a perfectly smooth, unbroken curve for all decimals
   // ==========================================
   if (A.height === 0 && B.height === 0 && !Number.isInteger(B.value)) {
     let base = A.value;
@@ -517,24 +516,10 @@ function computeTetration(A, B, Barrier) {
     let intPart = Math.floor(exponent);
     let fracPart = exponent - intPart;
     
-    let inverseFrac = 1 / fracPart;
-    let fracResult;
+    // Pure Linear Approximation Baseline (x^^fracPart = base^fracPart)
+    let fracResult = Math.pow(base, fracPart);
 
-    // 1. Check if it's a clean 1/n fraction (e.g., 0.5, 0.25, 0.1)
-    if (Math.abs(inverseFrac - Math.round(inverseFrac)) < 0.001) {
-      let k = Math.round(inverseFrac);
-      // Evaluates x^^fracPart using your exact Lambert W Super-Root logic
-      fracResult = superRoot(k, base);
-    } else {
-      // 2. Fallback: Linear Approximation
-      // Step down to negative height: h = fracPart - 1
-      // Apply baseline: x^^(fracPart - 1) = (fracPart - 1) + 1 = fracPart
-      // First stack up to positive fraction: x^^fracPart = base^fracPart
-      fracResult = Math.pow(base, fracPart);
-    }
-
-    // 3. Pass the fractional boundary result into the integer engine as the Barrier!
-    // This tells the engine to calculate: base ^^ intPart, starting from fracResult
+    // Pass the fractional boundary safely into your integer tower engine
     let newB = createTower(intPart, 0);
     let newBarrier = createTower(fracResult, 0);
     
@@ -669,44 +654,6 @@ function computeTetration(A, B, Barrier) {
   } else {
     return createTower(1, B);
   }
-}
-
-//Tetration Inverses===========================================================
-
-// 1. The Forward Stack: Computes n * e^(n * e^(n...)) for height k
-function lambertStack(k, n) {
-  if (k === 1) return n;
-  return n * Math.exp(lambertStack(k - 1, n));
-}
-
-// 2. The Extended Lambert W Solver (Binary Search)
-// Solves for n where lambertStack(k, n) = a
-function extendedLambertW(k, a) {
-  if (a <= 0) return NaN; // Real numbers only for this calculator
-  
-  let low = 0;
-  let high = Math.max(1, Math.log(a) + 1); // Safe upper bound
-  let mid, guess;
-  
-  // 60 iterations provides extreme floating-point precision
-  for (let i = 0; i < 60; i++) {
-    mid = (low + high) / 2;
-    guess = lambertStack(k, mid);
-    
-    if (guess === a) break;
-    if (guess < a) low = mid;
-    else high = mid;
-  }
-  return mid;
-}
-
-// 3. The Super-Root Function using your exact W(k, ln(a)) logic!
-// Finds x where x^^k = a
-function superRoot(k, a) {
-  if (k === 1) return a;
-  // x = e^W(k, ln(a))
-  let wVal = extendedLambertW(k, Math.log(a));
-  return Math.exp(wVal);
 }
 
 // Hyper-E=====================================================================
@@ -955,4 +902,45 @@ function renderHeight1(display, val) {
 function renderMath(element, latex) {
   element.innerHTML = `\\[ ${latex} \\]`;
   MathJax.typesetPromise([element]).catch((err) => console.log(err));
+}
+
+// ===================================================================
+// WEBSITE STUFF ARCHIVE
+// These stuff are preserved for archival purposes.
+// ===================================================================
+
+// 1. The Forward Stack: Computes n * e^(n * e^(n...)) for height k
+function lambertStack(k, n) {
+  if (k === 1) return n;
+  return n * Math.exp(lambertStack(k - 1, n));
+}
+
+// 2. The Extended Lambert W Solver (Binary Search)
+// Solves for n where lambertStack(k, n) = a
+function extendedLambertW(k, a) {
+  if (a <= 0) return NaN; // Real numbers only for this calculator
+  
+  let low = 0;
+  let high = Math.max(1, Math.log(a) + 1); // Safe upper bound
+  let mid, guess;
+  
+  // 60 iterations provides extreme floating-point precision
+  for (let i = 0; i < 60; i++) {
+    mid = (low + high) / 2;
+    guess = lambertStack(k, mid);
+    
+    if (guess === a) break;
+    if (guess < a) low = mid;
+    else high = mid;
+  }
+  return mid;
+}
+
+// 3. The Super-Root Function using your exact W(k, ln(a)) logic!
+// Finds x where x^^k = a
+function superRoot(k, a) {
+  if (k === 1) return a;
+  // x = e^W(k, ln(a))
+  let wVal = extendedLambertW(k, Math.log(a));
+  return Math.exp(wVal);
 }
