@@ -25,26 +25,27 @@
       <span class="prompt">&gt;</span>
       <input type="text" id="calcInput" placeholder="idk" autofocus>
     </div>
+
+    <div class="keypad">
+      <button class="btn constant-btn" onclick="appendInput('e')">e</button>
+      <button class="btn constant-btn" onclick="appendInput('π')">&pi;</button>
+      <button class="btn constant-btn" onclick="appendInput('ϕ')">&phi;</button>
+
+      <button class="btn func-btn" onclick="appendInput('√')">&radic;</button>
+      <button class="btn func-btn" onclick="appendInput('log10')">log<sub>10</sub></button>
+      <button class="btn func-btn" onclick="appendInput('ln')">ln</button>
+    </div>
   </div>
 
-  <button class="btn" onclick="appendInput('e')">e</button>
-<button class="btn" onclick="appendInput('pi')">&pi;</button>
-<button class="btn" onclick="appendInput('phi')">&phi;</button>
-
-<button class="btn" onclick="appendInput('&radic;')">&radic;</button>
-<button class="btn" onclick="appendInput('log10')">log<sub>10</sub></button>
-<button class="btn" onclick="appendInput('ln')">ln</button>
-
-  <br>
-  <br>
   <p class="calc-heading">Limit</p>
   <span class="calc-info">10^^2^1024</span>
+
   <p class="calc-heading">Function Index</p>
-  <span class="calc-info">Basic Operations: a+b | a-b | a*b | a/b | a!</span>
-  <span class="calc-info">Knuth arrows: a^b | a^^b</span>
-  <span class="calc-info">Extra: a^^b>c</span>
-  <br>
-  <br>
+  <div class="info-container">
+    <span class="calc-info">Basic Operations: a+b | a-b | a*b | a/b | a!</span>
+    <span class="calc-info">Knuth arrows: a^b | a^^b</span>
+    <span class="calc-info">Extra: a^^b>c</span>
+  </div>
 
   <script src="script.js"></script>
 </body>
