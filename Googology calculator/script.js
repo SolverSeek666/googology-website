@@ -17,12 +17,19 @@ document.getElementById('calcInput').addEventListener('keydown', function(e) {
 });
 
 function appendInput(value) {
-  // Normalize the square root symbol if it comes in as an HTML entity name
-  if (value === '&radic;' || value === '√') {
-    expressionInput.value += '√';
-  } else {
-    expressionInput.value += value;
-  }
+  const inputEl = document.getElementById('calcInput');
+  if (!inputEl) return;
+
+  // Inserts character exactly where user's text cursor is located
+  const startPos = inputEl.selectionStart;
+  const endPos = inputEl.selectionEnd;
+  const text = inputEl.value;
+  
+  inputEl.value = text.substring(0, startPos) + value + text.substring(endPos, text.length);
+  
+  // Refocus input bar and move cursor right past the newly appended button text
+  inputEl.focus();
+  inputEl.selectionStart = inputEl.selectionEnd = startPos + value.length;
 }
 
 // ============================================================================
