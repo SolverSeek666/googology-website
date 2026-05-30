@@ -32,13 +32,8 @@ function appendInput(value) {
   inputEl.selectionStart = inputEl.selectionEnd = startPos + value.length;
 }
 
-// ============================================================================
-// SECTION 2: THE MATH BRAIN (ROBUST PARSER ENGINE)
-// Uses a Recursive Descent Parser to enforce true mathematical precedence.
-// ============================================================================
-
-// Global parser state
-let tokens = expressionInput.value.match(/\d+(?:\.\d+)?|\^\^|[a-zA-Z]+|[-+*/^()!>√πϕ]/g) || [];
+// 1. Keep these global placeholders at the very top of your script
+let tokens = [];
 let tokenIndex = 0;
 
 function peek() {
@@ -56,6 +51,47 @@ function match(t) {
   }
   return false;
 }
+
+// 2. This is your main evaluation trigger function (bound to Enter key or a button)
+function calculate() {
+  // FIXED: Fetch the element using the correct HTML ID
+  const inputEl = document.getElementById('calcInput');
+  const displayEl = document.getElementById('outputDisplay');
+  if (!inputEl || !displayEl) return;
+
+  // FIXED: Tokenize NOW, at the moment of calculation, not at page load!
+  tokens = inputEl.value.match(/\d+(?:\.\d+)?|\^\^|[a-zA-Z]+|[-+*/^()!>√πϕ]/g) || [];
+  tokenIndex = 0; // Always reset the pointer before parsing a new line
+
+  try {
+    if (tokens.length === 0) {
+      throw new Error("Please enter an expression");
+    }
+
+    // Run the parser engine
+    let resultTower = parseExpression();
+
+    // Check if the parser quit early without consuming everything (e.g., syntax error)
+    if (tokenIndex < tokens.length) {
+      throw new Error("Unexpected token: " + tokens[tokenIndex]);
+    }
+
+    // Send the completed tower to your display renderer
+    formatTower(displayEl, resultTower);
+
+  } catch (err) {
+    // Gracefully catch engine crashes and display them nicely in MathJax format
+    displayEl.innerHTML = `\\[ \\text{Error: ${err.message}} \\]`;
+    if (window.MathJax) {
+      window.MathJax.typesetPromise([displayEl]);
+    }
+  }
+}
+
+// ============================================================================
+// SECTION 2: THE MATH BRAIN (ROBUST PARSER ENGINE)
+// Uses a Recursive Descent Parser to enforce true mathematical precedence.
+// ============================================================================
 
 // Helper to initialize a Tower structure
 function createTower(val, height = 0) {
