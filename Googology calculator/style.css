@@ -40,9 +40,9 @@ a {
 /* Keypad Layout Wrapper */
 .keypad {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr); /* FIXED: 4 Columns now */
   gap: 1px;
-  background-color: #333; /* Acts as subtle grid border lines */
+  background-color: #333; 
   border-top: 2px solid #333;
 }
 
