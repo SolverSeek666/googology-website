@@ -16,6 +16,15 @@ document.getElementById('calcInput').addEventListener('keydown', function(e) {
   }
 });
 
+function appendInput(value) {
+  // Normalize the square root symbol if it comes in as an HTML entity name
+  if (value === '&radic;' || value === '√') {
+    expressionInput.value += '√';
+  } else {
+    expressionInput.value += value;
+  }
+}
+
 // ============================================================================
 // SECTION 2: THE MATH BRAIN (ROBUST PARSER ENGINE)
 // Uses a Recursive Descent Parser to enforce true mathematical precedence.
@@ -52,10 +61,6 @@ function processGoogology(rawInput) {
   // Clean up the input: convert to lowercase, swap 'x' for '*', remove spaces
   let expr = rawInput.toLowerCase().replace(/x/g, '*').replace(/\s+/g, '');
   expr = expr.replace(/phi/g, `(${PHI})`);
-  
-  // Hardcoded Easter eggs
-  if (expr === 'googol') return renderMath(display, `\\text{Result: } 10^{100}`); 
-  if (expr === 'googolplex') return renderMath(display, `\\text{Result: } 10^{10^{100}}`); 
 
   try {
     // Tokenize the expression into numbers, operators, and structural elements
@@ -176,11 +181,12 @@ function parseFactorial() {
   return node;
 }
 
-// 6. Core Elements: Numbers, Constants, Parentheses, Unary signs
+// 6. Core Elements: Numbers, Constants, Parentheses, Unary signs, and Functions
 function parsePrimary() {
   let t = peek();
   if (!t) throw new Error("Unexpected end of expression");
 
+  // 1. Parentheses
   if (t === '(') {
     consume();
     let node = parseExpression();
@@ -188,6 +194,7 @@ function parsePrimary() {
     return node;
   }
 
+  // 2. Unary Operators
   if (t === '-') {
     consume();
     let node = parsePrimary();
@@ -199,17 +206,55 @@ function parsePrimary() {
     return parsePrimary();
   }
 
+  // 3. Mathematical Functions (Evaluated before consuming the token)
+  if (t === '√') {
+    consume();
+    let node = parsePrimary(); // Grabs ONLY the next primary element
+    // Mathematically, √x is x^0.5. This handles giant towers instantly!
+    return powerTowers(node, createTower(0.5, 0));
+  }
+
+  if (t === 'log10') {
+    consume();
+    let node = parsePrimary();
+    if (node.height >= 1) {
+      // Googology optimization: log10 drops a tower's height by exactly 1 layer
+      return createTower(node.value, node.height - 1);
+    }
+    return createTower(Math.log10(node.value), 0);
+  }
+
+  if (t === 'ln') {
+    consume();
+    let node = parsePrimary();
+    if (node.height === 0) {
+      return createTower(Math.log(node.value), 0); // Math.log is natural log in JS
+    } else if (node.height === 1) {
+      // ln(10^V) = V * ln(10)
+      return multiplyTowers(createTower(node.value, 0), createTower(Math.log(10), 0));
+    }
+    // For height >= 2, the scale difference between ln and log10 is macroscopically 
+    // invisible, so it safely sheds a height layer.
+    return createTower(node.value, node.height - 1);
+  }
+
+  // 4. Constants and Base Numbers (Consumes the token first)
   consume();
   if (t === 'googol') return createTower(100, 1);
   if (t === 'googolplex') return createTower(100, 2);
-  if (t === 'phi') return createTower(PHI, 0);
+  
+  // Irrationals & Constants
+  if (t === 'phi' || t === 'ϕ') return createTower((1 + Math.sqrt(5)) / 2, 0);
+  if (t === 'pi' || t === 'π') return createTower(Math.PI, 0);
+  if (t === 'e') return createTower(Math.E, 0);
 
+  // Standard Numeric Fallback
   let num = Number(t);
   if (!isNaN(num)) {
     return createTower(num, 0);
   }
 
-  throw new Error("Unknown token");
+  throw new Error("Unknown token: " + t);
 }
 
 // ============================================================================
