@@ -57,8 +57,8 @@ function calculate() {
   // 1. Clean up & Normalize input (Lowercases words, swaps 'x' to '*', removes white-spaces)
   let expr = inputEl.value.toLowerCase().replace(/x/g, '*').replace(/\s+/g, '');
 
-  // 2. Tokenize using the upgraded, symbol-aware Regex layout
-  tokens = expr.match(/\d+(?:\.\d+)?|\^\^|[a-z]+|[-+*/^()!>√πϕ]/g) || [];
+  // 2. Tokenize using the upgraded, symbol-aware Regex layout (added ∞ and comma)
+  tokens = expr.match(/\d+(?:\.\d+)?|\^\^|[a-z]+|[-+*/^()!>√πϕ∞,]/g) || [];
   tokenIndex = 0; // Reset pointer for the fresh execution descent
 
   try {
@@ -193,6 +193,20 @@ function parseFactorial() {
   return node;
 }
 
+// Helper to read multiple arguments like (a,b) for log and roots
+function parseFunctionArgs() {
+  if (match('(')) {
+    let args = [parseExpression()];
+    while (match(',')) {
+      args.push(parseExpression());
+    }
+    if (!match(')')) throw new Error("Missing closing parenthesis");
+    return args;
+  }
+  // Fallback for normal spacing, e.g., "log 10" instead of "log(10)"
+  return [parsePrimary()]; 
+}
+
 // 6. Core Elements: Numbers, Constants, Parentheses, Unary signs, and Functions
 function parsePrimary() {
   let t = peek();
@@ -218,40 +232,78 @@ function parsePrimary() {
     return parsePrimary();
   }
 
-  // 3. Mathematical Functions 
+  // 3. Roots: √(x) or √(n, x)
   if (t === '√') {
     consume();
-    let node = parsePrimary(); 
-    return powerTowers(node, createTower(0.5, 0));
+    let args = parseFunctionArgs();
+    let n = args.length === 2 ? args[0] : createTower(2, 0);
+    let val = args.length === 2 ? args[1] : args[0];
+    return powerTowers(val, divideTowers(createTower(1, 0), n));
   }
 
-  // FIXED: Changed from 'log10' to 'log'
+  // 4. Logarithms: log(x) or log(base, x)
   if (t === 'log') {
     consume();
-    let node = parsePrimary();
-    if (node.height >= 1) {
-      return createTower(node.value, node.height - 1);
-    }
-    return createTower(Math.log10(node.value), 0);
+    let args = parseFunctionArgs();
+    let base = args.length === 2 ? args[0] : createTower(10, 0);
+    let val = args.length === 2 ? args[1] : args[0];
+    
+    // log_base(val) = log10(val) / log10(base)
+    const towerLog10 = (node) => node.height >= 1 ? createTower(node.value, node.height - 1) : createTower(Math.log10(node.value), 0);
+    return divideTowers(towerLog10(val), towerLog10(base));
   }
 
   if (t === 'ln') {
     consume();
-    let node = parsePrimary();
-    if (node.height === 0) {
-      return createTower(Math.log(node.value), 0); 
-    } else if (node.height === 1) {
-      return multiplyTowers(createTower(node.value, 0), createTower(Math.log(10), 0));
-    }
-    return createTower(node.value, node.height - 1);
+    let args = parseFunctionArgs();
+    let val = args[0];
+    if (val.height === 0) return createTower(Math.log(val.value), 0);
+    if (val.height === 1) return multiplyTowers(createTower(val.value, 0), createTower(Math.log(10), 0));
+    return createTower(val.value, val.height - 1);
   }
 
-  // 4. Constants and Base Numbers
+  // 5. Trigonometry
+  if (t === 'sin' || t === 'cos' || t === 'tan') {
+    let op = t;
+    consume();
+    let args = parseFunctionArgs();
+    let val = args[0];
+    if (val.height > 0) throw new Error(`${op} is undefined for Googolisms`);
+    
+    let res = 0;
+    if (op === 'sin') res = Math.sin(val.value);
+    if (op === 'cos') res = Math.cos(val.value);
+    if (op === 'tan') res = Math.tan(val.value);
+    return createTower(res, 0);
+  }
+
+  // 6. Gamma Function Γ(x)
+  if (t === 'gamma' || t === 'γ' || t === 'Γ') {
+    consume();
+    let args = parseFunctionArgs();
+    let node = args[0];
+    if (node.height === 0) {
+      let x = node.value;
+      if (x === 1 || x === 2) return createTower(1, 0);
+      if (x <= 171 && Number.isInteger(x) && x > 0) {
+        let g = 1;
+        for (let i = 2; i < x; i++) g *= i;
+        return createTower(g, 0);
+      }
+      // Stirling Approximation for huge numbers/floats: log10(Γ(x))
+      let val = (x - 0.5) * Math.log10(x) - x * Math.LOG10E + 0.5 * Math.log10(2 * Math.PI);
+      return createTower(val, 1);
+    }
+    // High tower gamma is functionally identical to high tower factorial
+    return createTower(node.value, node.height + 1);
+  }
+
+  // 7. Constants and Base Numbers
   consume();
   if (t === 'googol') return createTower(100, 1);
   if (t === 'googolplex') return createTower(100, 2);
   
-  // FIXED: Caught both string words and literal Greek symbols
+  if (t === 'infinity' || t === '∞') return createTower(Infinity, 0);
   if (t === 'phi' || t === 'ϕ') return createTower((1 + Math.sqrt(5)) / 2, 0);
   if (t === 'pi' || t === 'π') return createTower(Math.PI, 0);
   if (t === 'e') return createTower(Math.E, 0);
@@ -572,6 +624,12 @@ function solveMultifactorial(x, k) {
 // ============================================================================
 
 function formatTower(display, current) {
+  // NEW: Handle Infinity & NaN explicitly at the very beginning!
+  if (current.height === 0) {
+    if (current.value === Infinity) return renderMath(display, "\\infty");
+    if (current.value === -Infinity) return renderMath(display, "-\\infty");
+    if (isNaN(current.value)) return renderMath(display, "\\text{Undefined}");
+  }
   const toLatexSci = (num) => {
     let str = String(num);
     if (str.includes('e')) {
