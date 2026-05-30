@@ -38,7 +38,7 @@ function appendInput(value) {
 // ============================================================================
 
 // Global parser state
-let tokens = [];
+let tokens = expressionInput.value.match(/\d+(?:\.\d+)?|\^\^|[a-zA-Z]+|[-+*/^()!>√πϕ]/g) || [];
 let tokenIndex = 0;
 
 function peek() {
@@ -213,19 +213,18 @@ function parsePrimary() {
     return parsePrimary();
   }
 
-  // 3. Mathematical Functions (Evaluated before consuming the token)
+  // 3. Mathematical Functions 
   if (t === '√') {
     consume();
-    let node = parsePrimary(); // Grabs ONLY the next primary element
-    // Mathematically, √x is x^0.5. This handles giant towers instantly!
+    let node = parsePrimary(); 
     return powerTowers(node, createTower(0.5, 0));
   }
 
-  if (t === 'log10') {
+  // FIXED: Changed from 'log10' to 'log'
+  if (t === 'log') {
     consume();
     let node = parsePrimary();
     if (node.height >= 1) {
-      // Googology optimization: log10 drops a tower's height by exactly 1 layer
       return createTower(node.value, node.height - 1);
     }
     return createTower(Math.log10(node.value), 0);
@@ -235,22 +234,19 @@ function parsePrimary() {
     consume();
     let node = parsePrimary();
     if (node.height === 0) {
-      return createTower(Math.log(node.value), 0); // Math.log is natural log in JS
+      return createTower(Math.log(node.value), 0); 
     } else if (node.height === 1) {
-      // ln(10^V) = V * ln(10)
       return multiplyTowers(createTower(node.value, 0), createTower(Math.log(10), 0));
     }
-    // For height >= 2, the scale difference between ln and log10 is macroscopically 
-    // invisible, so it safely sheds a height layer.
     return createTower(node.value, node.height - 1);
   }
 
-  // 4. Constants and Base Numbers (Consumes the token first)
+  // 4. Constants and Base Numbers
   consume();
   if (t === 'googol') return createTower(100, 1);
   if (t === 'googolplex') return createTower(100, 2);
   
-  // Irrationals & Constants
+  // FIXED: Caught both string words and literal Greek symbols
   if (t === 'phi' || t === 'ϕ') return createTower((1 + Math.sqrt(5)) / 2, 0);
   if (t === 'pi' || t === 'π') return createTower(Math.PI, 0);
   if (t === 'e') return createTower(Math.E, 0);
