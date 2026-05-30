@@ -1,38 +1,12 @@
 // I use gemini to help me lmao
 
 // ============================================================================
-// SECTION 1: SETUP & INPUT
+// SECTION 1: SETUP & INPUT (UNIFIED & FIXED)
 // ============================================================================
 
 const PHI = (1 + Math.sqrt(5)) / 2;
 
-// Listen for the "Enter" key in the input box to start the calculation
-document.getElementById('calcInput').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') {
-    const input = this.value.trim();
-    if (input) {
-      processGoogology(input);
-    }
-  }
-});
-
-function appendInput(value) {
-  const inputEl = document.getElementById('calcInput');
-  if (!inputEl) return;
-
-  // Inserts character exactly where user's text cursor is located
-  const startPos = inputEl.selectionStart;
-  const endPos = inputEl.selectionEnd;
-  const text = inputEl.value;
-  
-  inputEl.value = text.substring(0, startPos) + value + text.substring(endPos, text.length);
-  
-  // Refocus input bar and move cursor right past the newly appended button text
-  inputEl.focus();
-  inputEl.selectionStart = inputEl.selectionEnd = startPos + value.length;
-}
-
-// 1. Keep these global placeholders at the very top of your script
+// Global parser state placeholders
 let tokens = [];
 let tokenIndex = 0;
 
@@ -52,35 +26,59 @@ function match(t) {
   return false;
 }
 
-// 2. This is your main evaluation trigger function (bound to Enter key or a button)
+// Listen for the "Enter" key in the input box to trigger the calculation engine
+document.getElementById('calcInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    calculate(); // Fixed: Directly call the unified engine!
+  }
+});
+
+// Appends values directly to the user's blinking cursor location
+function appendInput(value) {
+  const inputEl = document.getElementById('calcInput');
+  if (!inputEl) return;
+
+  const startPos = inputEl.selectionStart;
+  const endPos = inputEl.selectionEnd;
+  const text = inputEl.value;
+  
+  inputEl.value = text.substring(0, startPos) + value + text.substring(endPos, text.length);
+  
+  inputEl.focus();
+  inputEl.selectionStart = inputEl.selectionEnd = startPos + value.length;
+}
+
+// The core evaluation engine execution block
 function calculate() {
-  // FIXED: Fetch the element using the correct HTML ID
   const inputEl = document.getElementById('calcInput');
   const displayEl = document.getElementById('outputDisplay');
   if (!inputEl || !displayEl) return;
 
-  // FIXED: Tokenize NOW, at the moment of calculation, not at page load!
-  tokens = inputEl.value.match(/\d+(?:\.\d+)?|\^\^|[a-zA-Z]+|[-+*/^()!>√πϕ]/g) || [];
-  tokenIndex = 0; // Always reset the pointer before parsing a new line
+  // 1. Clean up & Normalize input (Lowercases words, swaps 'x' to '*', removes white-spaces)
+  let expr = inputEl.value.toLowerCase().replace(/x/g, '*').replace(/\s+/g, '');
+
+  // 2. Tokenize using the upgraded, symbol-aware Regex layout
+  tokens = expr.match(/\d+(?:\.\d+)?|\^\^|[a-z]+|[-+*/^()!>√πϕ]/g) || [];
+  tokenIndex = 0; // Reset pointer for the fresh execution descent
 
   try {
     if (tokens.length === 0) {
       throw new Error("Please enter an expression");
     }
 
-    // Run the parser engine
+    // 3. Run the recursive descent parser engine
     let resultTower = parseExpression();
 
-    // Check if the parser quit early without consuming everything (e.g., syntax error)
+    // 4. Check if syntax errors left dangling unparsed elements behind
     if (tokenIndex < tokens.length) {
       throw new Error("Unexpected token: " + tokens[tokenIndex]);
     }
 
-    // Send the completed tower to your display renderer
+    // 5. Send structural tower to your MathJax display formatter
     formatTower(displayEl, resultTower);
 
   } catch (err) {
-    // Gracefully catch engine crashes and display them nicely in MathJax format
+    // Gracefully catch system faults and display an elegant MathJax message block
     displayEl.innerHTML = `\\[ \\text{Error: ${err.message}} \\]`;
     if (window.MathJax) {
       window.MathJax.typesetPromise([displayEl]);
@@ -96,35 +94,6 @@ function calculate() {
 // Helper to initialize a Tower structure
 function createTower(val, height = 0) {
   return { value: val, height: height };
-}
-
-function processGoogology(rawInput) {
-  const display = document.getElementById('outputDisplay');
-  
-  // Clean up the input: convert to lowercase, swap 'x' for '*', remove spaces
-  let expr = rawInput.toLowerCase().replace(/x/g, '*').replace(/\s+/g, '');
-  expr = expr.replace(/phi/g, `(${PHI})`);
-
-  try {
-    // Tokenize the expression into numbers, operators, and structural elements
-    const tokenRegex = /\d+(?:\.\d+)?(?:e[+-]?\d+)?|\^\^|\^|!|[-+*/()>]|[a-z]+/g;
-    tokens = expr.match(tokenRegex) || [];
-    tokenIndex = 0;
-
-    if (tokens.length === 0) throw new Error("Empty expression");
-
-    // Start parsing from lowest precedence (addition/subtraction)
-    let finalTower = parseExpression();
-
-    if (tokenIndex < tokens.length) {
-      throw new Error("Unparsed tokens remaining");
-    }
-
-    formatTower(display, finalTower);
-    return;
-  } catch (err) {
-    return renderMath(display, `\\text{Error: Could not compute expression.}`);
-  }
 }
 
 // 1. Precedence Level: Addition & Subtraction
