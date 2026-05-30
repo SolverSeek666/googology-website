@@ -317,18 +317,14 @@ function computeTetration(A, B, Barrier) {
         // Base is a height-1 tower: (10^v) ^^ y > Barrier
         if (bHeight === 0) {
           if (y === 2) {
-            // (10^v)^bVal = 10^(v * bVal) -> Stays a flat height-1 exponent
             return createTower(A.value * bVal, 1);
           }
           
-          // FIXED: Structural evaluation for y >= 3
           if (A.value * bVal <= 308) {
             let topVal = A.value * Math.pow(10, A.value * bVal);
             if (A.value > 0) topVal += Math.log10(A.value);
-            // Height collapses to y - 1 because the base layer is absorbed
             return createTower(topVal, y - 1);
           } else {
-            // Handle floating-point overflow gracefully by pushing an extra layer
             let topVal = A.value * bVal;
             if (A.value > 0) topVal += Math.log10(A.value);
             return createTower(topVal, y);
@@ -345,7 +341,6 @@ function computeTetration(A, B, Barrier) {
             return createTower(topVal, 2);
           }
           
-          // FIXED: Structural evaluation for y >= 3
           if (A.value <= 308) {
             let topVal = A.value + bVal * Math.pow(10, A.value);
             return createTower(topVal, y - 1);
@@ -358,7 +353,6 @@ function computeTetration(A, B, Barrier) {
           return createTower(bVal, bHeight + y);
         }
       } else if (A.height === 3) {
-        // Base is a height-3 tower: (10^10^10^v) ^^ y > Barrier
         if (bHeight === 0 && A.value <= 308) {
           let topVal = Math.pow(10, A.value) + Math.log10(bVal);
           return createTower(topVal, A.height + y - 2);
@@ -368,7 +362,6 @@ function computeTetration(A, B, Barrier) {
           return createTower(A.value, A.height + y - 1);
         }
       } else {
-        // Base is a height >= 4 tower: (10^^a > v) ^^ y > Barrier
         if (bHeight === 0 && A.value <= 308) {
           let topVal = Math.pow(10, A.value); 
           return createTower(topVal, A.height + y - 2);
@@ -379,7 +372,6 @@ function computeTetration(A, B, Barrier) {
         }
       }
     } else {
-      // Exponent B is also a tower.
       return createTower(B.value, B.height + 1);
     }
   }
@@ -391,7 +383,20 @@ function computeTetration(A, B, Barrier) {
      if (Barrier.height === 0 && Barrier.value === 1 && B.height === 0 && B.value > 0 && B.value < 6) {
         return createTower(10, B.value - 1);
      } else if (B.height === 0) {
-        return createTower(Barrier.value, B.value + Barrier.height);
+        let bVal = Barrier.value;
+        let bHeight = Barrier.height;
+        let y = B.value;
+
+        // FIXED: Collapse small barrier exponents to match decimal notation rules
+        if (bHeight === 0 && bVal < 308) {
+          let collapsedValue = Math.pow(10, bVal);
+          if (Number.isFinite(collapsedValue) && collapsedValue < 1e300) {
+            // Reduces the height layout by 1 because the value gets fully evaluated
+            return createTower(collapsedValue, y - 1);
+          }
+        }
+        
+        return createTower(bVal, y + bHeight);
      } else {
         return createTower(B.value, B.height + 1);
      }
