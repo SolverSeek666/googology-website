@@ -308,23 +308,22 @@ function computeTetration(A, B, Barrier) {
   if (A.height >= 1) {
     if (B.height === 0) {
       let y = B.value;
-      if (y === 1) return A; // X ^^ 1 = X
-      
       let bVal = Barrier.value;
       let bHeight = Barrier.height;
+
+      // Handle trivial barrier (Barrier = 1) normally
+      if (bHeight === 0 && bVal === 1) {
+        if (y === 1) return A;
+      }
 
       if (A.height === 1) {
         // Base is a height-1 tower: (10^v) ^^ y > Barrier
         if (bHeight === 0) {
-          if (y === 2) {
+          if (y === 1) {
+            // (10^v)^n = 10^(v * n) -> Height 1
             return createTower(A.value * bVal, 1);
-          }
-          
-          if (A.value * bVal <= 308) {
-            let topVal = A.value * Math.pow(10, A.value * bVal);
-            if (A.value > 0) topVal += Math.log10(A.value);
-            return createTower(topVal, y - 1);
           } else {
+            // (10^v)^^(2) > n = 10^(10^(v * n + log10(v))) -> Height 2+
             let topVal = A.value * bVal;
             if (A.value > 0) topVal += Math.log10(A.value);
             return createTower(topVal, y);
@@ -332,43 +331,59 @@ function computeTetration(A, B, Barrier) {
         } else {
           return createTower(bVal, bHeight + y);
         }
-      } else if (A.height === 2) {
+      } 
+      
+      else if (A.height === 2) {
         // Base is a height-2 tower: (10^10^v) ^^ y > Barrier
         if (bHeight === 0) {
-          if (y === 2) {
+          if (y === 1) {
+            // (10^10^v)^n = 10^(n * 10^v) = 10^10^(v + log10(n))
             let topVal = A.value;
             if (bVal > 0) topVal += Math.log10(bVal);
             return createTower(topVal, 2);
-          }
-          
-          if (A.value <= 308) {
-            let topVal = A.value + bVal * Math.pow(10, A.value);
-            return createTower(topVal, y - 1);
           } else {
-            let topVal = A.value;
-            if (bVal > 0) topVal += Math.log10(bVal);
-            return createTower(topVal, y);
+            if (A.value <= 308) {
+              let topVal = A.value + bVal * Math.pow(10, A.value);
+              return createTower(topVal, y);
+            } else {
+              let topVal = A.value;
+              if (bVal > 0) topVal += Math.log10(bVal);
+              return createTower(topVal, y + 1);
+            }
           }
         } else {
           return createTower(bVal, bHeight + y);
         }
-      } else if (A.height === 3) {
-        if (bHeight === 0 && A.value <= 308) {
-          let topVal = Math.pow(10, A.value) + Math.log10(bVal);
-          return createTower(topVal, A.height + y - 2);
-        } else if (bHeight > 0) {
-          return createTower(bVal, bHeight + y);
+      } 
+      
+      else if (A.height === 3) {
+        // Base is a height-3 tower: (10^10^10^v) ^^ y > Barrier
+        if (bHeight === 0) {
+          if (y === 1) {
+            if (A.value <= 308) {
+              let topVal = Math.pow(10, A.value) + Math.log10(bVal);
+              return createTower(topVal, 3);
+            } else {
+              return createTower(A.value, 3);
+            }
+          } else {
+            return createTower(A.value, y + 2);
+          }
         } else {
-          return createTower(A.value, A.height + y - 1);
+          return createTower(bVal, bHeight + y);
         }
-      } else {
-        if (bHeight === 0 && A.value <= 308) {
-          let topVal = Math.pow(10, A.value); 
-          return createTower(topVal, A.height + y - 2);
-        } else if (bHeight > 0) {
-          return createTower(bVal, bHeight + y);
+      } 
+      
+      else {
+        // Base is a height-4+ tower
+        if (bHeight === 0) {
+          if (y === 1) {
+            return createTower(A.value, A.height);
+          } else {
+            return createTower(A.value, A.height + y - 1);
+          }
         } else {
-          return createTower(A.value, A.height + y - 1);
+          return createTower(bVal, bHeight + y);
         }
       }
     } else {
@@ -387,11 +402,9 @@ function computeTetration(A, B, Barrier) {
         let bHeight = Barrier.height;
         let y = B.value;
 
-        // FIXED: Collapse small barrier exponents to match decimal notation rules
         if (bHeight === 0 && bVal < 308) {
           let collapsedValue = Math.pow(10, bVal);
           if (Number.isFinite(collapsedValue) && collapsedValue < 1e300) {
-            // Reduces the height layout by 1 because the value gets fully evaluated
             return createTower(collapsedValue, y - 1);
           }
         }
