@@ -268,12 +268,20 @@ function parsePrimary() {
     consume();
     let args = parseFunctionArgs();
     let val = args[0];
-    if (val.height > 0) throw new Error(`${op} is undefined for Googolisms`);
+    
+    // Trig of Infinity or Googolisms is mathematically undefined/unstable
+    if (val.value === Infinity || val.value === -Infinity || val.height > 0) {
+      return createTower(NaN, 0); 
+    }
     
     let res = 0;
     if (op === 'sin') res = Math.sin(val.value);
     if (op === 'cos') res = Math.cos(val.value);
-    if (op === 'tan') res = Math.tan(val.value);
+    if (op === 'tan') {
+      // Fix Javascript's floating point Pi precision for tan(π/2)
+      if (Math.abs(Math.cos(val.value)) < 1e-10) return createTower(NaN, 0); 
+      res = Math.tan(val.value);
+    }
     return createTower(res, 0);
   }
 
@@ -282,6 +290,13 @@ function parsePrimary() {
     consume();
     let args = parseFunctionArgs();
     let node = args[0];
+
+    // Gamma of 0 or negative integers is undefined. Gamma of Inf is Inf.
+    if (node.value === Infinity) return createTower(Infinity, 0);
+    if (node.height === 0 && (node.value === 0 || (node.value < 0 && Number.isInteger(node.value)))) {
+      return createTower(NaN, 0); 
+    }
+
     if (node.height === 0) {
       let x = node.value;
       if (x === 1 || x === 2) return createTower(1, 0);
@@ -297,7 +312,7 @@ function parsePrimary() {
     // High tower gamma is functionally identical to high tower factorial
     return createTower(node.value, node.height + 1);
   }
-
+  
   // 7. Constants and Base Numbers
   consume();
   if (t === 'googol') return createTower(100, 1);
@@ -323,16 +338,30 @@ function parsePrimary() {
 // ============================================================================
 
 function addTowers(A, B) {
+  if (isNaN(A.value) || isNaN(B.value)) return createTower(NaN, 0);
+  if (A.value === Infinity || B.value === Infinity) return createTower(Infinity, 0);
+  
   if (A.height === 0 && B.height === 0) return createTower(A.value + B.value, 0);
-  return A.height >= B.height ? A : B; // Tower completely dominates standard addition
+  return A.height >= B.height ? A : B; 
 }
 
 function subtractTowers(A, B) {
+  if (isNaN(A.value) || isNaN(B.value)) return createTower(NaN, 0);
+  if (A.value === Infinity && B.value === Infinity) return createTower(NaN, 0); // ∞ - ∞ is undefined
+  if (A.value === Infinity) return createTower(Infinity, 0);
+  if (B.value === Infinity) return createTower(-Infinity, 0);
+
   if (A.height === 0 && B.height === 0) return createTower(A.value - B.value, 0);
-  return A; // Tower dominates subtraction
+  return A;
 }
 
 function multiplyTowers(A, B) {
+  if (isNaN(A.value) || isNaN(B.value)) return createTower(NaN, 0);
+  if (A.value === Infinity || B.value === Infinity) {
+    if (A.value === 0 || B.value === 0) return createTower(NaN, 0); // 0 * ∞ is undefined
+    return createTower(Infinity, 0);
+  }
+
   if (A.height === 0 && B.height === 0) return createTower(A.value * B.value, 0);
   if (A.height === 1 && B.height === 0) return createTower(A.value + Math.log10(B.value), 1);
   if (B.height === 1 && A.height === 0) return createTower(B.value + Math.log10(A.value), 1);
@@ -340,12 +369,31 @@ function multiplyTowers(A, B) {
 }
 
 function divideTowers(A, B) {
+  if (isNaN(A.value) || isNaN(B.value)) return createTower(NaN, 0);
+  if (A.value === Infinity && B.value === Infinity) return createTower(NaN, 0); // ∞ / ∞
+  if (A.value === Infinity) return createTower(Infinity, 0);
+  if (B.value === Infinity) return createTower(0, 0);
+  if (B.height === 0 && B.value === 0) return createTower(Infinity, 0); // x / 0
+
   if (A.height === 0 && B.height === 0) return createTower(A.value / B.value, 0);
   if (A.height === 1 && B.height === 0) return createTower(A.value - Math.log10(B.value), 1);
   return A;
 }
 
 function powerTowers(A, B) {
+  // Case 0: INFINITY
+  if (isNaN(A.value) || isNaN(B.value)) return createTower(NaN, 0);
+  
+  // Infinity / Zero Guardrails
+  if (B.height === 0 && B.value === 0) return createTower(1, 0);
+  if (A.height === 0 && A.value === 0 && B.value > 0) return createTower(0, 0);
+  if (A.value === Infinity) return createTower(Infinity, 0);
+  if (B.value === Infinity) {
+    if (A.height === 0 && A.value === 1) return createTower(NaN, 0); // 1^∞ is indeterminate
+    if (A.height === 0 && A.value < 1 && A.value > -1) return createTower(0, 0); // 0.5^∞ is 0
+    return createTower(Infinity, 0);
+  }
+  
   // Case 1: Both are standard numbers (height 0)
   if (A.height === 0 && B.height === 0) {
     let next = Math.pow(A.value, B.value);
@@ -409,6 +457,12 @@ function powerTowers(A, B) {
 }
 
 function computeTetration(A, B, Barrier) {
+  // Case 0: INFINITY
+  if (isNaN(A.value) || isNaN(B.value) || isNaN(Barrier.value)) return createTower(NaN, 0);
+  
+  // Infinity overriding everything else
+  if (B.value === Infinity || A.value === Infinity) return createTower(Infinity, 0);
+  
   // FIXED: Check if the height B is itself an ultra-giant tower structure
   let isBTower = (typeof B.height === 'object' && B.height !== null) || (typeof B.height === 'number' && B.height >= 1);
 
