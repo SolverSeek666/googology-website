@@ -98,13 +98,13 @@ function parseExpression() {
 
 // 2. Precedence Level: Multiplication & Division
 function parseTerm() {
-  let node = parsePower();
+  let node = parseTetration(); // FIXED: Now evaluates Tetration first
   while (true) {
     if (match('*')) {
-      let right = parsePower();
+      let right = parseTetration();
       node = multiplyTowers(node, right);
     } else if (match('/')) {
-      let right = parsePower();
+      let right = parseTetration();
       node = divideTowers(node, right);
     } else {
       break;
@@ -113,27 +113,27 @@ function parseTerm() {
   return node;
 }
 
-// 3. Precedence Level: Powers (^) - Right Associative
-function parsePower() {
-  let node = parseTetration();
-  if (match('^')) {
-    let right = parsePower(); 
-    node = powerTowers(node, right);
-  }
-  return node;
-}
-
-// 4. Precedence Level: Tetration (^^) and Barrier (>) - Right Associative
+// 3. Precedence Level: Tetration (^^) and Barrier (>) - Right Associative
 function parseTetration() {
-  let node = parseFactorial();
+  let node = parsePower(); // FIXED: Now evaluates Powers tighter than Tetration
   if (match('^^')) {
     let right = parseTetration(); 
     let barrier = createTower(1, 0);
     if (match('>')) {
-      // FIXED: Grab the entire remaining expression as the barrier block
+      // Grab the entire remaining expression as the barrier block
       barrier = parseExpression();
     }
     node = computeTetration(node, right, barrier);
+  }
+  return node;
+}
+
+// 4. Precedence Level: Powers (^) - Right Associative
+function parsePower() {
+  let node = parseFactorial(); // FIXED: Falls back to Factorials
+  if (match('^')) {
+    let right = parsePower(); 
+    node = powerTowers(node, right);
   }
   return node;
 }
@@ -304,9 +304,12 @@ function powerTowers(A, B) {
 }
 
 function computeTetration(A, B, Barrier) {
+  // FIXED: Check if the height B is itself an ultra-giant tower structure
+  let isBTower = (typeof B.height === 'object' && B.height !== null) || (typeof B.height === 'number' && B.height >= 1);
+
   // Case 1: Base A is already a giant tower (height >= 1)
   if (A.height >= 1) {
-    if (B.height === 0) {
+    if (!isBTower) {
       let y = B.value;
       let bVal = Barrier.value;
       let bHeight = Barrier.height;
@@ -317,13 +320,10 @@ function computeTetration(A, B, Barrier) {
       }
 
       if (A.height === 1) {
-        // Base is a height-1 tower: (10^v) ^^ y > Barrier
         if (bHeight === 0) {
           if (y === 1) {
-            // (10^v)^n = 10^(v * n) -> Height 1
             return createTower(A.value * bVal, 1);
           } else {
-            // (10^v)^^(2) > n = 10^(10^(v * n + log10(v))) -> Height 2+
             let topVal = A.value * bVal;
             if (A.value > 0) topVal += Math.log10(A.value);
             return createTower(topVal, y);
@@ -331,13 +331,9 @@ function computeTetration(A, B, Barrier) {
         } else {
           return createTower(bVal, bHeight + y);
         }
-      } 
-      
-      else if (A.height === 2) {
-        // Base is a height-2 tower: (10^10^v) ^^ y > Barrier
+      } else if (A.height === 2) {
         if (bHeight === 0) {
           if (y === 1) {
-            // (10^10^v)^n = 10^(n * 10^v) = 10^10^(v + log10(n))
             let topVal = A.value;
             if (bVal > 0) topVal += Math.log10(bVal);
             return createTower(topVal, 2);
@@ -354,10 +350,7 @@ function computeTetration(A, B, Barrier) {
         } else {
           return createTower(bVal, bHeight + y);
         }
-      } 
-      
-      else if (A.height === 3) {
-        // Base is a height-3 tower: (10^10^10^v) ^^ y > Barrier
+      } else if (A.height === 3) {
         if (bHeight === 0) {
           if (y === 1) {
             if (A.value <= 308) {
@@ -372,9 +365,7 @@ function computeTetration(A, B, Barrier) {
         } else {
           return createTower(bVal, bHeight + y);
         }
-      } 
-      
-      else {
+      } else {
         // Base is a height-4+ tower
         if (bHeight === 0) {
           if (y === 1) {
@@ -387,7 +378,8 @@ function computeTetration(A, B, Barrier) {
         }
       }
     } else {
-      return createTower(B.value, B.height + 1);
+      // Height B is an ultra-giant tower! The barrier is macroscopically irrelevant.
+      return createTower(1, B);
     }
   }
 
@@ -395,9 +387,9 @@ function computeTetration(A, B, Barrier) {
   let base = A.value;
   
   if (Math.abs(base - 10) < 1e-7) {
-     if (Barrier.height === 0 && Barrier.value === 1 && B.height === 0 && B.value > 0 && B.value < 6) {
+     if (Barrier.height === 0 && Barrier.value === 1 && !isBTower && B.value > 0 && B.value < 6) {
         return createTower(10, B.value - 1);
-     } else if (B.height === 0) {
+     } else if (!isBTower) {
         let bVal = Barrier.value;
         let bHeight = Barrier.height;
         let y = B.value;
@@ -408,17 +400,17 @@ function computeTetration(A, B, Barrier) {
             return createTower(collapsedValue, y - 1);
           }
         }
-        
         return createTower(bVal, y + bHeight);
      } else {
-        return createTower(B.value, B.height + 1);
+        // Height B is an ultra-giant tower!
+        return createTower(1, B);
      }
   }
   
-  if (B.height === 0) {
+  // Standard loop for small non-10 bases
+  if (!isBTower) {
     let y = B.value;
     let iters = Math.min(y, 10);
-    
     let current = createTower(Barrier.value, Barrier.height);
     
     for (let i = 0; i < iters; i++) {
@@ -437,11 +429,10 @@ function computeTetration(A, B, Barrier) {
         current.height += 1;
       }
     }
-    
     if (y > 10) current.height += (y - 10);
     return current;
   } else {
-    return createTower(B.value, B.height + 1);
+    return createTower(1, B);
   }
 }
 
@@ -533,31 +524,34 @@ function formatTower(display, current) {
     if (str.includes('e')) {
       let [coeff, exp] = str.split('e');
       exp = exp.replace('+', ''); 
-      
-      // Parse the coefficient and force it to 4 decimal places
       let parsedCoeff = parseFloat(coeff);
       let coeffStr = parsedCoeff.toFixed(4);
-      
-      // Keep the clean clean 10^{exp} look if it's a perfect power of 10
       if (coeff === '1' || coeffStr === '1.0000') return `10^{${exp}}`;
-      
-      // Otherwise, return it with its beautiful trailing zeros!
       return `${coeffStr} \\times 10^{${exp}}`;
     }
     return typeof formatValueClean === 'function' ? formatValueClean(num) : str;
   };
 
-  // ============================================================================
-  // FIXED: Generalized Tower Shifting (Normalization)
-  // If any tower (height >= 1) has a top value >= 1e10, we continuously shift 
-  // it up into the tower height layers until the remaining top value 'd' 
-  // is nicely compressed below 10^10. This transforms 10^^a>b into 10^^c>d.
-  // ============================================================================
-  if (current.height >= 1) {
+  // Prevent normalization crash if height is an object
+  if (typeof current.height === 'number' && current.height >= 1) {
     while (current.value >= 1e10) {
       current.height += 1;
       current.value = Math.log10(current.value);
     }
+  }
+
+  // FIXED: Delete barrier threshold check
+  let isPastThreshold = false;
+  if (typeof current.height === 'object' && current.height !== null) {
+    isPastThreshold = true;
+  } else if (typeof current.height === 'number' && current.height >= 1e10) {
+    isPastThreshold = true;
+  }
+
+  if (isPastThreshold) {
+    let heightStr = (typeof current.height === 'object') ? formatTowerToString(current.height) : toLatexSci(current.height);
+    renderMath(display, `10 \\uparrow\\uparrow {${heightStr}}`);
+    return;
   }
 
   if (current.height >= 6) {
@@ -601,12 +595,20 @@ function formatTower(display, current) {
     let coeffStr = coeff.toFixed(4);
     let latex = coeffStr === "1.0000" ? `10^{${toLatexSci(exp)}}` : `${coeffStr} \\times 10^{${toLatexSci(exp)}}`;
     
-    // Loop height - 1 times, because the 'latex' string already absorbed the first base-10!
     for (let h = 0; h < current.height - 1; h++) {
       latex = `10^{${latex}}`;
     }
     renderMath(display, `${latex}`);
   }
+}
+
+// Helper to recursively stringify giant inner tower heights
+function formatTowerToString(current) {
+  // simplified stringifier just for the inner bracket 
+  if (typeof current.height === 'object') {
+     return `10 \\uparrow\\uparrow {${formatTowerToString(current.height)}}`;
+  }
+  return current.value; // Falls back to raw value or scientific notation 
 }
 
 function formatValueClean(v) {
