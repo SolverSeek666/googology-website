@@ -505,27 +505,40 @@ function computeTetration(A, B, Barrier) {
   let isBTower = (typeof B.height === 'object' && B.height !== null) || (typeof B.height === 'number' && B.height >= 1);
 
   // ==========================================
-  // PURE FRACTIONAL TETRATION INTERCEPTOR
-  // Formula: x ^^ (a/b) = superroot(b, x) ^^ a
+  // HYBRID DECIMAL TETRATION INTERCEPTOR
+  // Clean 1/n fractions -> Extended Lambert W Super-Root
+  // Chaotic decimals -> Linear Approximation Baseline
   // ==========================================
   if (A.height === 0 && B.height === 0 && !Number.isInteger(B.value)) {
     let base = A.value;
     let exponent = B.value;
     if (exponent < 0) return createTower(NaN, 0);
 
-    // 1. Convert decimal to its fractional components (a / b)
-    let frac = getFractionComponents(exponent);
+    let intPart = Math.floor(exponent);
+    let fracPart = exponent - intPart;
     
-    // 2. Compute the superroot base: superroot(b, x) using your Lambert code
-    let superRootBase = superRoot(frac.b, base);
+    let inverseFrac = 1 / fracPart;
+    let fracResult;
+
+    // 1. Check if it's a clean 1/n fraction (e.g., 0.5, 0.25, 0.1)
+    if (Math.abs(inverseFrac - Math.round(inverseFrac)) < 0.001) {
+      let k = Math.round(inverseFrac);
+      // Evaluates x^^fracPart using your exact Lambert W Super-Root logic
+      fracResult = superRoot(k, base);
+    } else {
+      // 2. Fallback: Linear Approximation
+      // Step down to negative height: h = fracPart - 1
+      // Apply baseline: x^^(fracPart - 1) = (fracPart - 1) + 1 = fracPart
+      // First stack up to positive fraction: x^^fracPart = base^fracPart
+      fracResult = Math.pow(base, fracPart);
+    }
+
+    // 3. Pass the fractional boundary result into the integer engine as the Barrier!
+    // This tells the engine to calculate: base ^^ intPart, starting from fracResult
+    let newB = createTower(intPart, 0);
+    let newBarrier = createTower(fracResult, 0);
     
-    // 3. Stack it 'a' times: superroot(b, x) ^^ a
-    // We create a new base node and feed it into your existing integer engine!
-    let newBaseNode = createTower(superRootBase, 0);
-    let newHeightNode = createTower(frac.a, 0);
-    let emptyBarrier = createTower(1, 0); // Standard barrier of 1 for normal integer tetration
-    
-    return computeTetration(newBaseNode, newHeightNode, emptyBarrier);
+    return computeTetration(A, newB, newBarrier);
   }
   // ==========================================
   
