@@ -614,6 +614,85 @@ function computeTetration(A, B, Barrier) {
   }
 }
 
+// Decimal Tetration===========================================================
+
+// 1. The Forward Stack: Computes n * e^(n * e^(n...)) for height k
+function lambertStack(k, n) {
+  if (k === 1) return n;
+  return n * Math.exp(lambertStack(k - 1, n));
+}
+
+// 2. The Extended Lambert W Solver (Binary Search)
+// Solves for n where lambertStack(k, n) = a
+function extendedLambertW(k, a) {
+  if (a <= 0) return NaN; // Real numbers only for this calculator
+  
+  let low = 0;
+  let high = Math.max(1, Math.log(a) + 1); // Safe upper bound
+  let mid, guess;
+  
+  // 60 iterations provides extreme floating-point precision
+  for (let i = 0; i < 60; i++) {
+    mid = (low + high) / 2;
+    guess = lambertStack(k, mid);
+    
+    if (guess === a) break;
+    if (guess < a) low = mid;
+    else high = mid;
+  }
+  return mid;
+}
+
+// 3. The Super-Root Function using your exact W(k, ln(a)) logic!
+// Finds x where x^^k = a
+function superRoot(k, a) {
+  if (k === 1) return a;
+  // x = e^W(k, ln(a))
+  let wVal = extendedLambertW(k, Math.log(a));
+  return Math.exp(wVal);
+}
+
+function decimalTetration(base, exponent) {
+  // 1. Standard integer towers (e.g., x^^3)
+  if (Number.isInteger(exponent)) {
+    if (exponent === 0) return 1;
+    if (exponent < 0) return NaN; // Standard tetration doesn't allow integer negatives
+    let res = base;
+    for (let i = 1; i < exponent; i++) res = Math.pow(base, res);
+    return res;
+  }
+
+  let intPart = Math.floor(exponent);
+  let fracPart = exponent - intPart;
+  
+  // 2. Check if it's a clean fraction for your Lambert Super-Root! (like 0.5, 0.333, 0.25)
+  let inverseFrac = 1 / fracPart;
+  // If it's within 0.001 of a whole number, we consider it a clean 1/n fraction
+  if (Math.abs(inverseFrac - Math.round(inverseFrac)) < 0.001) {
+    let k = Math.round(inverseFrac);
+    let fractionalBase = superRoot(k, base);
+    
+    let res = fractionalBase;
+    for (let i = 0; i < intPart; i++) {
+      res = Math.pow(base, res);
+    }
+    return res;
+  }
+
+  // 3. Fallback: Linear Approximation for chaotic decimals (like 0.767 or 3/5)
+  // Step A: Calculate the base layer (height between -1 and 0)
+  // Since fracPart is between 0 and 1, (fracPart - 1) is between -1 and 0.
+  let baseLayer = (fracPart - 1) + 1; // Which simplifies to just fracPart!
+  
+  // Step B: Stack it back up! (+1 for the fraction, +intPart for the integers)
+  let res = baseLayer;
+  for (let i = 0; i < intPart + 1; i++) {
+    res = Math.pow(base, res);
+  }
+  
+  return res;
+}
+
 // Hyper-E=====================================================================
 
 function computeHyperE(A, B) {
