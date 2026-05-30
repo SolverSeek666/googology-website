@@ -55,10 +55,10 @@ function calculate() {
   if (!inputEl || !displayEl) return;
 
   // 1. Clean up & Normalize input (Lowercases words, swaps 'x' to '*', removes white-spaces)
-  let expr = inputEl.value.toLowerCase().replace(/x/g, '*').replace(/\s+/g, '');
+  let expr = input.replace(/[^E]/g, char => char.toLowerCase());
 
   // 2. Tokenize using the upgraded, symbol-aware Regex layout (added Γ and γ)
-  tokens = expr.match(/\d+(?:\.\d+)?|\^\^|[a-z]+|[-+*/^()!>√πϕ∞,Γγ]/g) || [];
+  tokens = expr.match(/\d+(?:\.\d+)?|\^\^|[a-z]+|E|[-+*/^()!>√πϕ∞,Γγ]/g) || [];
   tokenIndex = 0; // Reset pointer for the fresh execution descent
 
   try {
@@ -212,6 +212,14 @@ function parsePrimary() {
   let t = peek();
   if (!t) throw new Error("Unexpected end of expression");
 
+  // NEW: Standalone Hyper-E notation (Ea syntax, e.g., E3 = 10^3)
+  if (t === 'E') {
+    consume();
+    // Base defaults to 1 when 'E' is used as a prefix (1 * 10^exponent)
+    let exponent = parseUnary(); 
+    return computeHyperE(createTower(1, 0), exponent); 
+  }
+
   // 1. Parentheses
   if (t === '(') {
     consume();
@@ -248,7 +256,6 @@ function parsePrimary() {
     let base = args.length === 2 ? args[0] : createTower(10, 0);
     let val = args.length === 2 ? args[1] : args[0];
     
-    // log_base(val) = log10(val) / log10(base)
     const towerLog10 = (node) => node.height >= 1 ? createTower(node.value, node.height - 1) : createTower(Math.log10(node.value), 0);
     return divideTowers(towerLog10(val), towerLog10(base));
   }
@@ -269,7 +276,6 @@ function parsePrimary() {
     let args = parseFunctionArgs();
     let val = args[0];
     
-    // Trig of Infinity or Googolisms is mathematically undefined/unstable
     if (val.value === Infinity || val.value === -Infinity || val.height > 0) {
       return createTower(NaN, 0); 
     }
@@ -278,7 +284,6 @@ function parsePrimary() {
     if (op === 'sin') res = Math.sin(val.value);
     if (op === 'cos') res = Math.cos(val.value);
     if (op === 'tan') {
-      // Fix Javascript's floating point Pi precision for tan(π/2)
       if (Math.abs(Math.cos(val.value)) < 1e-10) return createTower(NaN, 0); 
       res = Math.tan(val.value);
     }
@@ -291,7 +296,6 @@ function parsePrimary() {
     let args = parseFunctionArgs();
     let node = args[0];
 
-    // Gamma of 0 or negative integers is undefined. Gamma of Inf is Inf.
     if (node.value === Infinity) return createTower(Infinity, 0);
     if (node.height === 0 && (node.value === 0 || (node.value < 0 && Number.isInteger(node.value)))) {
       return createTower(NaN, 0); 
@@ -305,37 +309,48 @@ function parsePrimary() {
         for (let i = 2; i < x; i++) g *= i;
         return createTower(g, 0);
       }
-      // Stirling Approximation for huge numbers/floats: log10(Γ(x))
       let val = (x - 0.5) * Math.log10(x) - x * Math.LOG10E + 0.5 * Math.log10(2 * Math.PI);
       return createTower(val, 1);
     }
-    // High tower gamma is functionally identical to high tower factorial
     return createTower(node.value, node.height + 1);
   }
   
   // 7. Constants and Base Numbers
   consume();
-  if (t === 'googol') return createTower(100, 1);
-  if (t === 'googolplex') return createTower(100, 2);
-  
-  if (t === 'infinity' || t === '∞') return createTower(Infinity, 0);
-  if (t === 'phi' || t === 'ϕ') return createTower((1 + Math.sqrt(5)) / 2, 0);
-  if (t === 'pi' || t === 'π') return createTower(Math.PI, 0);
-  if (t === 'e') return createTower(Math.E, 0);
+  let node;
 
-  // Standard Numeric Fallback
-  let num = Number(t);
-  if (!isNaN(num)) {
-    return createTower(num, 0);
+  if (t === 'googol') node = createTower(100, 1);
+  else if (t === 'googolplex') node = createTower(100, 2);
+  else if (t === 'infinity' || t === '∞') node = createTower(Infinity, 0);
+  else if (t === 'phi' || t === 'ϕ') node = createTower((1 + Math.sqrt(5)) / 2, 0);
+  else if (t === 'pi' || t === 'π') node = createTower(Math.PI, 0);
+  else if (t === 'e') node = createTower(Math.E, 0); // Strictly handles lowercase e (Euler's)
+  else {
+    // Standard Numeric Fallback
+    let num = Number(t);
+    if (!isNaN(num)) {
+      node = createTower(num, 0);
+    } else {
+      throw new Error("Unknown token: " + t);
+    }
   }
 
-  throw new Error("Unknown token: " + t);
+  // Catch Hyper-E trailing notation (aEb syntax, e.g., 5E3)
+  while (peek() === 'E') {
+    consume(); // eat the uppercase 'E'
+    let exponent = parseUnary(); 
+    node = computeHyperE(node, exponent);
+  }
+
+  return node;
 }
 
 // ============================================================================
 // SECTION 2.2: TOWER ARITHMETIC UTILITIES
 // Handles interactions between high towers and low mathematical numbers.
 // ============================================================================
+
+// Operators===================================================================
 
 function addTowers(A, B) {
   if (isNaN(A.value) || isNaN(B.value)) return createTower(NaN, 0);
@@ -593,6 +608,23 @@ function computeTetration(A, B, Barrier) {
   } else {
     return createTower(1, B);
   }
+}
+
+// Hyper-E=====================================================================
+
+function computeHyperE(A, B) {
+  if (isNaN(A.value) || isNaN(B.value)) return createTower(NaN, 0);
+
+  let tenToTheB;
+  // If the exponent is small, compute it normally
+  if (B.height === 0 && B.value < 300) {
+    tenToTheB = createTower(Math.pow(10, B.value), 0);
+  } else {
+    // For 10^300 and beyond, it smoothly gains +1 tower height
+    tenToTheB = createTower(B.value, B.height + 1);
+  }
+
+  return multiplyTowers(A, tenToTheB);
 }
 
 // ============================================================================
