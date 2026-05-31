@@ -61,7 +61,7 @@ function calculate() {
     .replace(/\s+/g, '');
 
   // 2. Tokenize using the upgraded, symbol-aware Regex layout (added Γ and γ)
-  tokens = expr.match(/\d+(?:\.\d+)?|\^\^|[a-z]+|E|[-+*/^()!>√πϕ∞,Γγ]/g) || [];
+  tokens = expr.match(/\d+(?:\.\d+)?|\^\^\^|\^\^|[a-z]+|E|[-+*/^()!>√πϕ∞,Γγ]/g) || [];
   tokenIndex = 0; // Reset pointer for the fresh execution descent
 
   try {
