@@ -481,14 +481,21 @@ function powerTowers(A, B) {
 }
 
 function computeTetration(A, B, Barrier) {
-  // Case 0: INFINITY
+  // Case 0: INFINITY / NaN checks
   if (isNaN(A.value) || isNaN(B.value) || isNaN(Barrier.value)) return createTower(NaN, 0);
-  
-  // Infinity overriding everything else
   if (B.value === Infinity || A.value === Infinity) return createTower(Infinity, 0);
   
   // FIXED: Check if the height B is itself an ultra-giant tower structure
   let isBTower = (typeof B.height === 'object' && B.height !== null) || (typeof B.height === 'number' && B.height >= 1);
+
+  // ==========================================
+  // FIX: ZERO HEIGHT EDGE-CASE INTERCEPTOR
+  // Tetration to a height of 0 simply returns the baseline barrier
+  // ==========================================
+  if (!isBTower && B.value === 0) {
+    return Barrier;
+  }
+  // ==========================================
 
   // ==========================================
   // PURE LINEAR FRACTIONAL TETRATION INTERCEPTOR
