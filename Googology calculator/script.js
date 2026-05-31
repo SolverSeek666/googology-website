@@ -882,7 +882,7 @@ function formatTower(display, current) {
 }
 
 // ============================================================================
-// FIXED: TOWER DISPLAY LAYER RENDERER FOR HEIGHT 1 (OUTPUTS CLEAN LATEX)
+// FIXED: TOWER DISPLAY LAYER RENDERER FOR HEIGHT 1 (WITH COEFFICIENT RESCUE)
 // ============================================================================
 function renderHeight1(tower) {
   let val = (typeof tower === 'object' && tower !== null) ? tower.value : tower;
@@ -890,15 +890,38 @@ function renderHeight1(tower) {
   if (isNaN(val) || val === undefined) return "\\text{NaN}";
   if (val === Infinity) return "10^{\\infty}";
 
-  // Format using valid MathJax/KaTeX syntax instead of standard text notation
-  if (val < 1000) {
-    // e.g., 10^{5.512}
-    return `10^{${val.toFixed(3)}}`; 
-  } else if (val < 1e9) {
-    // e.g., 10^{1778} (Note: Commas omitted inside LaTeX curly braces to avoid parsing glitches)
-    return `10^{${Math.floor(val)}}`; 
+  // Format numbers below 10^1000 using raw exponents if preferred,
+  // or jump straight to scientific notation processing below.
+  if (val < 10) {
+    return `10^{${val.toFixed(4)}}`;
+  }
+
+  if (val < 1e9) {
+    // 1. Separate the integer exponent and the fractional part
+    let exp = Math.floor(val);
+    let frac = val - exp;
+    
+    // 2. Reconstruct the standard scientific notation coefficient (a)
+    let coeff = Math.pow(10, frac);
+    
+    // 3. Handle edge-case rounding up (e.g., 9.99999... -> 10.0000)
+    if (coeff.toFixed(4) === "10.0000") {
+      coeff = 1;
+      exp += 1;
+    }
+    
+    let coeffStr = coeff.toFixed(4);
+    
+    // If the coefficient is perfectly 1, keep it clean: 10^b
+    if (coeffStr === "1.0000") {
+      return `10^{${exp}}`;
+    }
+    
+    // Otherwise, return the beautiful a \times 10^b format you wanted!
+    return `${coeffStr} \\times 10^{${exp}}`;
+    
   } else {
-    // If the exponent itself needs scientific notation, format cleanly
+    // For completely cosmic numbers where the exponent itself needs scientific notation
     let str = val.toExponential(4).replace("e+", "e");
     let [coeff, exp] = str.split('e');
     if (coeff === '1' || parseFloat(coeff).toFixed(4) === '1.0000') {
