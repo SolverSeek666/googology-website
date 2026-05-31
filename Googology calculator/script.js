@@ -513,17 +513,9 @@ function computeTetration(A, B, Barrier) {
           base: 10,
           pentationHeight: newPentHeight
         };
-      } else {
-        // Safe tracking for small base-10 stacks
-        return {
-          isTetration: true,
-          base: 10,
-          exponent: newPentHeight,
-          barrier: Barrier,
-          value: 10,
-          height: newPentHeight - 1
-        };
       }
+      // REMOVED THE ELSE OVERRIDE! Small stacks now naturally fall through 
+      // to calculate and display their true structural layout.
     }
   }
   
@@ -690,34 +682,31 @@ function computeTetration(A, B, Barrier) {
 // Helper to calculate pentation height of a pure base-10 tetration stack
 function getStackPentationHeight(B) {
   if (!B) return null;
-  
-  // 1. If it's already been flagged as a pentation object
   if (B.isPentation && B.base === 10) {
     return B.pentationHeight;
   }
   
-  // 2. NEW: If it's our new custom tetration object format
-  if (B.isTetration && B.base === 10 && B.barrier && B.barrier.value === 1 && B.barrier.height === 0) {
-    return typeof B.exponent === 'object' ? B.exponent.value : B.exponent;
-  }
-  
-  // 3. Fallback for legacy tower trails
   let val = typeof B === 'object' ? B.value : B;
   let height = typeof B === 'object' ? B.height : 0;
   
-  if (val === 10 && height === 0) return 1;  // Single 10
-  if (val === 10 && height === 9) return 2;  // 10 ^^ 10
+  // Base case: a single 10 contributes 1 to the next tetration layer
+  if (!B.isTetration && height === 0) {
+    if (val === 10) return 1;
+    return null;
+  }
   
-  if (val === 1 && typeof height === 'object' && height !== null) {
-    let count = 1;
-    let curr = height;
-    while (curr && curr.value === 1 && typeof curr.height === 'object' && curr.height !== null) {
-      count++;
-      curr = curr.height;
+  if (B.isTetration && B.base === 10 && (!B.barrier || (B.barrier.height === 0 && B.barrier.value === 1))) {
+    let expVal = typeof B.exponent === 'object' ? B.exponent.value : B.exponent;
+    let expHeight = typeof B.exponent === 'object' ? B.exponent.height : 0;
+    
+    if (!B.exponent.isTetration && expHeight === 0) {
+      if (expVal === 10) return 2; // 10^^10 has a pentation height of 2
+      if (expVal === 1) return 1;  // 10^^1 has a pentation height of 1
+      return null;
     }
-    if (curr && curr.value === 10 && curr.height === 9) {
-      return 2 + count;
-    }
+    
+    let expPent = getStackPentationHeight(B.exponent);
+    if (expPent !== null) return expPent + 1;
   }
   return null;
 }
