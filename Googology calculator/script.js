@@ -750,18 +750,18 @@ function solveMultifactorial(x, k) {
   return { value: part1 + part2, height: 1 };
 }
 
-
 // ============================================================================
-// SECTION 3: DISPLAY FORMATTING ROUTER
+// SECTION 3: DISPLAY FORMATTING ROUTER (AUTOMATIC TETRATION STACKER)
 // ============================================================================
 
 function formatTower(display, current) {
-  // NEW: Handle Infinity & NaN explicitly at the very beginning!
+  // 1. Handle Infinity & NaN explicitly at the very beginning
   if (current.height === 0) {
     if (current.value === Infinity) return renderMath(display, "\\infty");
     if (current.value === -Infinity) return renderMath(display, "-\\infty");
     if (isNaN(current.value)) return renderMath(display, "\\text{Undefined}");
   }
+
   const toLatexSci = (num) => {
     let str = String(num);
     if (str.includes('e')) {
@@ -775,7 +775,7 @@ function formatTower(display, current) {
     return typeof formatValueClean === 'function' ? formatValueClean(num) : str;
   };
 
-  // Prevent normalization crash if height is an object
+  // 2. Normalize standard number heights if applicable
   if (typeof current.height === 'number' && current.height >= 1) {
     while (current.value >= 1e10) {
       current.height += 1;
@@ -783,40 +783,31 @@ function formatTower(display, current) {
     }
   }
 
-  // FIXED: Delete barrier threshold check
-  let isPastThreshold = false;
-  if (typeof current.height === 'object' && current.height !== null) {
-    isPastThreshold = true;
-  } else if (typeof current.height === 'number' && current.height >= 1e10) {
-    isPastThreshold = true;
-  }
-
-  if (isPastThreshold) {
-    let heightStr = (typeof current.height === 'object') ? formatTowerToString(current.height) : toLatexSci(current.height);
-    renderMath(display, `10 \\uparrow\\uparrow {${heightStr}}`);
-    return;
-  }
-
-  if (current.height >= 6) {
-    let a = current.height;
-    let b = current.value;
+  // 3. Resolve Tetration Stack
+  let stack = resolveTetrationStack(current);
+  
+  if (stack !== null) {
+    let formattedStr = formatBaseTower(stack.topTower);
     
-    if (Math.abs(b - 10) < 1e-4 || b.toFixed(4) === "10.0000") {
-      a += 1;
-      b = 1;
-    }
-    
-    let heightStr = toLatexSci(a);
-    
-    if (Math.abs(b - 1) < 1e-4 || b.toFixed(4) === "1.0000") {
-      renderMath(display, `10 \\uparrow\\uparrow {${heightStr}}`);
+    if (stack.layers === 1) {
+      // Rule: Layer 1 after tetration adds parenthesis if it contains scientific notation (\times)
+      if (formattedStr.includes("\\times")) {
+        renderMath(display, `10 \\uparrow\\uparrow {(${formattedStr})}`);
+      } else {
+        renderMath(display, `10 \\uparrow\\uparrow {${formattedStr}}`);
+      }
     } else {
-      let bStr = b < 1e10 ? Number(b.toFixed(4)).toString() : toLatexSci(b);
-      renderMath(display, `10 \\uparrow\\uparrow {${heightStr}} > ${bStr}`);
+      // Rule: Layer 2 or higher requires NO parenthesis
+      let prefix = "";
+      for (let i = 0; i < stack.layers; i++) {
+        prefix += "10 \\uparrow\\uparrow ";
+      }
+      renderMath(display, `${prefix}{${formattedStr}}`);
     }
     return;
   }
 
+  // 4. FALLBACK BASE CASES (For numbers below the tetration threshold)
   if (current.height === 0) {
     if (current.value < 10000000000) {
       let outputStr = Number(current.value.toFixed(10)).toString();
@@ -845,12 +836,70 @@ function formatTower(display, current) {
   }
 }
 
-// Helper to recursively stringify giant inner tower heights flawlessly
-function formatTowerToString(current) {
-  if (!current) return "0";
+// Helper to extract the single continuous tetration height of any tower
+function getTetrationHeightTower(t) {
+  if (typeof t.height === 'object' && t.height !== null) {
+    return t.height;
+  }
+  
+  let h = t.height;
+  let v = t.value;
+  
+  if (h === 0) {
+    if (v >= 10) {
+      h = 1;
+      v = Math.log10(v);
+    } else {
+      return null;
+    }
+  }
+  
+  while (v >= 10) {
+    h += 1;
+    v = Math.log10(v);
+  }
+  
+  return { height: 0, value: h + Math.log10(v) };
+}
 
-  // Internal helper to intercept and convert JavaScript's ugly 1e+21 strings into clean LaTeX
-  const cleanNum = (num) => {
+// Determines if a height tower exceeds the double tetration threshold (10^^6)
+function isPastDoubleTetrationThreshold(t) {
+  if (typeof t.height === 'object' && t.height !== null) return true;
+  let h = t.height;
+  let v = t.value;
+  while (v >= 1e10 && h >= 1) {
+    h += 1;
+    v = Math.log10(v);
+  }
+  if (h > 6) return true;
+  if (h === 6) return v > 1; // Since 10^^6 fully normalizes down to height 6, value 1
+  return false;
+}
+
+// Traverses up through the tetration layers to determine the final stack size
+function resolveTetrationStack(current) {
+  let isTetration = false;
+  if (typeof current.height === 'object' && current.height !== null) isTetration = true;
+  else if (typeof current.height === 'number' && current.height >= 6) isTetration = true;
+  
+  if (!isTetration) return null;
+  
+  let layers = 1;
+  let curr = getTetrationHeightTower(current);
+  
+  while (curr !== null && isPastDoubleTetrationThreshold(curr)) {
+    layers += 1;
+    curr = getTetrationHeightTower(curr);
+  }
+  
+  return { layers, topTower: curr };
+}
+
+// Formats the remaining top-level base tower into clean scientific notation or basic towers
+function formatBaseTower(t) {
+  if (!t) return "0";
+  
+  const cleanSci = (num) => {
     let str = String(num);
     if (str.includes('e')) {
       let [coeff, exp] = str.split('e');
@@ -860,77 +909,43 @@ function formatTowerToString(current) {
       if (coeff === '1' || coeffStr === '1.0000') return `10^{${exp}}`;
       return `${coeffStr} \\times 10^{${exp}}`;
     }
-    // Fall back to your global clean formatter if the number is large but lacks an 'e'
-    if (num >= 1e10 && typeof formatValueClean === 'function') {
-      return formatValueClean(num);
+    if (num >= 1e10) {
+      let log = Math.log10(num);
+      let exp = Math.floor(log);
+      let coeff = Math.pow(10, log - exp);
+      if (coeff.toFixed(4) === "10.0000") {
+        coeff = 1;
+        exp += 1;
+      }
+      let coeffStr = coeff.toFixed(4);
+      if (coeffStr === "1.0000") return `10^{${exp}}`;
+      return `${coeffStr} \\times 10^{${exp}}`;
     }
     return str;
   };
 
-  // LAYER 1: The height of this sub-tower is itself another nested object
-  if (typeof current.height === 'object' && current.height !== null) {
-    return `10 \\uparrow\\uparrow {${formatTowerToString(current.height)}}`;
+  if (t.height === 0) {
+    if (t.value < 100000) {
+      return Number(t.value.toFixed(4)).toString();
+    }
+    return cleanSci(t.value);
   }
-
-  // LAYER 2: The height is a standard number structure
-  if (typeof current.height === 'number') {
-    if (current.height === 0) {
-      return cleanNum(current.value);
-    }
-    if (current.height === 1) {
-      return `10^{${cleanNum(current.value)}}`;
-    }
-    
-    // For heights >= 2, unwrap them safely as a stacked power tower string
-    let latex = cleanNum(current.value);
-    for (let h = 0; h < current.height; h++) {
-      latex = `10^{${latex}}`;
-    }
-    return latex;
-  }
-
-  return cleanNum(current.value);
-}
-
-function formatValueClean(v) {
-  if (v < 1e10) return Math.floor(v).toString();
-  let log = Math.log10(v);
-  let exp = Math.floor(log);
-  let coeff = Math.pow(10, log - exp);
   
+  let exp = Math.floor(t.value);
+  let coeff = Math.pow(10, t.value - exp);
   if (coeff.toFixed(4) === "10.0000") {
     coeff = 1;
     exp += 1;
   }
   
   let coeffStr = coeff.toFixed(4);
-  if (coeffStr === "1.0000") return `10^{${formatValueClean(exp)}}`;
-  return `${coeffStr} \\times 10^{${formatValueClean(exp)}}`;
-}
-
-function renderHeight1(display, val) {
-  const toLatexSci = (num) => {
-    let str = String(num);
-    if (str.includes('e')) {
-      let [coeff, exp] = str.split('e');
-      exp = exp.replace('+', '');
-      if (coeff === '1') return `10^{${exp}}`;
-      return `${coeff} \\times 10^{${exp}}`;
-    }
-    return typeof formatValueClean === 'function' ? formatValueClean(num) : str;
-  };
-
-  let exp = Math.floor(val);
-  let coeff = Math.pow(10, val - exp);
+  let expStr = exp >= 100000 ? cleanSci(exp) : exp.toString();
+  let latex = coeffStr === "1.0000" ? `10^{${expStr}}` : `${coeffStr} \\times 10^{${expStr}}`;
   
-  if (coeff.toFixed(4) === "10.0000") {
-    coeff = 1;
-    exp += 1;
+  for (let h = 0; h < t.height - 1; h++) {
+    latex = `10^{${latex}}`;
   }
-  
-  let coeffStr = coeff.toFixed(4);
-  let latex = coeffStr === "1.0000" ? `10^{${toLatexSci(exp)}}` : `${coeffStr} \\times 10^{${toLatexSci(exp)}}`;
-  renderMath(display, latex);
+  return latex;
 }
 
 // ============================================================================
