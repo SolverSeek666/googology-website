@@ -491,10 +491,33 @@ function powerTowers(A, B) {
   return A;
 }
 
+// TETRATION ENGINE============================================================
+
 function computeTetration(A, B, Barrier) {
   // Case 0: INFINITY / NaN checks
   if (isNaN(A.value) || isNaN(B.value) || isNaN(Barrier.value)) return createTower(NaN, 0);
   if (B.value === Infinity || A.value === Infinity) return createTower(Infinity, 0);
+  
+  // ==========================================================================
+  // NEW INTERCEPTOR: PURE TETRATION STACK DETECTOR
+  // Converts huge chains like 10^^10^^10... into Pentation when height >= 6
+  // ==========================================================================
+  if (A.value === 10 && Barrier.height === 0 && Barrier.value === 1) {
+    let currentPentHeight = getStackPentationHeight(B);
+    if (currentPentHeight !== null) {
+      let newPentHeight = currentPentHeight + 1;
+      if (newPentHeight >= 6) {
+        return {
+          value: newPentHeight,
+          height: 1,
+          isPentation: true,
+          base: 10,
+          pentationHeight: newPentHeight
+        };
+      }
+    }
+  }
+  // ==========================================================================
   
   // FIXED: Check if the height B is itself an ultra-giant tower structure
   let isBTower = (typeof B.height === 'object' && B.height !== null) || (typeof B.height === 'number' && B.height >= 1);
@@ -660,15 +683,44 @@ function computeTetration(A, B, Barrier) {
   }
 }
 
-// ============================================================================
-// PENTATION ENGINE (FIXED BOUNDARY FOR 10^^^6)
-// ============================================================================
+// PENTATION ENGINE============================================================
+
+// Helper to calculate pentation height of a pure base-10 tetration stack
+function getStackPentationHeight(B) {
+  if (B.value === Infinity || A.value === Infinity) return createTower(Infinity, 0);
+  if (!B) return null;
+  
+  // If it's already been flagged as a pentation object
+  if (B.isPentation && B.base === 10) {
+    return B.pentationHeight;
+  }
+  
+  let val = typeof B === 'object' ? B.value : B;
+  let height = typeof B === 'object' ? B.height : 0;
+  
+  // if (val === 10 && height === 0) return 1;  // Single 10
+  // if (val === 10 && height === 9) return 2;  // 10 ^^ 10
+  
+  // Follow the nested tower trail left behind by previous 10 ^^ evaluations
+  if (val === 1 && typeof height === 'object' && height !== null) {
+    let count = 1;
+    let curr = height;
+    while (curr && curr.value === 1 && typeof curr.height === 'object' && curr.height !== null) {
+      count++;
+      curr = curr.height;
+    }
+    if (curr && curr.value === 10 && curr.height === 9) {
+      return 2 + count;
+    }
+  }
+  return null;
+}
+
 function computePentation(A, B) {
   if (isNaN(A.value) || isNaN(B.value)) return { value: NaN, height: 0 };
   if (B.value === 0) return { value: 1, height: 0 }; 
   if (B.value === 1) return A;
   
-  // FIX: Changed '>' to '>=' so 10^^^6 transforms into pentation instantly
   if (A.value === 10 && B.value >= 6) {
     return {
       value: B.value,
