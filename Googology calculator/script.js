@@ -904,24 +904,6 @@ function solveMultifactorial(x, k) {
   return { value: part1 + part2, height: 1 };
 }
 
-// ==========================================================================
-// 2.8 EXPLICIT TETRATION ROUTE
-// ==========================================================================
-if (current.isTetration === true) {
-  let baseStr = typeof current.base === 'object' ? formatBaseTower(current.base) : current.base.toString();
-  let expStr = typeof current.exponent === 'object' ? formatBaseTower(current.exponent) : current.exponent.toString();
-    
-  let latex = `${baseStr} \\uparrow\\uparrow {${expStr}}`;
-    
-  // Check if there is a real, non-trivial barrier attached (> 1)
-  if (current.barrier && !(current.barrier.height === 0 && current.barrier.value === 1)) {
-    let barrierStr = current.barrier.height === 0 ? current.barrier.value.toString() : formatBaseTower(current.barrier);
-    latex += ` > {${barrierStr}}`;
-  }
-    
-  return renderMath(display, latex);
-}
-
 // ============================================================================
 // SECTION 3: DISPLAY FORMATTING ROUTER (THE FIX)
 // ============================================================================
