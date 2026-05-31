@@ -61,7 +61,7 @@ function calculate() {
     .replace(/\s+/g, '');
 
   // 2. Tokenize using the upgraded, symbol-aware Regex layout (added Γ and γ)
-  tokens = expr.match(/\d+(?:\.\d+)?|\^\^\^|\^\^|[a-z]+|E|[-+*/^()!>√πϕ∞,Γγ]/g) || [];
+  tokens = expr.match(/\d+(?:\.\d+)?|\^\^|[a-z]+|E|[-+*/^()!>√πϕ∞,Γγ]/g) || [];
   tokenIndex = 0; // Reset pointer for the fresh execution descent
 
   try {
@@ -118,14 +118,13 @@ function parseExpression() {
 
 // 2. Precedence Level: Multiplication & Division
 function parseTerm() {
-  // FIXED: Now evaluates Pentation before Multiplication!
-  let node = parsePentation(); 
+  let node = parseTetration(); // FIXED: Now evaluates Tetration first
   while (true) {
     if (match('*')) {
-      let right = parsePentation();
+      let right = parseTetration();
       node = multiplyTowers(node, right);
     } else if (match('/')) {
-      let right = parsePentation();
+      let right = parseTetration();
       node = divideTowers(node, right);
     } else {
       break;
@@ -134,19 +133,9 @@ function parseTerm() {
   return node;
 }
 
-// 2.5 Precedence Level: Pentation (^^^) - Right Associative
-function parsePentation() {
-  let node = parseTetration(); // Drops down to Tetration if no ^^^ is found
-  if (match('^^^')) {
-    let right = parsePentation(); // Right-associative (evaluates right-to-left)
-    node = computePentation(node, right);
-  }
-  return node;
-}
-
 // 3. Precedence Level: Tetration (^^) and Barrier (>) - Right Associative
 function parseTetration() {
-  let node = parsePower(); 
+  let node = parsePower(); // FIXED: Now evaluates Powers tighter than Tetration
   if (match('^^')) {
     let right = parseTetration(); 
     let barrier = createTower(1, 0);
@@ -161,7 +150,7 @@ function parseTetration() {
 
 // 4. Precedence Level: Powers (^) - Right Associative
 function parsePower() {
-  let node = parseFactorial(); 
+  let node = parseFactorial(); // FIXED: Falls back to Factorials
   if (match('^')) {
     let right = parsePower(); 
     node = powerTowers(node, right);
@@ -491,40 +480,27 @@ function powerTowers(A, B) {
   return A;
 }
 
-// TETRATION ENGINE============================================================
-
 function computeTetration(A, B, Barrier) {
   // Case 0: INFINITY / NaN checks
   if (isNaN(A.value) || isNaN(B.value) || isNaN(Barrier.value)) return createTower(NaN, 0);
   if (B.value === Infinity || A.value === Infinity) return createTower(Infinity, 0);
   
-  // ==========================================================================
-  // PURE TETRATION STACK DETECTOR (Converts large chains into Pentation)
-  // ==========================================================================
-  if (A.value === 10 && Barrier.height === 0 && Barrier.value === 1) {
-    let currentPentHeight = getStackPentationHeight(B);
-    if (currentPentHeight !== null) {
-      let newPentHeight = currentPentHeight + 1;
-      if (newPentHeight >= 6) {
-        return {
-          value: newPentHeight,
-          height: 1,
-          isPentation: true,
-          base: 10,
-          pentationHeight: newPentHeight
-        };
-      }
-      // REMOVED THE ELSE OVERRIDE! Small stacks now naturally fall through 
-      // to calculate and display their true structural layout.
-    }
-  }
-  
+  // FIXED: Check if the height B is itself an ultra-giant tower structure
   let isBTower = (typeof B.height === 'object' && B.height !== null) || (typeof B.height === 'number' && B.height >= 1);
 
+  // ==========================================
+  // FIX: ZERO HEIGHT EDGE-CASE INTERCEPTOR
+  // Tetration to a height of 0 simply returns the baseline barrier
+  // ==========================================
   if (!isBTower && B.value === 0) {
     return Barrier;
   }
+  // ==========================================
 
+  // ==========================================
+  // PURE LINEAR FRACTIONAL TETRATION INTERCEPTOR
+  // Ensures a perfectly smooth, unbroken curve for all decimals
+  // ==========================================
   if (A.height === 0 && B.height === 0 && !Number.isInteger(B.value)) {
     let base = A.value;
     let exponent = B.value;
@@ -532,94 +508,101 @@ function computeTetration(A, B, Barrier) {
 
     let intPart = Math.floor(exponent);
     let fracPart = exponent - intPart;
+    
+    // Pure Linear Approximation Baseline (x^^fracPart = base^fracPart)
     let fracResult = Math.pow(base, fracPart);
 
+    // Pass the fractional boundary safely into your integer tower engine
     let newB = createTower(intPart, 0);
     let newBarrier = createTower(fracResult, 0);
     
     return computeTetration(A, newB, newBarrier);
   }
+  // ==========================================
   
-  // Calculate underlying tower math properties so background mechanics stay accurate
-  let underlying;
-  
+  // Case 1: Base A is already a giant tower (height >= 1)
   if (A.height >= 1) {
     if (!isBTower) {
       let y = B.value;
       let bVal = Barrier.value;
       let bHeight = Barrier.height;
 
-      if (bHeight === 0 && bVal === 1 && y === 1) {
-        underlying = A;
+      // Handle trivial barrier (Barrier = 1) normally
+      if (bHeight === 0 && bVal === 1) {
+        if (y === 1) return A;
       }
 
-      if (!underlying) {
-        if (A.height === 1) {
-          if (bHeight === 0) {
-            if (y === 1) {
-              underlying = createTower(A.value * bVal, 1);
-            } else {
-              let topVal = A.value * bVal;
-              if (A.value > 0) topVal += Math.log10(A.value);
-              underlying = createTower(topVal, y);
-            }
+      if (A.height === 1) {
+        if (bHeight === 0) {
+          if (y === 1) {
+            return createTower(A.value * bVal, 1);
           } else {
-            underlying = createTower(bVal, bHeight + y);
-          }
-        } else if (A.height === 2) {
-          if (bHeight === 0) {
-            if (y === 1) {
-              let topVal = A.value;
-              if (bVal > 0) topVal += Math.log10(bVal);
-              underlying = createTower(topVal, 2);
-            } else {
-              if (A.value <= 308) {
-                let topVal = A.value + bVal * Math.pow(10, A.value);
-                underlying = createTower(topVal, y);
-              } else {
-                let topVal = A.value;
-                if (bVal > 0) topVal += Math.log10(bVal);
-                underlying = createTower(topVal, y + 1);
-              }
-            }
-          } else {
-            underlying = createTower(bVal, bHeight + y);
-          }
-        } else if (A.height === 3) {
-          if (bHeight === 0) {
-            if (y === 1) {
-              if (A.value <= 308) {
-                let topVal = Math.pow(10, A.value) + Math.log10(bVal);
-                underlying = createTower(topVal, 3);
-              } else {
-                underlying = createTower(A.value, 3);
-              }
-            } else {
-              underlying = createTower(A.value, y + 2);
-            }
-          } else {
-            underlying = createTower(bVal, bHeight + y);
+            let topVal = A.value * bVal;
+            if (A.value > 0) topVal += Math.log10(A.value);
+            return createTower(topVal, y);
           }
         } else {
-          if (bHeight === 0) {
-            if (y === 1) {
-              underlying = createTower(A.value, A.height);
+          return createTower(bVal, bHeight + y);
+        }
+      } else if (A.height === 2) {
+        if (bHeight === 0) {
+          if (y === 1) {
+            let topVal = A.value;
+            if (bVal > 0) topVal += Math.log10(bVal);
+            return createTower(topVal, 2);
+          } else {
+            if (A.value <= 308) {
+              let topVal = A.value + bVal * Math.pow(10, A.value);
+              return createTower(topVal, y);
             } else {
-              underlying = createTower(A.value, A.height + y - 1);
+              let topVal = A.value;
+              if (bVal > 0) topVal += Math.log10(bVal);
+              return createTower(topVal, y + 1);
+            }
+          }
+        } else {
+          return createTower(bVal, bHeight + y);
+        }
+      } else if (A.height === 3) {
+        if (bHeight === 0) {
+          if (y === 1) {
+            if (A.value <= 308) {
+              let topVal = Math.pow(10, A.value) + Math.log10(bVal);
+              return createTower(topVal, 3);
+            } else {
+              return createTower(A.value, 3);
             }
           } else {
-            underlying = createTower(bVal, bHeight + y);
+            return createTower(A.value, y + 2);
           }
+        } else {
+          return createTower(bVal, bHeight + y);
+        }
+      } else {
+        // Base is a height-4+ tower
+        if (bHeight === 0) {
+          if (y === 1) {
+            return createTower(A.value, A.height);
+          } else {
+            return createTower(A.value, A.height + y - 1);
+          }
+        } else {
+          return createTower(bVal, bHeight + y);
         }
       }
     } else {
-      underlying = createTower(1, B);
+      // Height B is an ultra-giant tower! The barrier is macroscopically irrelevant.
+      return createTower(1, B);
     }
-  } else {
-    let base = A.value;
+  }
+
+  // Case 2: Base A is a standard number (height === 0)
+  let base = A.value;
   
-    if (Math.abs(base - 10) < 1e-7) {
-      if (!isBTower) {
+  if (Math.abs(base - 10) < 1e-7) {
+     if (Barrier.height === 0 && Barrier.value === 1 && !isBTower && B.value > 0 && B.value < 6) {
+        return createTower(10, B.value - 1);
+     } else if (!isBTower) {
         let bVal = Barrier.value;
         let bHeight = Barrier.height;
         let y = B.value;
@@ -627,129 +610,43 @@ function computeTetration(A, B, Barrier) {
         if (bHeight === 0 && bVal < 308) {
           let collapsedValue = Math.pow(10, bVal);
           if (Number.isFinite(collapsedValue) && collapsedValue < 1e300) {
-            underlying = createTower(collapsedValue, y - 1);
+            return createTower(collapsedValue, y - 1);
           }
         }
-        if (!underlying) {
-          underlying = createTower(bVal, y + bHeight);
+        return createTower(bVal, y + bHeight);
+     } else {
+        // Height B is an ultra-giant tower!
+        return createTower(1, B);
+     }
+  }
+  
+  // Standard loop for small non-10 bases
+  if (!isBTower) {
+    let y = B.value;
+    let iters = Math.min(y, 10);
+    let current = createTower(Barrier.value, Barrier.height);
+    
+    for (let i = 0; i < iters; i++) {
+      if (current.height === 0) {
+        let next = Math.pow(base, current.value);
+        if (Number.isFinite(next) && next < 1e300) {
+          current.value = next;
+        } else {
+          current.value = current.value * Math.log10(base);
+          current.height = 1;
         }
+      } else if (current.height === 1) {
+        current.value = current.value + Math.log10(Math.log10(base));
+        current.height = 2;
       } else {
-        underlying = createTower(1, B);
-      }
-    } else {
-      if (!isBTower) {
-        let y = B.value;
-        let iters = Math.min(y, 10);
-        let current = createTower(Barrier.value, Barrier.height);
-        
-        for (let i = 0; i < iters; i++) {
-          if (current.height === 0) {
-            let next = Math.pow(base, current.value);
-            if (Number.isFinite(next) && next < 1e300) {
-              current.value = next;
-            } else {
-              current.value = current.value * Math.log10(base);
-              current.height = 1;
-            }
-          } else if (current.height === 1) {
-            current.value = current.value + Math.log10(Math.log10(base));
-            current.height = 2;
-          } else {
-            current.height += 1;
-          }
-        }
-        if (y > 10) current.height += (y - 10);
-        underlying = current;
-      } else {
-        underlying = createTower(1, B);
+        current.height += 1;
       }
     }
+    if (y > 10) current.height += (y - 10);
+    return current;
+  } else {
+    return createTower(1, B);
   }
-
-  // Return custom Tetration tracker holding layout and barrier data
-  return {
-    isTetration: true,
-    base: A.height === 0 ? A.value : A,
-    exponent: isBTower ? B : B.value,
-    barrier: Barrier,
-    value: underlying.value,
-    height: underlying.height
-  };
-}
-
-// PENTATION ENGINE============================================================
-
-// Helper to calculate pentation height of a pure base-10 tetration stack
-function getStackPentationHeight(B) {
-  if (!B) return null;
-  if (B.isPentation && B.base === 10) {
-    return B.pentationHeight;
-  }
-  
-  let val = typeof B === 'object' ? B.value : B;
-  let height = typeof B === 'object' ? B.height : 0;
-  
-  // Base case: a single 10 contributes 1 to the next tetration layer
-  if (!B.isTetration && height === 0) {
-    if (val === 10) return 1;
-    return null;
-  }
-  
-  if (B.isTetration && B.base === 10 && (!B.barrier || (B.barrier.height === 0 && B.barrier.value === 1))) {
-    let expVal = typeof B.exponent === 'object' ? B.exponent.value : B.exponent;
-    let expHeight = typeof B.exponent === 'object' ? B.exponent.height : 0;
-    
-    if (!B.exponent.isTetration && expHeight === 0) {
-      if (expVal === 10) return 2; // 10^^10 has a pentation height of 2
-      if (expVal === 1) return 1;  // 10^^1 has a pentation height of 1
-      return null;
-    }
-    
-    let expPent = getStackPentationHeight(B.exponent);
-    if (expPent !== null) return expPent + 1;
-  }
-  return null;
-}
-
-function computePentation(A, B) {
-  if (isNaN(A.value) || isNaN(B.value)) return { value: NaN, height: 0 };
-  if (B.value === 0) return { value: 1, height: 0 }; 
-  if (B.value === 1) return A;
-  
-  if (A.value === 10 && B.value >= 6) {
-    return {
-      value: B.value,
-      height: 1,
-      isPentation: true,
-      base: 10,
-      pentationHeight: B.value
-    };
-  }
-  
-  // Fallback computation for smaller numbers, stacks, or fractional steps
-  let floorB = Math.floor(B.value);
-  let f = B.value - floorB;
-  
-  // Linear height approximation for decimal pentation baseline
-  let current = { value: 1 + f * (A.value - 1), height: 0 };
-  
-  for (let i = 0; i < floorB; i++) {
-    let defaultBarrier = { value: 1, height: 0 };
-    current = computeTetration(A, current, defaultBarrier);
-  }
-  
-  // FIX: Changed '>' to '>=' here as well for safety
-  if (A.value === 10 && B.value >= 6) {
-    return {
-      value: B.value,
-      height: 1,
-      isPentation: true,
-      base: 10,
-      pentationHeight: B.value
-    };
-  }
-  
-  return current;
 }
 
 // Hyper-E=====================================================================
@@ -894,82 +791,201 @@ function solveMultifactorial(x, k) {
 }
 
 // ============================================================================
-// SECTION 3: DISPLAY FORMATTING ROUTER (THE FIX)
+// SECTION 3: DISPLAY FORMATTING ROUTER (AUTOMATIC TETRATION STACKER)
 // ============================================================================
 
-function renderMath(display, latex) {
-  display.innerHTML = `\\[ ${latex} \\]`;
-  if (window.MathJax && window.MathJax.typesetPromise) {
-    window.MathJax.typesetPromise([display]).catch(() => {});
-  }
-}
-
-function formatBaseTower(node) {
-  if (typeof node !== 'object' || node === null) return String(node);
-  
-  if (node.isTetration) {
-    let baseStr = formatBaseTower(node.base);
-    let expStr = formatBaseTower(node.exponent);
-    let latex = `${baseStr} \\uparrow\\uparrow {${expStr}}`;
-    if (node.barrier && !(node.barrier.height === 0 && node.barrier.value === 1)) {
-      latex += ` > {${formatBaseTower(node.barrier)}}`;
-    }
-    return latex;
-  }
-  
-  if (node.isPentation) {
-    return `10 \\uparrow\\uparrow\\uparrow {${node.pentationHeight}}`;
-  }
-  
-  if (node.height === 0) {
-    if (node.value === Infinity) return "\\infty";
-    if (node.value === -Infinity) return "-\\infty";
-    if (isNaN(node.value)) return "\\text{Undefined}";
-    
-    if (node.value >= 1e6 || node.value <= -1e6) {
-      let str = node.value.toExponential(4);
-      let [coeff, exp] = str.split('e');
-      exp = exp.replace('+', '');
-      if (coeff === '1' || coeff === '1.0000') return `10^{${exp}}`;
-      return `${coeff} \\times 10^{${exp}}`;
-    }
-    return Number(node.value.toFixed(4)).toString();
-  }
-  
-  let inner = { value: node.value, height: node.height - 1 };
-  return `10^{${formatBaseTower(inner)}}`;
-}
-
 function formatTower(display, current) {
+  // 1. Handle Infinity & NaN explicitly at the very beginning
   if (current.height === 0) {
     if (current.value === Infinity) return renderMath(display, "\\infty");
     if (current.value === -Infinity) return renderMath(display, "-\\infty");
     if (isNaN(current.value)) return renderMath(display, "\\text{Undefined}");
   }
 
-  // Explicit Pentation Formatting Route
-  if (current.isPentation === true) {
-    let pHeight = current.pentationHeight;
-    let formattedP = pHeight % 1 === 0 ? pHeight.toString() : pHeight.toFixed(4);
-    return renderMath(display, `10 \\uparrow\\uparrow\\uparrow {${formattedP}}`);
-  }
-
-  // Explicit Tetration Formatting Route (Preserves Barrier info)
-  if (current.isTetration === true) {
-    let baseStr = typeof current.base === 'object' ? formatBaseTower(current.base) : current.base.toString();
-    let expStr = typeof current.exponent === 'object' ? formatBaseTower(current.exponent) : current.exponent.toString();
-    let latex = `${baseStr} \\uparrow\\uparrow {${expStr}}`;
-    
-    if (current.barrier && !(current.barrier.height === 0 && current.barrier.value === 1)) {
-      let barrierStr = current.barrier.height === 0 ? current.barrier.value.toString() : formatBaseTower(current.barrier);
-      latex += ` > {${barrierStr}}`;
+  const toLatexSci = (num) => {
+    let str = String(num);
+    if (str.includes('e')) {
+      let [coeff, exp] = str.split('e');
+      exp = exp.replace('+', ''); 
+      let parsedCoeff = parseFloat(coeff);
+      let coeffStr = parsedCoeff.toFixed(4);
+      if (coeff === '1' || coeffStr === '1.0000') return `10^{${exp}}`;
+      return `${coeffStr} \\times 10^{${exp}}`;
     }
-    return renderMath(display, latex);
+    return typeof formatValueClean === 'function' ? formatValueClean(num) : str;
+  };
+
+  // 2. Normalize standard number heights if applicable
+  if (typeof current.height === 'number' && current.height >= 1) {
+    while (current.value >= 1e10) {
+      current.height += 1;
+      current.value = Math.log10(current.value);
+    }
   }
 
-  // Normal Math Tower Fallback Route
-  let latex = formatBaseTower(current);
-  return renderMath(display, latex);
+  // 3. Resolve Tetration Stack
+  let stack = resolveTetrationStack(current);
+  
+  if (stack !== null) {
+    let formattedStr = formatBaseTower(stack.topTower);
+    
+    if (stack.layers === 1) {
+      // Rule: Layer 1 after tetration adds parenthesis if it contains scientific notation (\times)
+      if (formattedStr.includes("\\times")) {
+        renderMath(display, `10 \\uparrow\\uparrow {(${formattedStr})}`);
+      } else {
+        renderMath(display, `10 \\uparrow\\uparrow {${formattedStr}}`);
+      }
+    } else {
+      // Rule: Layer 2 or higher requires NO parenthesis
+      let prefix = "";
+      for (let i = 0; i < stack.layers; i++) {
+        prefix += "10 \\uparrow\\uparrow ";
+      }
+      renderMath(display, `${prefix}{${formattedStr}}`);
+    }
+    return;
+  }
+
+  // 4. FALLBACK BASE CASES (For numbers below the tetration threshold)
+  if (current.height === 0) {
+    if (current.value < 10000000000) {
+      let outputStr = Number(current.value.toFixed(10)).toString();
+      renderMath(display, `${outputStr}`);
+    } else {
+      renderHeight1(display, Math.log10(current.value));
+    }
+  } else if (current.height === 1) {
+    renderHeight1(display, current.value);
+  } else {
+    let exp = Math.floor(current.value);
+    let coeff = Math.pow(10, current.value - exp);
+    
+    if (coeff.toFixed(4) === "10.0000") {
+      coeff = 1;
+      exp += 1;
+    }
+    
+    let coeffStr = coeff.toFixed(4);
+    let latex = coeffStr === "1.0000" ? `10^{${toLatexSci(exp)}}` : `${coeffStr} \\times 10^{${toLatexSci(exp)}}`;
+    
+    for (let h = 0; h < current.height - 1; h++) {
+      latex = `10^{${latex}}`;
+    }
+    renderMath(display, `${latex}`);
+  }
+}
+
+// Helper to extract the single continuous tetration height of any tower
+function getTetrationHeightTower(t) {
+  if (typeof t.height === 'object' && t.height !== null) {
+    return t.height;
+  }
+  
+  let h = t.height;
+  let v = t.value;
+  
+  if (h === 0) {
+    if (v >= 10) {
+      h = 1;
+      v = Math.log10(v);
+    } else {
+      return null;
+    }
+  }
+  
+  while (v >= 10) {
+    h += 1;
+    v = Math.log10(v);
+  }
+  
+  return { height: 0, value: h + Math.log10(v) };
+}
+
+// Determines if a height tower exceeds the double tetration threshold (10^^6)
+function isPastDoubleTetrationThreshold(t) {
+  if (typeof t.height === 'object' && t.height !== null) return true;
+  let h = t.height;
+  let v = t.value;
+  while (v >= 1e10 && h >= 1) {
+    h += 1;
+    v = Math.log10(v);
+  }
+  if (h > 6) return true;
+  if (h === 6) return v > 1; // Since 10^^6 fully normalizes down to height 6, value 1
+  return false;
+}
+
+// Traverses up through the tetration layers to determine the final stack size
+function resolveTetrationStack(current) {
+  let isTetration = false;
+  if (typeof current.height === 'object' && current.height !== null) isTetration = true;
+  else if (typeof current.height === 'number' && current.height >= 6) isTetration = true;
+  
+  if (!isTetration) return null;
+  
+  let layers = 1;
+  let curr = getTetrationHeightTower(current);
+  
+  while (curr !== null && isPastDoubleTetrationThreshold(curr)) {
+    layers += 1;
+    curr = getTetrationHeightTower(curr);
+  }
+  
+  return { layers, topTower: curr };
+}
+
+// Formats the remaining top-level base tower into clean scientific notation or basic towers
+function formatBaseTower(t) {
+  if (!t) return "0";
+  
+  const cleanSci = (num) => {
+    let str = String(num);
+    if (str.includes('e')) {
+      let [coeff, exp] = str.split('e');
+      exp = exp.replace('+', ''); 
+      let parsedCoeff = parseFloat(coeff);
+      let coeffStr = parsedCoeff.toFixed(4);
+      if (coeff === '1' || coeffStr === '1.0000') return `10^{${exp}}`;
+      return `${coeffStr} \\times 10^{${exp}}`;
+    }
+    if (num >= 1e10) {
+      let log = Math.log10(num);
+      let exp = Math.floor(log);
+      let coeff = Math.pow(10, log - exp);
+      if (coeff.toFixed(4) === "10.0000") {
+        coeff = 1;
+        exp += 1;
+      }
+      let coeffStr = coeff.toFixed(4);
+      if (coeffStr === "1.0000") return `10^{${exp}}`;
+      return `${coeffStr} \\times 10^{${exp}}`;
+    }
+    return str;
+  };
+
+  if (t.height === 0) {
+    if (t.value < 100000) {
+      return Number(t.value.toFixed(4)).toString();
+    }
+    return cleanSci(t.value);
+  }
+  
+  let exp = Math.floor(t.value);
+  let coeff = Math.pow(10, t.value - exp);
+  if (coeff.toFixed(4) === "10.0000") {
+    coeff = 1;
+    exp += 1;
+  }
+  
+  let coeffStr = coeff.toFixed(4);
+  let expStr = exp >= 100000 ? cleanSci(exp) : exp.toString();
+  let latex = coeffStr === "1.0000" ? `10^{${expStr}}` : `${coeffStr} \\times 10^{${expStr}}`;
+  
+  for (let h = 0; h < t.height - 1; h++) {
+    latex = `10^{${latex}}`;
+  }
+  return latex;
 }
 
 // ============================================================================
