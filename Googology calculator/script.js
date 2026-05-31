@@ -118,13 +118,14 @@ function parseExpression() {
 
 // 2. Precedence Level: Multiplication & Division
 function parseTerm() {
-  let node = parseTetration(); // FIXED: Now evaluates Tetration first
+  // FIXED: Now evaluates Pentation before Multiplication!
+  let node = parsePentation(); 
   while (true) {
     if (match('*')) {
-      let right = parseTetration();
+      let right = parsePentation();
       node = multiplyTowers(node, right);
     } else if (match('/')) {
-      let right = parseTetration();
+      let right = parsePentation();
       node = divideTowers(node, right);
     } else {
       break;
@@ -133,9 +134,19 @@ function parseTerm() {
   return node;
 }
 
+// 2.5 Precedence Level: Pentation (^^^) - Right Associative
+function parsePentation() {
+  let node = parseTetration(); // Drops down to Tetration if no ^^^ is found
+  if (match('^^^')) {
+    let right = parsePentation(); // Right-associative (evaluates right-to-left)
+    node = computePentation(node, right);
+  }
+  return node;
+}
+
 // 3. Precedence Level: Tetration (^^) and Barrier (>) - Right Associative
 function parseTetration() {
-  let node = parsePower(); // FIXED: Now evaluates Powers tighter than Tetration
+  let node = parsePower(); 
   if (match('^^')) {
     let right = parseTetration(); 
     let barrier = createTower(1, 0);
@@ -150,7 +161,7 @@ function parseTetration() {
 
 // 4. Precedence Level: Powers (^) - Right Associative
 function parsePower() {
-  let node = parseFactorial(); // FIXED: Falls back to Factorials
+  let node = parseFactorial(); 
   if (match('^')) {
     let right = parsePower(); 
     node = powerTowers(node, right);
