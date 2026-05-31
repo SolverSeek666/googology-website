@@ -876,6 +876,29 @@ function formatTower(display, current) {
   }
 }
 
+// ============================================================================
+// FIX: TOWER DISPLAY LAYER RENDERER FOR HEIGHT 1
+// ============================================================================
+function renderHeight1(tower) {
+  // Safe guard in case the parser passes a raw number instead of an object
+  let val = (typeof tower === 'object' && tower !== null) ? tower.value : tower;
+  
+  if (isNaN(val) || val === undefined) return "NaN";
+  if (val === Infinity) return "10^Infinity";
+
+  // Format the exponent nicely depending on how huge it is
+  if (val < 1000) {
+    // e.g., 10^5.512
+    return "10^" + val.toFixed(3); 
+  } else if (val < 1e9) {
+    // e.g., 10^1,778
+    return "10^" + Math.floor(val).toLocaleString(); 
+  } else {
+    // If the exponent itself needs scientific notation (e.g., 10^(1.23e12))
+    return "10^(" + val.toExponential(4).replace("e+", "e") + ")";
+  }
+}
+
 // Helper to extract the single continuous tetration height of any tower
 function getTetrationHeightTower(t) {
   if (typeof t.height === 'object' && t.height !== null) {
@@ -986,29 +1009,6 @@ function formatBaseTower(t) {
     latex = `10^{${latex}}`;
   }
   return latex;
-}
-
-// ============================================================================
-// FIX: TOWER DISPLAY LAYER RENDERER FOR HEIGHT 1
-// ============================================================================
-function renderHeight1(tower) {
-  // Safe guard in case the parser passes a raw number instead of an object
-  let val = (typeof tower === 'object' && tower !== null) ? tower.value : tower;
-  
-  if (isNaN(val) || val === undefined) return "NaN";
-  if (val === Infinity) return "10^Infinity";
-
-  // Format the exponent nicely depending on how huge it is
-  if (val < 1000) {
-    // e.g., 10^5.512
-    return "10^" + val.toFixed(3); 
-  } else if (val < 1e9) {
-    // e.g., 10^1,778
-    return "10^" + Math.floor(val).toLocaleString(); 
-  } else {
-    // If the exponent itself needs scientific notation (e.g., 10^(1.23e12))
-    return "10^(" + val.toExponential(4).replace("e+", "e") + ")";
-  }
 }
 
 // ============================================================================
