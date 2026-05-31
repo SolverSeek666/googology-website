@@ -660,6 +660,47 @@ function computeHyperE(A, B) {
 }
 
 // ============================================================================
+// NEW HELPER: GAMMA FUNCTION EVALUATOR
+// ============================================================================
+function evaluateGamma(val, height = 0) {
+  if (height === 0) {
+    if (val === Infinity) return { value: Infinity, height: 0 };
+    if (val === 0 || (val < 0 && Number.isInteger(val))) return { value: NaN, height: 0 };
+    if (val === 1 || val === 2) return { value: 1, height: 0 };
+    
+    // Integer shortcut
+    if (val <= 171 && Number.isInteger(val) && val > 0) {
+      let g = 1;
+      for (let i = 2; i < val; i++) g *= i;
+      return { value: g, height: 0 };
+    }
+    
+    // Argument Shifting Trick for Stirling precision
+    let shift = 0;
+    let shiftFactor = 1;
+    while (val < 10) {
+      shiftFactor *= val;
+      val += 1;
+      shift++;
+    }
+    
+    let log10Gamma = (val - 0.5) * Math.log10(val) - val * Math.LOG10E + 0.5 * Math.log10(2 * Math.PI);
+    
+    if (shift > 0) {
+      log10Gamma -= Math.log10(shiftFactor);
+    }
+    
+    if (log10Gamma < 300) {
+      return { value: Math.pow(10, log10Gamma), height: 0 };
+    }
+    
+    return { value: log10Gamma, height: 1 };
+  }
+  
+  return { value: val, height: height + 1 };
+}
+
+// ============================================================================
 // SECTION 2.5: FACTORIAL CORE ENGINE HELPERS
 // Recursively unwraps strings like ((10!)!) and computes multifactorials.
 // ============================================================================
