@@ -649,6 +649,37 @@ function computeTetration(A, B, Barrier) {
   }
 }
 
+// ============================================================================
+// PENTATION ENGINE (REPEATED TETRATION STACKER)
+// ============================================================================
+function computePentation(A, B) {
+  // Case 0: Safe checks
+  if (isNaN(A.value) || isNaN(B.value)) return createTower(NaN, 0);
+  if (B.value === 0) return createTower(1, 0); // Hyper-operation identity
+  if (B.value === 1) return A;
+  
+  let current = A;
+  let steps = B.value;
+  
+  // Check if the pentation height B is already a giant tower
+  let isBTower = (typeof B.height === 'object' && B.height !== null) || (typeof B.height === 'number' && B.height >= 1);
+  if (isBTower) {
+    // If the height is a tower, the result transcends structural heights entirely
+    return createTower(1, createTower(1, B));
+  }
+  
+  // Iteratively evaluate pentation steps
+  // e.g., 3 ^^^ 3 turns into: computeTetration(3, (3 ^^ 3), Barrier)
+  for (let i = 1; i < steps; i++) {
+    // Create a trivial barrier of 1 for the next tetration layer
+    let defaultBarrier = createTower(1, 0);
+    
+    current = computeTetration(A, current, defaultBarrier);
+  }
+  
+  return current;
+}
+
 // Hyper-E=====================================================================
 
 function computeHyperE(A, B) {
@@ -896,7 +927,7 @@ function renderHeight1(tower) {
     return `10^{${val.toFixed(4)}}`;
   }
 
-  if (val < 1e9) {
+  if (val < 1e10) {
     // 1. Separate the integer exponent and the fractional part
     let exp = Math.floor(val);
     let frac = val - exp;
