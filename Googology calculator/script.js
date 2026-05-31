@@ -853,15 +853,20 @@ function formatTower(display, current) {
       let outputStr = Number(current.value.toFixed(10)).toString();
       renderMath(display, `${outputStr}`);
     } else {
-      renderHeight1(display, Math.log10(current.value));
+      // FIXED: Catch the returned LaTeX string and render it properly
+      let latex = renderHeight1(Math.log10(current.value));
+      renderMath(display, latex);
     }
   } else if (current.height === 1) {
-    renderHeight1(display, current.value);
+    // FIXED: Catch the returned LaTeX string and render it properly
+    let latex = renderHeight1(current.value);
+    renderMath(display, latex);
   } else {
     let exp = Math.floor(current.value);
     let coeff = Math.pow(10, current.value - exp);
     
     if (coeff.toFixed(4) === "10.0000") {
+      // Clean up overflow boundaries
       coeff = 1;
       exp += 1;
     }
@@ -877,25 +882,29 @@ function formatTower(display, current) {
 }
 
 // ============================================================================
-// FIX: TOWER DISPLAY LAYER RENDERER FOR HEIGHT 1
+// FIXED: TOWER DISPLAY LAYER RENDERER FOR HEIGHT 1 (OUTPUTS CLEAN LATEX)
 // ============================================================================
 function renderHeight1(tower) {
-  // Safe guard in case the parser passes a raw number instead of an object
   let val = (typeof tower === 'object' && tower !== null) ? tower.value : tower;
   
-  if (isNaN(val) || val === undefined) return "NaN";
-  if (val === Infinity) return "10^Infinity";
+  if (isNaN(val) || val === undefined) return "\\text{NaN}";
+  if (val === Infinity) return "10^{\\infty}";
 
-  // Format the exponent nicely depending on how huge it is
+  // Format using valid MathJax/KaTeX syntax instead of standard text notation
   if (val < 1000) {
-    // e.g., 10^5.512
-    return "10^" + val.toFixed(3); 
+    // e.g., 10^{5.512}
+    return `10^{${val.toFixed(3)}}`; 
   } else if (val < 1e9) {
-    // e.g., 10^1,778
-    return "10^" + Math.floor(val).toLocaleString(); 
+    // e.g., 10^{1778} (Note: Commas omitted inside LaTeX curly braces to avoid parsing glitches)
+    return `10^{${Math.floor(val)}}`; 
   } else {
-    // If the exponent itself needs scientific notation (e.g., 10^(1.23e12))
-    return "10^(" + val.toExponential(4).replace("e+", "e") + ")";
+    // If the exponent itself needs scientific notation, format cleanly
+    let str = val.toExponential(4).replace("e+", "e");
+    let [coeff, exp] = str.split('e');
+    if (coeff === '1' || parseFloat(coeff).toFixed(4) === '1.0000') {
+      return `10^{10^{${exp}}}`;
+    }
+    return `10^{${parseFloat(coeff).toFixed(4)} \\times 10^{${exp}}}`;
   }
 }
 
