@@ -661,16 +661,15 @@ function computeTetration(A, B, Barrier) {
 }
 
 // ============================================================================
-// PENTATION ENGINE (WITH ADJUSTED NOTATION CUTOFF)
+// PENTATION ENGINE (FIXED BOUNDARY FOR 10^^^6)
 // ============================================================================
 function computePentation(A, B) {
   if (isNaN(A.value) || isNaN(B.value)) return { value: NaN, height: 0 };
   if (B.value === 0) return { value: 1, height: 0 }; 
   if (B.value === 1) return A;
   
-  // CUTOFF UPDATE: Only force pentation display if the height strictly crosses 6.
-  // This allows 10^^^2 through 10^^^6 to unroll into standard tetration stacks!
-  if (A.value === 10 && B.value > 6) {
+  // FIX: Changed '>' to '>=' so 10^^^6 transforms into pentation instantly
+  if (A.value === 10 && B.value >= 6) {
     return {
       value: B.value,
       height: 1,
@@ -692,8 +691,8 @@ function computePentation(A, B) {
     current = computeTetration(A, current, defaultBarrier);
   }
   
-  // Double-check cutoff at the end of evaluation for safety
-  if (A.value === 10 && B.value > 6) {
+  // FIX: Changed '>' to '>=' here as well for safety
+  if (A.value === 10 && B.value >= 6) {
     return {
       value: B.value,
       height: 1,
