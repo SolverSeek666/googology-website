@@ -499,8 +499,7 @@ function computeTetration(A, B, Barrier) {
   if (B.value === Infinity || A.value === Infinity) return createTower(Infinity, 0);
   
   // ==========================================================================
-  // NEW INTERCEPTOR: PURE TETRATION STACK DETECTOR
-  // Converts huge chains like 10^^10^^10... into Pentation when height >= 6
+  // PURE TETRATION STACK DETECTOR (Converts large chains into Pentation)
   // ==========================================================================
   if (A.value === 10 && Barrier.height === 0 && Barrier.value === 1) {
     let currentPentHeight = getStackPentationHeight(B);
@@ -514,27 +513,26 @@ function computeTetration(A, B, Barrier) {
           base: 10,
           pentationHeight: newPentHeight
         };
+      } else {
+        // Safe tracking for small base-10 stacks
+        return {
+          isTetration: true,
+          base: 10,
+          exponent: newPentHeight,
+          barrier: Barrier,
+          value: 10,
+          height: newPentHeight - 1
+        };
       }
     }
   }
-  // ==========================================================================
   
-  // FIXED: Check if the height B is itself an ultra-giant tower structure
   let isBTower = (typeof B.height === 'object' && B.height !== null) || (typeof B.height === 'number' && B.height >= 1);
 
-  // ==========================================
-  // FIX: ZERO HEIGHT EDGE-CASE INTERCEPTOR
-  // Tetration to a height of 0 simply returns the baseline barrier
-  // ==========================================
   if (!isBTower && B.value === 0) {
     return Barrier;
   }
-  // ==========================================
 
-  // ==========================================
-  // PURE LINEAR FRACTIONAL TETRATION INTERCEPTOR
-  // Ensures a perfectly smooth, unbroken curve for all decimals
-  // ==========================================
   if (A.height === 0 && B.height === 0 && !Number.isInteger(B.value)) {
     let base = A.value;
     let exponent = B.value;
@@ -542,101 +540,94 @@ function computeTetration(A, B, Barrier) {
 
     let intPart = Math.floor(exponent);
     let fracPart = exponent - intPart;
-    
-    // Pure Linear Approximation Baseline (x^^fracPart = base^fracPart)
     let fracResult = Math.pow(base, fracPart);
 
-    // Pass the fractional boundary safely into your integer tower engine
     let newB = createTower(intPart, 0);
     let newBarrier = createTower(fracResult, 0);
     
     return computeTetration(A, newB, newBarrier);
   }
-  // ==========================================
   
-  // Case 1: Base A is already a giant tower (height >= 1)
+  // Calculate underlying tower math properties so background mechanics stay accurate
+  let underlying;
+  
   if (A.height >= 1) {
     if (!isBTower) {
       let y = B.value;
       let bVal = Barrier.value;
       let bHeight = Barrier.height;
 
-      // Handle trivial barrier (Barrier = 1) normally
-      if (bHeight === 0 && bVal === 1) {
-        if (y === 1) return A;
+      if (bHeight === 0 && bVal === 1 && y === 1) {
+        underlying = A;
       }
 
-      if (A.height === 1) {
-        if (bHeight === 0) {
-          if (y === 1) {
-            return createTower(A.value * bVal, 1);
-          } else {
-            let topVal = A.value * bVal;
-            if (A.value > 0) topVal += Math.log10(A.value);
-            return createTower(topVal, y);
-          }
-        } else {
-          return createTower(bVal, bHeight + y);
-        }
-      } else if (A.height === 2) {
-        if (bHeight === 0) {
-          if (y === 1) {
-            let topVal = A.value;
-            if (bVal > 0) topVal += Math.log10(bVal);
-            return createTower(topVal, 2);
-          } else {
-            if (A.value <= 308) {
-              let topVal = A.value + bVal * Math.pow(10, A.value);
-              return createTower(topVal, y);
+      if (!underlying) {
+        if (A.height === 1) {
+          if (bHeight === 0) {
+            if (y === 1) {
+              underlying = createTower(A.value * bVal, 1);
             } else {
+              let topVal = A.value * bVal;
+              if (A.value > 0) topVal += Math.log10(A.value);
+              underlying = createTower(topVal, y);
+            }
+          } else {
+            underlying = createTower(bVal, bHeight + y);
+          }
+        } else if (A.height === 2) {
+          if (bHeight === 0) {
+            if (y === 1) {
               let topVal = A.value;
               if (bVal > 0) topVal += Math.log10(bVal);
-              return createTower(topVal, y + 1);
-            }
-          }
-        } else {
-          return createTower(bVal, bHeight + y);
-        }
-      } else if (A.height === 3) {
-        if (bHeight === 0) {
-          if (y === 1) {
-            if (A.value <= 308) {
-              let topVal = Math.pow(10, A.value) + Math.log10(bVal);
-              return createTower(topVal, 3);
+              underlying = createTower(topVal, 2);
             } else {
-              return createTower(A.value, 3);
+              if (A.value <= 308) {
+                let topVal = A.value + bVal * Math.pow(10, A.value);
+                underlying = createTower(topVal, y);
+              } else {
+                let topVal = A.value;
+                if (bVal > 0) topVal += Math.log10(bVal);
+                underlying = createTower(topVal, y + 1);
+              }
             }
           } else {
-            return createTower(A.value, y + 2);
+            underlying = createTower(bVal, bHeight + y);
           }
-        } else {
-          return createTower(bVal, bHeight + y);
-        }
-      } else {
-        // Base is a height-4+ tower
-        if (bHeight === 0) {
-          if (y === 1) {
-            return createTower(A.value, A.height);
+        } else if (A.height === 3) {
+          if (bHeight === 0) {
+            if (y === 1) {
+              if (A.value <= 308) {
+                let topVal = Math.pow(10, A.value) + Math.log10(bVal);
+                underlying = createTower(topVal, 3);
+              } else {
+                underlying = createTower(A.value, 3);
+              }
+            } else {
+              underlying = createTower(A.value, y + 2);
+            }
           } else {
-            return createTower(A.value, A.height + y - 1);
+            underlying = createTower(bVal, bHeight + y);
           }
         } else {
-          return createTower(bVal, bHeight + y);
+          if (bHeight === 0) {
+            if (y === 1) {
+              underlying = createTower(A.value, A.height);
+            } else {
+              underlying = createTower(A.value, A.height + y - 1);
+            }
+          } else {
+            underlying = createTower(bVal, bHeight + y);
+          }
         }
       }
     } else {
-      // Height B is an ultra-giant tower! The barrier is macroscopically irrelevant.
-      return createTower(1, B);
+      underlying = createTower(1, B);
     }
-  }
-
-  // Case 2: Base A is a standard number (height === 0)
-  let base = A.value;
+  } else {
+    let base = A.value;
   
-  if (Math.abs(base - 10) < 1e-7) {
-     if (Barrier.height === 0 && Barrier.value === 1 && !isBTower && B.value > 0 && B.value < 6) {
-        return createTower(10, B.value - 1);
-     } else if (!isBTower) {
+    if (Math.abs(base - 10) < 1e-7) {
+      if (!isBTower) {
         let bVal = Barrier.value;
         let bHeight = Barrier.height;
         let y = B.value;
@@ -644,64 +635,79 @@ function computeTetration(A, B, Barrier) {
         if (bHeight === 0 && bVal < 308) {
           let collapsedValue = Math.pow(10, bVal);
           if (Number.isFinite(collapsedValue) && collapsedValue < 1e300) {
-            return createTower(collapsedValue, y - 1);
+            underlying = createTower(collapsedValue, y - 1);
           }
         }
-        return createTower(bVal, y + bHeight);
-     } else {
-        // Height B is an ultra-giant tower!
-        return createTower(1, B);
-     }
-  }
-  
-  // Standard loop for small non-10 bases
-  if (!isBTower) {
-    let y = B.value;
-    let iters = Math.min(y, 10);
-    let current = createTower(Barrier.value, Barrier.height);
-    
-    for (let i = 0; i < iters; i++) {
-      if (current.height === 0) {
-        let next = Math.pow(base, current.value);
-        if (Number.isFinite(next) && next < 1e300) {
-          current.value = next;
-        } else {
-          current.value = current.value * Math.log10(base);
-          current.height = 1;
+        if (!underlying) {
+          underlying = createTower(bVal, y + bHeight);
         }
-      } else if (current.height === 1) {
-        current.value = current.value + Math.log10(Math.log10(base));
-        current.height = 2;
       } else {
-        current.height += 1;
+        underlying = createTower(1, B);
+      }
+    } else {
+      if (!isBTower) {
+        let y = B.value;
+        let iters = Math.min(y, 10);
+        let current = createTower(Barrier.value, Barrier.height);
+        
+        for (let i = 0; i < iters; i++) {
+          if (current.height === 0) {
+            let next = Math.pow(base, current.value);
+            if (Number.isFinite(next) && next < 1e300) {
+              current.value = next;
+            } else {
+              current.value = current.value * Math.log10(base);
+              current.height = 1;
+            }
+          } else if (current.height === 1) {
+            current.value = current.value + Math.log10(Math.log10(base));
+            current.height = 2;
+          } else {
+            current.height += 1;
+          }
+        }
+        if (y > 10) current.height += (y - 10);
+        underlying = current;
+      } else {
+        underlying = createTower(1, B);
       }
     }
-    if (y > 10) current.height += (y - 10);
-    return current;
-  } else {
-    return createTower(1, B);
   }
+
+  // Return custom Tetration tracker holding layout and barrier data
+  return {
+    isTetration: true,
+    base: A.height === 0 ? A.value : A,
+    exponent: isBTower ? B : B.value,
+    barrier: Barrier,
+    value: underlying.value,
+    height: underlying.height
+  };
 }
 
 // PENTATION ENGINE============================================================
 
 // Helper to calculate pentation height of a pure base-10 tetration stack
 function getStackPentationHeight(B) {
-  if (B.value === Infinity || A.value === Infinity) return createTower(Infinity, 0);
   if (!B) return null;
   
-  // If it's already been flagged as a pentation object
+  // 1. If it's already been flagged as a pentation object
   if (B.isPentation && B.base === 10) {
     return B.pentationHeight;
   }
   
+  // 2. NEW: If it's our new custom tetration object format
+  if (B.isTetration && B.base === 10 && B.barrier && B.barrier.value === 1 && B.barrier.height === 0) {
+    return typeof B.exponent === 'object' ? B.exponent.value : B.exponent;
+  }
+  
+  // 3. Fallback for legacy tower trails
   let val = typeof B === 'object' ? B.value : B;
   let height = typeof B === 'object' ? B.height : 0;
   
-  // if (val === 10 && height === 0) return 1;  // Single 10
-  // if (val === 10 && height === 9) return 2;  // 10 ^^ 10
+  if (val === 10 && height === 0) return 1;  // Single 10
+  if (val === 10 && height === 9) return 2;  // 10 ^^ 10
   
-  // Follow the nested tower trail left behind by previous 10 ^^ evaluations
   if (val === 1 && typeof height === 'object' && height !== null) {
     let count = 1;
     let curr = height;
@@ -896,6 +902,24 @@ function solveMultifactorial(x, k) {
   let part1 = (x / k) * (Math.log10(x) - log10e);
   let part2 = 0.5 * Math.log10(2 * Math.PI * x / k);
   return { value: part1 + part2, height: 1 };
+}
+
+// ==========================================================================
+// 2.8 EXPLICIT TETRATION ROUTE
+// ==========================================================================
+if (current.isTetration === true) {
+  let baseStr = typeof current.base === 'object' ? formatBaseTower(current.base) : current.base.toString();
+  let expStr = typeof current.exponent === 'object' ? formatBaseTower(current.exponent) : current.exponent.toString();
+    
+  let latex = `${baseStr} \\uparrow\\uparrow {${expStr}}`;
+    
+  // Check if there is a real, non-trivial barrier attached (> 1)
+  if (current.barrier && !(current.barrier.height === 0 && current.barrier.value === 1)) {
+    let barrierStr = current.barrier.height === 0 ? current.barrier.value.toString() : formatBaseTower(current.barrier);
+    latex += ` > {${barrierStr}}`;
+  }
+    
+  return renderMath(display, latex);
 }
 
 // ============================================================================
