@@ -845,13 +845,51 @@ function formatTower(display, current) {
   }
 }
 
-// Helper to recursively stringify giant inner tower heights
+// Helper to recursively stringify giant inner tower heights flawlessly
 function formatTowerToString(current) {
-  // simplified stringifier just for the inner bracket 
-  if (typeof current.height === 'object') {
-     return `10 \\uparrow\\uparrow {${formatTowerToString(current.height)}}`;
+  if (!current) return "0";
+
+  // Internal helper to intercept and convert JavaScript's ugly 1e+21 strings into clean LaTeX
+  const cleanNum = (num) => {
+    let str = String(num);
+    if (str.includes('e')) {
+      let [coeff, exp] = str.split('e');
+      exp = exp.replace('+', ''); 
+      let parsedCoeff = parseFloat(coeff);
+      let coeffStr = parsedCoeff.toFixed(4);
+      if (coeff === '1' || coeffStr === '1.0000') return `10^{${exp}}`;
+      return `${coeffStr} \\times 10^{${exp}}`;
+    }
+    // Fall back to your global clean formatter if the number is large but lacks an 'e'
+    if (num >= 1e10 && typeof formatValueClean === 'function') {
+      return formatValueClean(num);
+    }
+    return str;
+  };
+
+  // LAYER 1: The height of this sub-tower is itself another nested object
+  if (typeof current.height === 'object' && current.height !== null) {
+    return `10 \\uparrow\\uparrow {${formatTowerToString(current.height)}}`;
   }
-  return current.value; // Falls back to raw value or scientific notation 
+
+  // LAYER 2: The height is a standard number structure
+  if (typeof current.height === 'number') {
+    if (current.height === 0) {
+      return cleanNum(current.value);
+    }
+    if (current.height === 1) {
+      return `10^{${cleanNum(current.value)}}`;
+    }
+    
+    // For heights >= 2, unwrap them safely as a stacked power tower string
+    let latex = cleanNum(current.value);
+    for (let h = 0; h < current.height; h++) {
+      latex = `10^{${latex}}`;
+    }
+    return latex;
+  }
+
+  return cleanNum(current.value);
 }
 
 function formatValueClean(v) {
