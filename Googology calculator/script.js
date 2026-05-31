@@ -661,16 +661,16 @@ function computeTetration(A, B, Barrier) {
 }
 
 // ============================================================================
-// PENTATION ENGINE (WITH EXPLICIT TYPE DIFFERENTIATION)
+// PENTATION ENGINE (WITH ADJUSTED NOTATION CUTOFF)
 // ============================================================================
 function computePentation(A, B) {
   if (isNaN(A.value) || isNaN(B.value)) return { value: NaN, height: 0 };
   if (B.value === 0) return { value: 1, height: 0 }; 
   if (B.value === 1) return A;
   
-  // For Base 10, if the pentation height is 2 or more, it instantly crosses 10^^6.
-  // We tag it with an explicit flag so the router doesn't have to guess.
-  if (A.value === 10 && B.value >= 2) {
+  // CUTOFF UPDATE: Only force pentation display if the height strictly crosses 6.
+  // This allows 10^^^2 through 10^^^6 to unroll into standard tetration stacks!
+  if (A.value === 10 && B.value > 6) {
     return {
       value: B.value,
       height: 1,
@@ -680,7 +680,7 @@ function computePentation(A, B) {
     };
   }
   
-  // Fallback computation for smaller numbers or fractional steps (e.g., 10 ^^^ 1.4)
+  // Fallback computation for smaller numbers, stacks, or fractional steps
   let floorB = Math.floor(B.value);
   let f = B.value - floorB;
   
@@ -692,8 +692,8 @@ function computePentation(A, B) {
     current = computeTetration(A, current, defaultBarrier);
   }
   
-  // If a decimal pentation ends up past our notation threshold, flag it here too
-  if (A.value === 10 && B.value > 2) {
+  // Double-check cutoff at the end of evaluation for safety
+  if (A.value === 10 && B.value > 6) {
     return {
       value: B.value,
       height: 1,
