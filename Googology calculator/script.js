@@ -650,30 +650,29 @@ function computeTetration(A, B, Barrier) {
 }
 
 // ============================================================================
-// PENTATION ENGINE (REPEATED TETRATION STACKER)
+// PENTATION ENGINE (SUPPORTS DECIMAL PENTATION VIA LINEAR HEIGHT INTERPOLATION)
 // ============================================================================
 function computePentation(A, B) {
-  // Case 0: Safe checks
   if (isNaN(A.value) || isNaN(B.value)) return createTower(NaN, 0);
-  if (B.value === 0) return createTower(1, 0); // Hyper-operation identity
+  if (B.value === 0) return createTower(1, 0); 
   if (B.value === 1) return A;
   
-  let current = A;
-  let steps = B.value;
+  // 1. Split height B into Integer and Fractional components
+  let floorB = Math.floor(B.value);
+  let f = B.value - floorB;
   
-  // Check if the pentation height B is already a giant tower
+  // 2. Compute the fractional baseline: A ^^^ f = 1 + f * (A - 1)
+  let current = createTower(1 + f * (A.value - 1), 0);
+  
+  // If B is a giant tower already, it transcends standard heights
   let isBTower = (typeof B.height === 'object' && B.height !== null) || (typeof B.height === 'number' && B.height >= 1);
   if (isBTower) {
-    // If the height is a tower, the result transcends structural heights entirely
     return createTower(1, createTower(1, B));
   }
   
-  // Iteratively evaluate pentation steps
-  // e.g., 3 ^^^ 3 turns into: computeTetration(3, (3 ^^ 3), Barrier)
-  for (let i = 1; i < steps; i++) {
-    // Create a trivial barrier of 1 for the next tetration layer
+  // 3. Repeatedly apply your tetration engine for the integer steps remaining
+  for (let i = 0; i < floorB; i++) {
     let defaultBarrier = createTower(1, 0);
-    
     current = computeTetration(A, current, defaultBarrier);
   }
   
@@ -822,15 +821,31 @@ function solveMultifactorial(x, k) {
 }
 
 // ============================================================================
-// SECTION 3: DISPLAY FORMATTING ROUTER (AUTOMATIC TETRATION STACKER)
+// SECTION 3: DISPLAY FORMATTING ROUTER (TETRATION / PENTATION)
 // ============================================================================
 
 function formatTower(display, current) {
-  // 1. Handle Infinity & NaN explicitly at the very beginning
+  // 1. Handle Infinity & NaN explicitly
   if (current.height === 0) {
     if (current.value === Infinity) return renderMath(display, "\\infty");
     if (current.value === -Infinity) return renderMath(display, "-\\infty");
     if (isNaN(current.value)) return renderMath(display, "\\text{Undefined}");
+  }
+
+  // 2. PENTATION THRESHOLD CHECK (Triggers after 10^^6)
+  let tetHeight = getTetrationHeightTower(current);
+  if (tetHeight !== null) {
+    let isPastPentation = false;
+    if (typeof tetHeight.height === 'object' && tetHeight.height !== null) isPastPentation = true;
+    else if (tetHeight.height > 0) isPastPentation = true;
+    else if (tetHeight.value >= 6) isPastPentation = true;
+    
+    if (isPastPentation) {
+      // The continuous tetration height IS your pentation value!
+      let formattedP = formatBaseTower(tetHeight);
+      // Using explicit LaTeX commands to prevent "unknown token ^"
+      return renderMath(display, `10 \\uparrow\\uparrow\\uparrow {${formattedP}}`);
+    }
   }
 
   const toLatexSci = (num) => {
@@ -846,7 +861,7 @@ function formatTower(display, current) {
     return typeof formatValueClean === 'function' ? formatValueClean(num) : str;
   };
 
-  // 2. Normalize standard number heights if applicable
+  // 3. Normalize standard number heights if applicable
   if (typeof current.height === 'number' && current.height >= 1) {
     while (current.value >= 1e10) {
       current.height += 1;
@@ -854,21 +869,18 @@ function formatTower(display, current) {
     }
   }
 
-  // 3. Resolve Tetration Stack
+  // 4. Resolve Tetration Stack
   let stack = resolveTetrationStack(current);
-  
   if (stack !== null) {
     let formattedStr = formatBaseTower(stack.topTower);
     
     if (stack.layers === 1) {
-      // Rule: Layer 1 after tetration adds parenthesis if it contains scientific notation (\times)
       if (formattedStr.includes("\\times")) {
         renderMath(display, `10 \\uparrow\\uparrow {(${formattedStr})}`);
       } else {
         renderMath(display, `10 \\uparrow\\uparrow {${formattedStr}}`);
       }
     } else {
-      // Rule: Layer 2 or higher requires NO parenthesis
       let prefix = "";
       for (let i = 0; i < stack.layers; i++) {
         prefix += "10 \\uparrow\\uparrow ";
@@ -878,18 +890,16 @@ function formatTower(display, current) {
     return;
   }
 
-  // 4. FALLBACK BASE CASES (For numbers below the tetration threshold)
+  // 5. FALLBACK BASE CASES
   if (current.height === 0) {
     if (current.value < 10000000000) {
       let outputStr = Number(current.value.toFixed(10)).toString();
       renderMath(display, `${outputStr}`);
     } else {
-      // FIXED: Catch the returned LaTeX string and render it properly
       let latex = renderHeight1(Math.log10(current.value));
       renderMath(display, latex);
     }
   } else if (current.height === 1) {
-    // FIXED: Catch the returned LaTeX string and render it properly
     let latex = renderHeight1(current.value);
     renderMath(display, latex);
   } else {
@@ -897,7 +907,6 @@ function formatTower(display, current) {
     let coeff = Math.pow(10, current.value - exp);
     
     if (coeff.toFixed(4) === "10.0000") {
-      // Clean up overflow boundaries
       coeff = 1;
       exp += 1;
     }
