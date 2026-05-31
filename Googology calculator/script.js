@@ -298,24 +298,10 @@ function parsePrimary() {
     consume();
     let args = parseFunctionArgs();
     let node = args[0];
-
-    if (node.value === Infinity) return createTower(Infinity, 0);
-    if (node.height === 0 && (node.value === 0 || (node.value < 0 && Number.isInteger(node.value)))) {
-      return createTower(NaN, 0); 
-    }
-
-    if (node.height === 0) {
-      let x = node.value;
-      if (x === 1 || x === 2) return createTower(1, 0);
-      if (x <= 171 && Number.isInteger(x) && x > 0) {
-        let g = 1;
-        for (let i = 2; i < x; i++) g *= i;
-        return createTower(g, 0);
-      }
-      let val = (x - 0.5) * Math.log10(x) - x * Math.LOG10E + 0.5 * Math.log10(2 * Math.PI);
-      return createTower(val, 1);
-    }
-    return createTower(node.value, node.height + 1);
+  
+    // Uses the extracted helper safely handling tower logic
+    let res = evaluateGamma(node.value, node.height);
+    return createTower(res.value, res.height);
   }
   
   // 7. Constants and Base Numbers
@@ -721,7 +707,13 @@ function parseFactorialExpression(s) {
 
 function solveMultifactorial(x, k) {
   if (x < 0 || isNaN(x)) return { value: NaN, height: 0 };
-  x = Math.round(x);
+  
+  // FIX: Intercept single decimal factorials (x! = Gamma(x + 1))
+  if (k === 1 && !Number.isInteger(x)) {
+    return evaluateGamma(x + 1, 0);
+  }
+  
+  x = Math.round(x); // Safe to keep for standard integers / multifactorials
   
   // Case A: Number is small enough to evaluate cleanly without hitting Infinity
   if (x <= 170) {
