@@ -6,7 +6,27 @@
 
 const PHI = (1 + Math.sqrt(5)) / 2;
 
-// 1. Tokenizer: Breaks text into readable pieces
+// 1. Grab your HTML elements from the page
+// (Make sure your HTML input has id="calculatorInput" and display has id="mathDisplay")
+let inputBox = document.getElementById("calculatorInput");
+let displayBox = document.getElementById("mathDisplay");
+
+// 2. Listen for keys being pressed inside the input box
+inputBox.addEventListener("keyup", function(event) {
+  
+  // IF THE KEY PRESSED IS ENTER: Run the engine!
+  if (event.key === "Enter") {
+    
+    // Get the text the user typed
+    let userText = inputBox.value; 
+    
+    // Feed it into our Section 4 bridge to parse, format, and render!
+    updateDisplay(userText, displayBox);
+    
+  }
+});
+
+// 2. Tokenizer: Breaks text into readable pieces
 function tokenize(input) {
   // Matches numbers (like 10 or 5) or operators (+ or -)
   let regex = /\d+|\+|-/g;
@@ -22,7 +42,7 @@ function tokenize(input) {
   });
 }
 
-// 2. Parser: Evaluates the tokens left-to-right
+// 3. Parser: Evaluates the tokens left-to-right
 function parseExpression(input) {
   let tokens = tokenize(input);
   if (tokens.length === 0) return createTower(0);
