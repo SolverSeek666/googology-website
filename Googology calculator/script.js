@@ -1,43 +1,120 @@
 // I use gemini to help me lmao
 
+// ============================================================================
+// SECTION 1: SETUP & INPUT (YOUR ORIGINAL ARCHITECTURE)
+// ============================================================================
+
 const PHI = (1 + Math.sqrt(5)) / 2;
 
-// ============================================================================
-// SECTION 1: PARSER ENGINE (TOKENS & EXPRESSIONS)
-// ============================================================================
+// Global parser state placeholders
+let tokens = [];
+let tokenIndex = 0;
 
-// 1. Tokenizer: Breaks text into readable pieces (now supports decimals too!)
-function tokenize(input) {
-  let regex = /\d+\.\d+|\d+|\+|-/g;
-  let matches = input.match(regex) || [];
-  
-  return matches.map(token => {
-    if (token === '+' || token === '-') {
-      return { type: 'OPERATOR', value: token };
-    } else {
-      return { type: 'NUMBER', value: parseFloat(token) };
-    }
-  });
+function peek() {
+  return tokens[tokenIndex] || null;
 }
 
-// 2. Parser: Evaluates the tokens left-to-right
-function parseExpression(input) {
-  let tokens = tokenize(input);
-  if (tokens.length === 0) return createTower(0);
+function consume() {
+  return tokens[tokenIndex++];
+}
 
-  let expr = createTower(tokens[0].value);
+function match(t) {
+  if (peek() === t) {
+    consume();
+    return true;
+  }
+  return false;
+}
 
-  for (let i = 1; i < tokens.length; i += 2) {
-    let operator = tokens[i];
-    let nextNumber = tokens[i + 1];
+// Listen for the "Enter" key in the input box to trigger the calculation engine
+document.getElementById('calcInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    calculate(); // Directly calls the unified engine!
+  }
+});
 
-    if (!operator || !nextNumber) break;
+// Appends values directly to the user's blinking cursor location
+function appendInput(value) {
+  const inputEl = document.getElementById('calcInput');
+  if (!inputEl) return;
 
-    let nextTower = createTower(nextNumber.value);
+  const startPos = inputEl.selectionStart;
+  const endPos = inputEl.selectionEnd;
+  const text = inputEl.value;
+  
+  inputEl.value = text.substring(0, startPos) + value + text.substring(endPos, text.length);
+  
+  inputEl.focus();
+  inputEl.selectionStart = inputEl.selectionEnd = startPos + value.length;
+}
 
-    if (operator.value === '+') {
+// The core evaluation engine execution block
+function calculate() {
+  const inputEl = document.getElementById('calcInput');
+  const displayEl = document.getElementById('outputDisplay');
+  if (!inputEl || !displayEl) return;
+
+  // 1. Clean up & Normalize input
+  let expr = inputEl.value
+    .replace(/[^E]/g, char => char.toLowerCase())
+    .replace(/x/g, '*')
+    .replace(/\s+/g, '');
+
+  // 2. Tokenize using the symbol-aware layout
+  tokens = expr.match(/\d+(?:\.\d+)?|\^\^|[a-z]+|E|[-+*/^()!>√πϕ∞,Γγ]/g) || [];
+  tokenIndex = 0; // Reset pointer for execution
+
+  try {
+    if (tokens.length === 0) {
+      throw new Error("Please enter an expression");
+    }
+
+    // 3. Run the simplified parser engine
+    let resultTower = parseExpression();
+
+    // 4. Check if syntax errors left dangling unparsed elements behind
+    if (tokenIndex < tokens.length) {
+      throw new Error("Unexpected token: " + tokens[tokenIndex]);
+    }
+
+    // 5. Send structural tower to display formatter
+    formatTower(displayEl, resultTower);
+
+  } catch (err) {
+    // Gracefully catch system faults and display an elegant error block
+    displayEl.innerHTML = `\\[ \\text{Error: ${err.message}} \\]`;
+    if (window.MathJax) {
+      window.MathJax.typesetPromise([displayEl]);
+    }
+  }
+}
+
+// ============================================================================
+// SECTION 2: THE SIMPLIFIED PARSER & MATH BRAIN
+// ============================================================================
+
+// Reads tokens left-to-right using your peek() and consume() states
+function parseExpression() {
+  let firstToken = consume();
+  if (!firstToken) return createTower(0);
+
+  // Turn the first token into our base expression tower
+  let expr = createTower(parseFloat(firstToken));
+
+  // Keep reading as long as there are operators like + or -
+  while (peek() === '+' || peek() === '-') {
+    let opToken = consume(); // Grab the '+' or '-'
+    let nextToken = consume(); // Grab the number after it
+    
+    if (!nextToken) {
+      throw new Error("Missing number after operator");
+    }
+
+    let nextTower = createTower(parseFloat(nextToken));
+
+    if (opToken === '+') {
       expr = executeAddition(expr, nextTower);
-    } else if (operator.value === '-') {
+    } else if (opToken === '-') {
       expr = executeSubtraction(expr, nextTower);
     }
   }
@@ -45,18 +122,17 @@ function parseExpression(input) {
   return expr;
 }
 
-// ============================================================================
-// SECTION 2: THE MATH BRAIN
-// ============================================================================
-
+// Helper to create our basic 2-slot tower tracker
 function createTower(val, heights = [0, 0]) {
   return { value: val, heights: [...heights] };
 }
 
+// Clean Addition Function
 function executeAddition(A, B) {
   let heightA = A.heights[0] + A.heights[1];
   let heightB = B.heights[0] + B.heights[1];
 
+  // IF IT'S IN HEIGHT 0: Standard addition
   if (heightA === 0 && heightB === 0) {
     return createTower(A.value + B.value);
   } else {
@@ -64,10 +140,12 @@ function executeAddition(A, B) {
   }
 }
 
+// Clean Subtraction Function
 function executeSubtraction(A, B) {
   let heightA = A.heights[0] + A.heights[1];
   let heightB = B.heights[0] + B.heights[1];
 
+  // IF IT'S IN HEIGHT 0: Standard subtraction
   if (heightA === 0 && heightB === 0) {
     return createTower(A.value - B.value);
   } else {
@@ -76,15 +154,19 @@ function executeSubtraction(A, B) {
 }
 
 // ============================================================================
-// SECTION 3: DISPLAY FORMATTING ROUTER
+// SECTION 3: DISPLAY ROUTER & RENDERMATH BRIDGE
 // ============================================================================
 
-function formatTower(current) {
-  if (isNaN(current.value)) return "\\text{Undefined}";
+function formatTower(displayElement, current) {
+  if (isNaN(current.value)) {
+    renderMath(displayElement, "\\text{Undefined}");
+    return;
+  }
   
   let expCount = current.heights[0];
   let val = current.value;
 
+  // 1. Build the base layout string
   let latex = val.toString();
   if (Math.abs(val) >= 1e6) {
     let exp = Math.floor(Math.log10(Math.abs(val)));
@@ -92,6 +174,7 @@ function formatTower(current) {
     latex = `${coeff.toFixed(4)} \\times 10^{${exp}}`;
   }
 
+  // 2. Wrap it if exponent layers are active
   if (expCount > 0) {
     if (expCount < 5) {
       for (let i = 0; i < expCount; i++) {
@@ -102,51 +185,16 @@ function formatTower(current) {
     }
   }
 
-  return latex;
+  // 3. Fire your required render math engine
+  renderMath(displayElement, latex);
 }
 
-// ============================================================================
-// SECTION 4: THE OUTPUT RENDERING BRIDGE (WITH SAFETIES)
-// ============================================================================
-
-function updateDisplay(inputString, displayElement) {
-  let finalExpr = parseExpression(inputString);
-  let latexOutput = formatTower(finalExpr);
-  
-  // Safety Check: If renderMath function doesn't exist yet, fall back to plain text
-  if (typeof renderMath === "function") {
-    renderMath(displayElement, latexOutput);
-  } else {
-    displayElement.innerHTML = `$$${latexOutput}$$ (Raw Text Fallback)`;
+// Fallback safety utility for Section 4 rendering
+function renderMath(element, latexString) {
+  element.innerHTML = `\\[ ${latexString} \\]`;
+  if (window.MathJax && typeof window.MathJax.typesetPromise === "function") {
+    window.MathJax.typesetPromise([element]);
   }
-}
-
-// ============================================================================
-// SECTION 5: SAFE INITIALIZATION BLOCK
-// ============================================================================
-
-function initializeCalculator() {
-  let inputBox = document.getElementById("calculatorInput");
-  let displayBox = document.getElementById("mathDisplay");
-
-  if (inputBox && displayBox) {
-    // Listen for the Enter key
-    inputBox.addEventListener("keyup", function(event) {
-      if (event.key === "Enter") {
-        updateDisplay(inputBox.value, displayBox);
-      }
-    });
-    console.log("Calculator engine successfully linked to HTML fields.");
-  } else {
-    console.error("Initialization failed: Check if your HTML elements use id='calculatorInput' and id='mathDisplay'!");
-  }
-}
-
-// Runs immediately if page is already cooked, otherwise waits for the trigger
-if (document.readyState === "complete" || document.readyState === "interactive") {
-  initializeCalculator();
-} else {
-  document.addEventListener("DOMContentLoaded", initializeCalculator);
 }
 
 // ===================================================================
