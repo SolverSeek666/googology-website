@@ -853,10 +853,11 @@ function formatTower(display, current) {
       let outputStr = Number(current.value.toFixed(10)).toString();
       renderMath(display, `${outputStr}`);
     } else {
-      renderHeight1(display, Math.log10(current.value));
+      let logVal = Math.log10(current.value);
+      renderMath(display, `10^{${toLatexSci(logVal)}}`);
     }
   } else if (current.height === 1) {
-    renderHeight1(display, current.value);
+    renderMath(display, `10^{${toLatexSci(current.value)}}`);
   } else {
     let exp = Math.floor(current.value);
     let coeff = Math.pow(10, current.value - exp);
