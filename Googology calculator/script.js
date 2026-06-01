@@ -1,32 +1,16 @@
 // I use gemini to help me lmao
 
 // ============================================================================
-// SECTION 1: SETUP & INPUT (UNIFIED & FIXED)
+// SECTION 0: SETUP STUFF
 // ============================================================================
 
 const PHI = (1 + Math.sqrt(5)) / 2;
 
-// 1. Grab your HTML elements from the page
-// (Make sure your HTML input has id="calculatorInput" and display has id="mathDisplay")
-let inputBox = document.getElementById("calculatorInput");
-let displayBox = document.getElementById("mathDisplay");
+// ============================================================================
+// SECTION 1: PARSER ENGINE (TOKENS & EXPRESSIONS)
+// ============================================================================
 
-// 2. Listen for keys being pressed inside the input box
-inputBox.addEventListener("keyup", function(event) {
-  
-  // IF THE KEY PRESSED IS ENTER: Run the engine!
-  if (event.key === "Enter") {
-    
-    // Get the text the user typed
-    let userText = inputBox.value; 
-    
-    // Feed it into our Section 4 bridge to parse, format, and render!
-    updateDisplay(userText, displayBox);
-    
-  }
-});
-
-// 2. Tokenizer: Breaks text into readable pieces
+// 1. Tokenizer: Breaks text into readable pieces
 function tokenize(input) {
   // Matches numbers (like 10 or 5) or operators (+ or -)
   let regex = /\d+|\+|-/g;
@@ -42,7 +26,7 @@ function tokenize(input) {
   });
 }
 
-// 3. Parser: Evaluates the tokens left-to-right
+// 2. Parser: Evaluates the tokens left-to-right
 function parseExpression(input) {
   let tokens = tokenize(input);
   if (tokens.length === 0) return createTower(0);
@@ -71,8 +55,7 @@ function parseExpression(input) {
 }
 
 // ============================================================================
-// SECTION 2: THE MATH BRAIN (ROBUST PARSER ENGINE)
-// Uses a Recursive Descent Parser to enforce true mathematical precedence.
+// SECTION 2: THE MATH BRAIN
 // ============================================================================
 
 // Helper to create our simple 2-slot tower tracker
@@ -111,12 +94,7 @@ function executeSubtraction(A, B) {
 }
 
 // ============================================================================
-// SECTION 2.5: TOWER ARITHMETIC UTILITIES
-// Handles interactions between high towers and low mathematical numbers.
-// ============================================================================
-
-// ============================================================================
-// SECTION 3: DISPLAY FORMATTING ROUTER (AUTOMATIC TETRATION STACKER)
+// SECTION 3: DISPLAY FORMATTING ROUTER
 // ============================================================================
 
 function formatTower(current) {
@@ -149,7 +127,7 @@ function formatTower(current) {
 }
 
 // ============================================================================
-// SECTION 4: THE OUTPUT RENDERING
+// SECTION 4: THE OUTPUT RENDERING BRIDGE
 // ============================================================================
 
 function updateDisplay(inputString, displayElement) {
@@ -163,33 +141,48 @@ function updateDisplay(inputString, displayElement) {
   renderMath(displayElement, latexOutput);
 }
 
+// ============================================================================
+// SECTION 5: INITIALIZATION & EVENT LISTENERS (SAFE TIMING FIX)
+// ============================================================================
+
+// This wrapper waits until the HTML page is fully loaded before doing anything
+window.addEventListener("DOMContentLoaded", function() {
+  
+  // 1. Grab your HTML elements safely now that they exist
+  let inputBox = document.getElementById("calculatorInput");
+  let displayBox = document.getElementById("mathDisplay");
+
+  // 2. Only add the listener if the elements actually exist on your page
+  if (inputBox && displayBox) {
+    inputBox.addEventListener("keyup", function(event) {
+      // IF THE KEY PRESSED IS ENTER: Run the engine!
+      if (event.key === "Enter") {
+        let userText = inputBox.value; 
+        updateDisplay(userText, displayBox);
+      }
+    });
+  } else {
+    console.error("Could not find calculatorInput or mathDisplay IDs in your HTML!");
+  }
+});
+
 // ===================================================================
 // WEBSITE STUFF ARCHIVE
-// These stuff are preserved for archival purposes.
 // ===================================================================
 
-// I resetted the calculator. for some reason.
-
-// 1. The Forward Stack: Computes n * e^(n * e^(n...)) for height k
 function lambertStack(k, n) {
   if (k === 1) return n;
   return n * Math.exp(lambertStack(k - 1, n));
 }
 
-// 2. The Extended Lambert W Solver (Binary Search)
-// Solves for n where lambertStack(k, n) = a
 function extendedLambertW(k, a) {
-  if (a <= 0) return NaN; // Real numbers only for this calculator
-  
+  if (a <= 0) return NaN;
   let low = 0;
-  let high = Math.max(1, Math.log(a) + 1); // Safe upper bound
+  let high = Math.max(1, Math.log(a) + 1);
   let mid, guess;
-  
-  // 60 iterations provides extreme floating-point precision
   for (let i = 0; i < 60; i++) {
     mid = (low + high) / 2;
     guess = lambertStack(k, mid);
-    
     if (guess === a) break;
     if (guess < a) low = mid;
     else high = mid;
@@ -197,11 +190,8 @@ function extendedLambertW(k, a) {
   return mid;
 }
 
-// 3. The Super-Root Function using your exact W(k, ln(a)) logic!
-// Finds x where x^^k = a
 function superRoot(k, a) {
   if (k === 1) return a;
-  // x = e^W(k, ln(a))
   let wVal = extendedLambertW(k, Math.log(a));
   return Math.exp(wVal);
 }
