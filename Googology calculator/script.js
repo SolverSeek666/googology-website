@@ -96,17 +96,12 @@ function calculate() {
 
 // Helper to initialize a Tower structure
 function createTower(val, heights = []) {
-  let cleanHeights = [0];
+  let cleanHeights = [0, 0]; 
   
   if (typeof heights === 'number') {
-    let h = heights;
-    if (h < 5) {
-      cleanHeights[0] = h; // Less than 5: 'h' layers of 10^
-      cleanHeights[1] = 0;
-    } else {
-      cleanHeights[0] = 0;
-      cleanHeights[1] = h; // 5 or greater: collapses to 'h' layers of 10^^
-    }
+    // A standard height number represents how many 10^ layers exist
+    cleanHeights[0] = heights; 
+    cleanHeights[1] = 0;
   } else if (Array.isArray(heights)) {
     cleanHeights[0] = heights[0] || 0;
     cleanHeights[1] = heights[1] || 0;
@@ -497,16 +492,16 @@ function powerTowers(A, B) {
 }
 
 function computeTetration(A, B, Barrier) {
-  // Direct barrier array interceptor for base 10
+  // Direct base 10 interceptor to prevent decimal leakage
   if (A.value === 10) {
-    let tetrationLayers = B.value; // The number of 10^^ layers to stack
+    let tetrationLayers = B.value; // e.g., 6 layers for 10^^6
     
-    // If no barrier exists yet, create a clean base tower
-    let baseTower = Barrier ? Barrier : createTower(10, [0, 0]);
+    // Fallback if no barrier exists yet (default base value to 1)
+    let baseTower = Barrier ? Barrier : createTower(1, [0, 0]);
     let newHeights = [...baseTower.heights];
     
-    // Add the new layers directly to index 1 (the 10^^ tetration slot)
-    newHeights[1] = (newHeights[1] || 0) + tetrationLayers;
+    // FIX: Tetration builds 10^ layers, so add directly to index 0
+    newHeights[0] = (newHeights[0] || 0) + tetrationLayers;
     
     return createTower(baseTower.value, newHeights);
   }
@@ -825,32 +820,49 @@ function solveMultifactorial(x, k) {
 // ============================================================================
 
 function formatTower(display, current) {
-  if (isNaN(current.value)) return renderMath(display, "\\text{Undefined}");
-  if (current.value === Infinity) return renderMath(display, "\\infty");
-  if (current.value === -Infinity) return renderMath(display, "-\\infty");
-
   let hArray = current.heights || [0, 0];
   let expCount = hArray[0] || 0;
   let tetCount = hArray[1] || 0;
 
-  // Base case: No layers at all
-  if (expCount === 0 && tetCount === 0) {
-    if (current.value >= 1e10) {
-      return renderMath(display, `10^{${Math.log10(current.value).toFixed(4)}}`);
+  // Inline helper to perfectly handle standard scientific notation
+  function formatValue(val) {
+    if (isNaN(val)) return "\\text{Undefined}";
+    if (val === Infinity) return "\\infty";
+    if (val === -Infinity) return "-\\infty";
+    
+    // Triggers beautiful scientific notation for any large numbers
+    if (Math.abs(val) >= 1e6) {
+      let exp = Math.floor(Math.log10(Math.abs(val)));
+      let coeff = val / Math.pow(10, exp);
+      if (coeff.toFixed(4) === "10.0000") {
+        coeff = 1;
+        exp += 1;
+      }
+      return `${coeff.toFixed(4)} \\times 10^{${exp}}`;
     }
-    return renderMath(display, current.value.toString());
+    return val.toString();
   }
 
-  let latex = current.value.toString();
+  // Start building from the core base value X
+  let latex = formatValue(current.value);
 
-  // 1. Apply the 10^ layers directly to X (index 0)
-  for (let j = 0; j < expCount; j++) {
-    latex = `10^{${latex}}`;
-  }
+  // If any operational layers exist, wrap them from the inside out
+  if (expCount > 0 || tetCount > 0) {
+    
+    // 1. Handle the 10^ layers (Index 0)
+    if (expCount < 5) {
+      for (let j = 0; j < expCount; j++) {
+        latex = `10^{${latex}}`;
+      }
+    } else {
+      // FIX: Collapse into your barrier notation when height >= 5
+      latex = `10 \\uparrow\\uparrow {${expCount}} > {${latex}}`;
+    }
 
-  // 2. Apply the 10^^ layers outside of that (index 1)
-  for (let j = 0; j < tetCount; j++) {
-    latex = `10 \\uparrow\\uparrow {(${latex})}`;
+    // 2. Handle the 10^^ layers (Index 1)
+    for (let j = 0; j < tetCount; j++) {
+      latex = `10 \\uparrow\\uparrow {(${latex})}`;
+    }
   }
 
   renderMath(display, latex);
