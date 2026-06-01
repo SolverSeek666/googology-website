@@ -95,8 +95,24 @@ function calculate() {
 // ============================================================================
 
 // Helper to initialize a Tower structure
-function createTower(val, height = 0) {
-  return { value: val, height: height };
+function createTower(val, heights = []) {
+  let cleanHeights = [0];
+  
+  if (typeof heights === 'number') {
+    let h = heights;
+    if (h < 5) {
+      cleanHeights[0] = h; // Less than 5: 'h' layers of 10^
+      cleanHeights[1] = 0;
+    } else {
+      cleanHeights[0] = 0;
+      cleanHeights[1] = h; // 5 or greater: collapses to 'h' layers of 10^^
+    }
+  } else if (Array.isArray(heights)) {
+    cleanHeights[0] = heights[0] || 0;
+    cleanHeights[1] = heights[1] || 0;
+  }
+
+  return { value: val, heights: cleanHeights };
 }
 
 // 1. Precedence Level: Addition & Subtraction
@@ -481,6 +497,20 @@ function powerTowers(A, B) {
 }
 
 function computeTetration(A, B, Barrier) {
+  // Direct barrier array interceptor for base 10
+  if (A.value === 10) {
+    let tetrationLayers = B.value; // The number of 10^^ layers to stack
+    
+    // If no barrier exists yet, create a clean base tower
+    let baseTower = Barrier ? Barrier : createTower(10, [0, 0]);
+    let newHeights = [...baseTower.heights];
+    
+    // Add the new layers directly to index 1 (the 10^^ tetration slot)
+    newHeights[1] = (newHeights[1] || 0) + tetrationLayers;
+    
+    return createTower(baseTower.value, newHeights);
+  }
+  
   // Case 0: INFINITY / NaN checks
   if (isNaN(A.value) || isNaN(B.value) || isNaN(Barrier.value)) return createTower(NaN, 0);
   if (B.value === Infinity || A.value === Infinity) return createTower(Infinity, 0);
@@ -795,86 +825,35 @@ function solveMultifactorial(x, k) {
 // ============================================================================
 
 function formatTower(display, current) {
-  // 1. Handle Infinity & NaN explicitly at the very beginning
-  if (current.height === 0) {
-    if (current.value === Infinity) return renderMath(display, "\\infty");
-    if (current.value === -Infinity) return renderMath(display, "-\\infty");
-    if (isNaN(current.value)) return renderMath(display, "\\text{Undefined}");
+  if (isNaN(current.value)) return renderMath(display, "\\text{Undefined}");
+  if (current.value === Infinity) return renderMath(display, "\\infty");
+  if (current.value === -Infinity) return renderMath(display, "-\\infty");
+
+  let hArray = current.heights || [0, 0];
+  let expCount = hArray[0] || 0;
+  let tetCount = hArray[1] || 0;
+
+  // Base case: No layers at all
+  if (expCount === 0 && tetCount === 0) {
+    if (current.value >= 1e10) {
+      return renderMath(display, `10^{${Math.log10(current.value).toFixed(4)}}`);
+    }
+    return renderMath(display, current.value.toString());
   }
 
-  const toLatexSci = (num) => {
-    let str = String(num);
-    if (str.includes('e')) {
-      let [coeff, exp] = str.split('e');
-      exp = exp.replace('+', ''); 
-      let parsedCoeff = parseFloat(coeff);
-      let coeffStr = parsedCoeff.toFixed(4);
-      if (coeff === '1' || coeffStr === '1.0000') return `10^{${exp}}`;
-      return `${coeffStr} \\times 10^{${exp}}`;
-    }
-    return typeof formatValueClean === 'function' ? formatValueClean(num) : str;
-  };
+  let latex = current.value.toString();
 
-  // 2. Normalize standard number heights if applicable
-  if (typeof current.height === 'number' && current.height >= 1) {
-    while (current.value >= 1e10) {
-      current.height += 1;
-      current.value = Math.log10(current.value);
-    }
+  // 1. Apply the 10^ layers directly to X (index 0)
+  for (let j = 0; j < expCount; j++) {
+    latex = `10^{${latex}}`;
   }
 
-  // 3. Resolve Tetration Stack
-  let stack = resolveTetrationStack(current);
-  
-  if (stack !== null) {
-    let formattedStr = formatBaseTower(stack.topTower);
-    
-    if (stack.layers === 1) {
-      // Rule: Layer 1 after tetration adds parenthesis if it contains scientific notation (\times)
-      if (formattedStr.includes("\\times")) {
-        renderMath(display, `10 \\uparrow\\uparrow {(${formattedStr})}`);
-      } else {
-        renderMath(display, `10 \\uparrow\\uparrow {${formattedStr}}`);
-      }
-    } else {
-      // Rule: Layer 2 or higher requires NO parenthesis
-      let prefix = "";
-      for (let i = 0; i < stack.layers; i++) {
-        prefix += "10 \\uparrow\\uparrow ";
-      }
-      renderMath(display, `${prefix}{${formattedStr}}`);
-    }
-    return;
+  // 2. Apply the 10^^ layers outside of that (index 1)
+  for (let j = 0; j < tetCount; j++) {
+    latex = `10 \\uparrow\\uparrow {(${latex})}`;
   }
 
-  // 4. FALLBACK BASE CASES (For numbers below the tetration threshold)
-  if (current.height === 0) {
-    if (current.value < 10000000000) {
-      let outputStr = Number(current.value.toFixed(10)).toString();
-      renderMath(display, `${outputStr}`);
-    } else {
-      let logVal = Math.log10(current.value);
-      renderMath(display, `10^{${toLatexSci(logVal)}}`);
-    }
-  } else if (current.height === 1) {
-    renderMath(display, `10^{${toLatexSci(current.value)}}`);
-  } else {
-    let exp = Math.floor(current.value);
-    let coeff = Math.pow(10, current.value - exp);
-    
-    if (coeff.toFixed(4) === "10.0000") {
-      coeff = 1;
-      exp += 1;
-    }
-    
-    let coeffStr = coeff.toFixed(4);
-    let latex = coeffStr === "1.0000" ? `10^{${toLatexSci(exp)}}` : `${coeffStr} \\times 10^{${toLatexSci(exp)}}`;
-    
-    for (let h = 0; h < current.height - 1; h++) {
-      latex = `10^{${latex}}`;
-    }
-    renderMath(display, `${latex}`);
-  }
+  renderMath(display, latex);
 }
 
 // Helper to extract the single continuous tetration height of any tower
