@@ -90,27 +90,18 @@ function calculate() {
 }
 
 // ============================================================================
-// SECTION 2: THE SIMPLIFIED PARSER & MATH BRAIN
+// SECTION 2: THE SIMPLIFIED PARSER & MATH BRAIN (NOW WITH MULTIPLY/DIVIDE!)
 // ============================================================================
 
-// Reads tokens left-to-right using your peek() and consume() states
+// LEVEL 1: Handles Addition and Subtraction
 function parseExpression() {
-  let firstToken = consume();
-  if (!firstToken) return createTower(0);
-
-  // Turn the first token into our base expression tower
-  let expr = createTower(parseFloat(firstToken));
+  // Go one level deeper to check for multiplication/division first!
+  let expr = parseTerm(); 
 
   // Keep reading as long as there are operators like + or -
   while (peek() === '+' || peek() === '-') {
     let opToken = consume(); // Grab the '+' or '-'
-    let nextToken = consume(); // Grab the number after it
-    
-    if (!nextToken) {
-      throw new Error("Missing number after operator");
-    }
-
-    let nextTower = createTower(parseFloat(nextToken));
+    let nextTower = parseTerm(); // Grab the next chunk of math
 
     if (opToken === '+') {
       expr = executeAddition(expr, nextTower);
@@ -122,6 +113,39 @@ function parseExpression() {
   return expr;
 }
 
+// LEVEL 2: Handles Multiplication and Division
+function parseTerm() {
+  // Go one level deeper to grab the actual number first
+  let expr = parseFactor();
+
+  // Keep reading as long as there are operators like * or /
+  while (peek() === '*' || peek() === '/') {
+    let opToken = consume(); // Grab the '*' or '/'
+    let nextTower = parseFactor(); // Grab the next number
+
+    if (opToken === '*') {
+      expr = executeMultiplication(expr, nextTower);
+    } else if (opToken === '/') {
+      expr = executeDivision(expr, nextTower);
+    }
+  }
+
+  return expr;
+}
+
+// LEVEL 3: Grabs the raw numbers (Tokens)
+function parseFactor() {
+  let token = consume();
+  if (!token) {
+    throw new Error("Missing number in your equation!");
+  }
+  return createTower(parseFloat(token));
+}
+
+// ============================================================================
+// TOWER ARITHMETIC UTILITIES
+// ============================================================================
+
 // Helper to create our basic 2-slot tower tracker
 function createTower(val, heights = [0, 0]) {
   return { value: val, heights: [...heights] };
@@ -132,11 +156,10 @@ function executeAddition(A, B) {
   let heightA = A.heights[0] + A.heights[1];
   let heightB = B.heights[0] + B.heights[1];
 
-  // IF IT'S IN HEIGHT 0: Standard addition
   if (heightA === 0 && heightB === 0) {
     return createTower(A.value + B.value);
   } else {
-    return heightA >= heightB ? A : B;
+    return heightA >= heightB ? A : B; // The giant tower swallows the small number
   }
 }
 
@@ -145,10 +168,39 @@ function executeSubtraction(A, B) {
   let heightA = A.heights[0] + A.heights[1];
   let heightB = B.heights[0] + B.heights[1];
 
-  // IF IT'S IN HEIGHT 0: Standard subtraction
   if (heightA === 0 && heightB === 0) {
     return createTower(A.value - B.value);
   } else {
+    return A; 
+  }
+}
+
+// Clean Multiplication Function
+function executeMultiplication(A, B) {
+  let heightA = A.heights[0] + A.heights[1];
+  let heightB = B.heights[0] + B.heights[1];
+
+  // IF IT'S IN HEIGHT 0: Standard multiplication
+  if (heightA === 0 && heightB === 0) {
+    return createTower(A.value * B.value);
+  } else {
+    // Multiplying a massive tower by a small number just leaves the massive tower
+    return heightA >= heightB ? A : B; 
+  }
+}
+
+// Clean Division Function
+function executeDivision(A, B) {
+  let heightA = A.heights[0] + A.heights[1];
+  let heightB = B.heights[0] + B.heights[1];
+
+  // IF IT'S IN HEIGHT 0: Standard division
+  if (heightA === 0 && heightB === 0) {
+    // Prevent the universe from exploding
+    if (B.value === 0) throw new Error("Cannot divide by zero!");
+    return createTower(A.value / B.value);
+  } else {
+    // Dividing a massive tower by a small number changes nothing about its scale
     return A; 
   }
 }
