@@ -90,7 +90,7 @@ function calculate() {
 }
 
 // ============================================================================
-// SECTION 2: THE SIMPLIFIED PARSER & MATH BRAIN (WITH PARENTHESES)
+// SECTION 2: THE SIMPLIFIED PARSER (NOW WITH EXPONENTS!)
 // ============================================================================
 
 // LEVEL 1: Handles Addition and Subtraction
@@ -113,11 +113,12 @@ function parseExpression() {
 
 // LEVEL 2: Handles Multiplication and Division
 function parseTerm() {
-  let expr = parseFactor();
+  // 1. UPDATED: We now check for Exponents BEFORE we multiply or divide!
+  let expr = parsePower();
 
   while (peek() === '*' || peek() === '/') {
     let opToken = consume(); 
-    let nextTower = parseFactor(); 
+    let nextTower = parsePower(); 
 
     if (opToken === '*') {
       expr = executeMultiplication(expr, nextTower);
@@ -129,25 +130,34 @@ function parseTerm() {
   return expr;
 }
 
-// LEVEL 3: Grabs raw numbers OR intercepts Parentheses!
+// LEVEL 2.5: NEW! Handles Exponents
+function parsePower() {
+  // Go one level deeper to grab the number or parentheses first
+  let expr = parseFactor();
+
+  // Keep reading as long as there is a '^' symbol
+  while (peek() === '^') {
+    consume(); // Eat the '^' token
+    let nextTower = parseFactor(); // Grab the next number
+    expr = executeExponentiation(expr, nextTower);
+  }
+
+  return expr;
+}
+
+// LEVEL 3: Grabs raw numbers OR intercepts Parentheses
 function parseFactor() {
-  // 1. INTERCEPT PARENTHESES: If we spy an opening bracket, look inside!
   if (peek() === '(') {
-    consume(); // Eat the '(' token
-    
-    // Jump all the way back up to Level 1 to solve the inside math completely!
+    consume(); 
     let insideExpr = parseExpression(); 
     
-    // Once it's solved, the very next token MUST be the closing bracket
     if (peek() !== ')') {
       throw new Error("Missing closing parenthesis ')'");
     }
-    consume(); // Eat the ')' token
-    
-    return insideExpr; // Return the solved structural tower from inside
+    consume(); 
+    return insideExpr; 
   }
 
-  // 2. FALLBACK TO NUMBERS: If it's not a parenthesis, read it like a normal number
   let token = consume();
   if (!token) {
     throw new Error("Missing number or expression!");
@@ -164,7 +174,6 @@ function parseFactor() {
 // TOWER ARITHMETIC UTILITIES
 // ============================================================================
 
-// Helper to create our basic 2-slot tower tracker
 function createTower(val, heights = [0, 0]) {
   return { value: val, heights: [...heights] };
 }
@@ -207,6 +216,20 @@ function executeDivision(A, B) {
     return createTower(A.value / B.value);
   } else {
     return A; 
+  }
+}
+
+// NEW: Clean Exponentiation Function
+function executeExponentiation(A, B) {
+  let heightA = A.heights[0] + A.heights[1];
+  let heightB = B.heights[0] + B.heights[1];
+  
+  // IF IT'S IN HEIGHT 0: Standard exponents
+  if (heightA === 0 && heightB === 0) {
+    return createTower(Math.pow(A.value, B.value));
+  } else {
+    // If working with massive numbers, the larger tower absorbs the smaller one
+    return heightA >= heightB ? A : B; 
   }
 }
 
