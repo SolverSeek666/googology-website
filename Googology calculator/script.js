@@ -481,19 +481,6 @@ function powerTowers(A, B) {
 }
 
 function computeTetration(A, B, Barrier) {
-  // FIX: Direct Barrier Array Interceptor
-  if (A.value === 10) {
-    let a = B.value; // How many 10^^ layers to add
-    let newHeights = [...(Barrier.heights || [])];
-    
-    // Add the layers directly to index 1 (the 2-arrow tetration slot)
-    newHeights[1] = (newHeights[1] || 0) + a; 
-    
-    return createTower(Barrier.value, newHeights);
-  }
-
-  // (You can leave the rest of the old non-10 fallbacks below this if needed)
-  
   // Case 0: INFINITY / NaN checks
   if (isNaN(A.value) || isNaN(B.value) || isNaN(Barrier.value)) return createTower(NaN, 0);
   if (B.value === Infinity || A.value === Infinity) return createTower(Infinity, 0);
