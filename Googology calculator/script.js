@@ -1,22 +1,16 @@
 // I use gemini to help me lmao
 
-// ============================================================================
-// SECTION 0: SETUP STUFF
-// ============================================================================
-
 const PHI = (1 + Math.sqrt(5)) / 2;
 
 // ============================================================================
 // SECTION 1: PARSER ENGINE (TOKENS & EXPRESSIONS)
 // ============================================================================
 
-// 1. Tokenizer: Breaks text into readable pieces
+// 1. Tokenizer: Breaks text into readable pieces (now supports decimals too!)
 function tokenize(input) {
-  // Matches numbers (like 10 or 5) or operators (+ or -)
-  let regex = /\d+|\+|-/g;
+  let regex = /\d+\.\d+|\d+|\+|-/g;
   let matches = input.match(regex) || [];
   
-  // Convert matches into clean token objects
   return matches.map(token => {
     if (token === '+' || token === '-') {
       return { type: 'OPERATOR', value: token };
@@ -31,10 +25,8 @@ function parseExpression(input) {
   let tokens = tokenize(input);
   if (tokens.length === 0) return createTower(0);
 
-  // Start with the very first number as our base expression (expr)
   let expr = createTower(tokens[0].value);
 
-  // Loop through the rest of the tokens two at a time (Operator + Number)
   for (let i = 1; i < tokens.length; i += 2) {
     let operator = tokens[i];
     let nextNumber = tokens[i + 1];
@@ -43,7 +35,6 @@ function parseExpression(input) {
 
     let nextTower = createTower(nextNumber.value);
 
-    // Check the operator token and run the clean math functions
     if (operator.value === '+') {
       expr = executeAddition(expr, nextTower);
     } else if (operator.value === '-') {
@@ -51,44 +42,35 @@ function parseExpression(input) {
     }
   }
 
-  return expr; // Returns the final structural tower
+  return expr;
 }
 
 // ============================================================================
 // SECTION 2: THE MATH BRAIN
 // ============================================================================
 
-// Helper to create our simple 2-slot tower tracker
 function createTower(val, heights = [0, 0]) {
   return { value: val, heights: [...heights] };
 }
 
-// Clean Addition Function
 function executeAddition(A, B) {
   let heightA = A.heights[0] + A.heights[1];
   let heightB = B.heights[0] + B.heights[1];
 
-  // IF IT'S IN HEIGHT 0: Just add the standard numbers!
   if (heightA === 0 && heightB === 0) {
     return createTower(A.value + B.value);
-  } 
-  // ELSE: The giant tower swallows the small number
-  else {
+  } else {
     return heightA >= heightB ? A : B;
   }
 }
 
-// Clean Subtraction Function
 function executeSubtraction(A, B) {
   let heightA = A.heights[0] + A.heights[1];
   let heightB = B.heights[0] + B.heights[1];
 
-  // IF IT'S IN HEIGHT 0: Just subtract the standard numbers!
   if (heightA === 0 && heightB === 0) {
     return createTower(A.value - B.value);
-  } 
-  // ELSE: Subtracting a small number from a giant tower changes nothing
-  else {
+  } else {
     return A; 
   }
 }
@@ -101,10 +83,8 @@ function formatTower(current) {
   if (isNaN(current.value)) return "\\text{Undefined}";
   
   let expCount = current.heights[0];
-  let tetCount = current.heights[1];
   let val = current.value;
 
-  // 1. Format the base number first
   let latex = val.toString();
   if (Math.abs(val) >= 1e6) {
     let exp = Math.floor(Math.log10(Math.abs(val)));
@@ -112,7 +92,6 @@ function formatTower(current) {
     latex = `${coeff.toFixed(4)} \\times 10^{${exp}}`;
   }
 
-  // 2. Wrap it in exponent layers if they exist
   if (expCount > 0) {
     if (expCount < 5) {
       for (let i = 0; i < expCount; i++) {
@@ -127,44 +106,48 @@ function formatTower(current) {
 }
 
 // ============================================================================
-// SECTION 4: THE OUTPUT RENDERING BRIDGE
+// SECTION 4: THE OUTPUT RENDERING BRIDGE (WITH SAFETIES)
 // ============================================================================
 
 function updateDisplay(inputString, displayElement) {
-  // Step 1: Parse the string into our simple engine
   let finalExpr = parseExpression(inputString);
-  
-  // Step 2: Convert the results into LaTeX format
   let latexOutput = formatTower(finalExpr);
   
-  // Step 3: Render it to the screen using Section 4 standard
-  renderMath(displayElement, latexOutput);
+  // Safety Check: If renderMath function doesn't exist yet, fall back to plain text
+  if (typeof renderMath === "function") {
+    renderMath(displayElement, latexOutput);
+  } else {
+    displayElement.innerHTML = `$$${latexOutput}$$ (Raw Text Fallback)`;
+  }
 }
 
 // ============================================================================
-// SECTION 5: INITIALIZATION & EVENT LISTENERS (SAFE TIMING FIX)
+// SECTION 5: SAFE INITIALIZATION BLOCK
 // ============================================================================
 
-// This wrapper waits until the HTML page is fully loaded before doing anything
-window.addEventListener("DOMContentLoaded", function() {
-  
-  // 1. Grab your HTML elements safely now that they exist
+function initializeCalculator() {
   let inputBox = document.getElementById("calculatorInput");
   let displayBox = document.getElementById("mathDisplay");
 
-  // 2. Only add the listener if the elements actually exist on your page
   if (inputBox && displayBox) {
+    // Listen for the Enter key
     inputBox.addEventListener("keyup", function(event) {
-      // IF THE KEY PRESSED IS ENTER: Run the engine!
       if (event.key === "Enter") {
-        let userText = inputBox.value; 
-        updateDisplay(userText, displayBox);
+        updateDisplay(inputBox.value, displayBox);
       }
     });
+    console.log("Calculator engine successfully linked to HTML fields.");
   } else {
-    console.error("Could not find calculatorInput or mathDisplay IDs in your HTML!");
+    console.error("Initialization failed: Check if your HTML elements use id='calculatorInput' and id='mathDisplay'!");
   }
-});
+}
+
+// Runs immediately if page is already cooked, otherwise waits for the trigger
+if (document.readyState === "complete" || document.readyState === "interactive") {
+  initializeCalculator();
+} else {
+  document.addEventListener("DOMContentLoaded", initializeCalculator);
+}
 
 // ===================================================================
 // WEBSITE STUFF ARCHIVE
