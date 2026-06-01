@@ -90,18 +90,16 @@ function calculate() {
 }
 
 // ============================================================================
-// SECTION 2: THE SIMPLIFIED PARSER & MATH BRAIN (NOW WITH MULTIPLY/DIVIDE!)
+// SECTION 2: THE SIMPLIFIED PARSER & MATH BRAIN (WITH PARENTHESES)
 // ============================================================================
 
 // LEVEL 1: Handles Addition and Subtraction
 function parseExpression() {
-  // Go one level deeper to check for multiplication/division first!
   let expr = parseTerm(); 
 
-  // Keep reading as long as there are operators like + or -
   while (peek() === '+' || peek() === '-') {
-    let opToken = consume(); // Grab the '+' or '-'
-    let nextTower = parseTerm(); // Grab the next chunk of math
+    let opToken = consume(); 
+    let nextTower = parseTerm(); 
 
     if (opToken === '+') {
       expr = executeAddition(expr, nextTower);
@@ -115,13 +113,11 @@ function parseExpression() {
 
 // LEVEL 2: Handles Multiplication and Division
 function parseTerm() {
-  // Go one level deeper to grab the actual number first
   let expr = parseFactor();
 
-  // Keep reading as long as there are operators like * or /
   while (peek() === '*' || peek() === '/') {
-    let opToken = consume(); // Grab the '*' or '/'
-    let nextTower = parseFactor(); // Grab the next number
+    let opToken = consume(); 
+    let nextTower = parseFactor(); 
 
     if (opToken === '*') {
       expr = executeMultiplication(expr, nextTower);
@@ -133,12 +129,34 @@ function parseTerm() {
   return expr;
 }
 
-// LEVEL 3: Grabs the raw numbers (Tokens)
+// LEVEL 3: Grabs raw numbers OR intercepts Parentheses!
 function parseFactor() {
+  // 1. INTERCEPT PARENTHESES: If we spy an opening bracket, look inside!
+  if (peek() === '(') {
+    consume(); // Eat the '(' token
+    
+    // Jump all the way back up to Level 1 to solve the inside math completely!
+    let insideExpr = parseExpression(); 
+    
+    // Once it's solved, the very next token MUST be the closing bracket
+    if (peek() !== ')') {
+      throw new Error("Missing closing parenthesis ')'");
+    }
+    consume(); // Eat the ')' token
+    
+    return insideExpr; // Return the solved structural tower from inside
+  }
+
+  // 2. FALLBACK TO NUMBERS: If it's not a parenthesis, read it like a normal number
   let token = consume();
   if (!token) {
-    throw new Error("Missing number in your equation!");
+    throw new Error("Missing number or expression!");
   }
+  
+  if (isNaN(parseFloat(token))) {
+    throw new Error("Unexpected token: " + token);
+  }
+  
   return createTower(parseFloat(token));
 }
 
@@ -151,23 +169,19 @@ function createTower(val, heights = [0, 0]) {
   return { value: val, heights: [...heights] };
 }
 
-// Clean Addition Function
 function executeAddition(A, B) {
   let heightA = A.heights[0] + A.heights[1];
   let heightB = B.heights[0] + B.heights[1];
-
   if (heightA === 0 && heightB === 0) {
     return createTower(A.value + B.value);
   } else {
-    return heightA >= heightB ? A : B; // The giant tower swallows the small number
+    return heightA >= heightB ? A : B;
   }
 }
 
-// Clean Subtraction Function
 function executeSubtraction(A, B) {
   let heightA = A.heights[0] + A.heights[1];
   let heightB = B.heights[0] + B.heights[1];
-
   if (heightA === 0 && heightB === 0) {
     return createTower(A.value - B.value);
   } else {
@@ -175,32 +189,23 @@ function executeSubtraction(A, B) {
   }
 }
 
-// Clean Multiplication Function
 function executeMultiplication(A, B) {
   let heightA = A.heights[0] + A.heights[1];
   let heightB = B.heights[0] + B.heights[1];
-
-  // IF IT'S IN HEIGHT 0: Standard multiplication
   if (heightA === 0 && heightB === 0) {
     return createTower(A.value * B.value);
   } else {
-    // Multiplying a massive tower by a small number just leaves the massive tower
     return heightA >= heightB ? A : B; 
   }
 }
 
-// Clean Division Function
 function executeDivision(A, B) {
   let heightA = A.heights[0] + A.heights[1];
   let heightB = B.heights[0] + B.heights[1];
-
-  // IF IT'S IN HEIGHT 0: Standard division
   if (heightA === 0 && heightB === 0) {
-    // Prevent the universe from exploding
     if (B.value === 0) throw new Error("Cannot divide by zero!");
     return createTower(A.value / B.value);
   } else {
-    // Dividing a massive tower by a small number changes nothing about its scale
     return A; 
   }
 }
