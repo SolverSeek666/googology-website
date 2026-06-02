@@ -403,44 +403,55 @@ function executeTrig(type, target) {
 // SECTION 3: DISPLAY ROUTER & RENDERMATH BRIDGE
 // ============================================================================
 
-function formatTower(displayElement, current) {
-  if (isNaN(current.value)) {
-    renderMath(displayElement, "\\text{Undefined}");
-    return;
-  }
+function formatTower(tower) {
+  // Guardrail: If something went totally wrong in the matrix
+  if (isNaN(tower.value)) return "Undefined";
   
-  let expCount = current.heights[0];
-  let val = current.value;
+  let h0 = tower.heights[0];
+  let h1 = tower.heights[1];
 
-  // 1. Build the base layout string
-  let latex = val.toString();
-  if (Math.abs(val) >= 1e6) {
-    let exp = Math.floor(Math.log10(Math.abs(val)));
-    let coeff = val / Math.pow(10, exp);
-    latex = `${coeff.toFixed(4)} \\times 10^{${exp}}`;
-  }
+  // CASE 1: Standard Everyday Numbers
+  if (h0 === 0 && h1 === 0) {
+    let val = tower.value;
+    if (val === 0) return "0";
 
-  // 2. Wrap it if exponent layers are active
-  if (expCount > 0) {
-    if (expCount < 5) {
-      for (let i = 0; i < expCount; i++) {
-        latex = `10^{${latex}}`;
-      }
-    } else {
-      latex = `10 \\uparrow\\uparrow {${expCount}} > {${latex}}`;
+    // If the standard number is quite large (>= 1,000,000) or tiny (< 0.0001)
+    if (Math.abs(val) >= 1e6 || Math.abs(val) < 1e-4) {
+      let nativeExp = val.toExponential(4); // Converts to computer "1.2345e+7"
+      return nativeExp.replace(/e\+?/, " * 10^"); // Cleans it up to "1.2345 * 10^7"
     }
+
+    // Otherwise, print it as a clean, normal decimal up to 6 places
+    return Number(val.toFixed(6)).toString();
   }
 
-  // 3. Fire your required render math engine
-  renderMath(displayElement, latex);
-}
+  // CASE 2: Bypassed Massive Numbers (Tower Height 1)
+  if (h0 === 1 && h1 === 0) {
+    let logValue = tower.value;
+    
+    let b = Math.floor(logValue); // Grab the integer exponent chunk
+    let f = logValue - b;         // Grab the fractional chunk
+    let a = Math.pow(10, f);      // Rebuild the coefficient safely!
 
-// Fallback safety utility for Section 4 rendering
-function renderMath(element, latexString) {
-  element.innerHTML = `\\[ ${latexString} \\]`;
-  if (window.MathJax && typeof window.MathJax.typesetPromise === "function") {
-    window.MathJax.typesetPromise([element]);
+    // Tiny patch: If rounding pushes 'a' up to 10 (like 9.99999), roll it over
+    if (a >= 9.9999) {
+      a = 1;
+      b += 1;
+    }
+
+    return `${a.toFixed(4)} * 10^${b}`;
   }
+
+  // CASE 3: Infinitely Stacked Hyper-Towers (Tower Height > 1)
+  if (h0 > 1 && h1 === 0) {
+    let visualTower = tower.value.toFixed(4);
+    for (let i = 0; i < h0; i++) {
+      visualTower = "10^" + visualTower;
+    }
+    return visualTower;
+  }
+
+  return "Tower scale out of bounds";
 }
 
 // ===================================================================
