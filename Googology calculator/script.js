@@ -90,16 +90,8 @@ function calculate() {
 }
 
 // ============================================================================
-// SECTION 2: THE SIMPLIFIED PARSER & MATH BRAIN (WITH BYPASS & GAMMA)
+// SECTION 2: THE PARSER ENGINE (NOW WITH TRIG, CONSTANTS, & PRECISION FIXES)
 // ============================================================================
-
-// Lanczos Coefficients for high-precision Gamma calculation
-const LANCZOS_G = 7;
-const LANCZOS_P = [
-  0.99999999999980993, 676.5203681218851, -1259.1392167224028,
-  771.32342877765313, -176.61502916214059, 12.507343278686905,
-  -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7
-];
 
 // LEVEL 1: Handles Addition and Subtraction
 function parseExpression() {
@@ -139,32 +131,20 @@ function parseTerm() {
 
 // LEVEL 2.5: Handles Exponents
 function parsePower() {
-  // Go to postfix first to see if there's a trailing factorial!
-  let expr = parsePostfix(); 
+  let expr = parseFactor();
 
   while (peek() === '^') {
     consume(); 
-    let nextTower = parsePostfix(); 
+    let nextTower = parseFactor(); 
     expr = executeExponentiation(expr, nextTower);
   }
 
   return expr;
 }
 
-// LEVEL 2.7: NEW! Postfix Operations (Handles Trailing Factorials like 5!)
-function parsePostfix() {
-  let expr = parseFactor();
-
-  while (peek() === '!') {
-    consume(); // Eat the '!' token
-    expr = executeFactorial(expr);
-  }
-
-  return expr;
-}
-
-// LEVEL 3: Grabs numbers, Parentheses, Functions, or Constants
+// LEVEL 3: Grabs numbers, Parentheses, Functions, OR Constants!
 function parseFactor() {
+  // 1. STANDARD PARENTHESES
   if (peek() === '(') {
     consume(); 
     let insideExpr = parseExpression(); 
@@ -173,31 +153,34 @@ function parseFactor() {
     return insideExpr; 
   }
 
+  // 2. INTERCEPT TRIGNOMETRY: sin(a), cos(a), tan(a)
   if (peek() === 'sin' || peek() === 'cos' || peek() === 'tan') {
-    let trigOp = consume(); 
+    let trigOp = consume(); // Grab 'sin', 'cos', or 'tan'
     if (peek() !== '(') throw new Error(`${trigOp} must be followed by '('`);
-    consume(); 
+    consume(); // Eat '('
+    
     let arg = parseExpression();
     if (peek() !== ')') throw new Error(`Missing closing parenthesis in ${trigOp}`);
-    consume(); 
+    consume(); // Eat ')'
+    
     return executeTrig(trigOp, arg);
   }
 
-  // NEW: Gamma Function Interceptor (Supports both Capital Γ and lowercase γ)
-  if (peek() === 'Γ' || peek() === 'γ') {
-    let op = consume();
-    if (peek() !== '(') throw new Error(`${op} function must be followed by '('`);
+  // 3. INTERCEPT CONSTANT SYMBOLS (Reads the exact symbols from your layout regex)
+  if (peek() === 'π') {
     consume();
-    let arg = parseExpression();
-    if (peek() !== ')') throw new Error(`Missing closing parenthesis in ${op}`);
+    return createTower(Math.PI);
+  }
+  if (peek() === 'e') {
     consume();
-    return executeGamma(arg);
+    return createTower(Math.E);
+  }
+  if (peek() === 'ϕ') {
+    consume();
+    return createTower(PHI); // Hooks directly into your global PHI constant!
   }
 
-  if (peek() === 'π') { consume(); return createTower(Math.PI); }
-  if (peek() === 'e') { consume(); return createTower(Math.E); }
-  if (peek() === 'ϕ') { consume(); return createTower(PHI); }
-
+  // 4. ROOTS: Handles √a AND √(a,b)
   if (peek() === '√') {
     consume(); 
     if (peek() === '(') {
@@ -220,6 +203,7 @@ function parseFactor() {
     }
   }
 
+  // 5. LOGARITHMS: Handles log(a) AND log(a,b)
   if (peek() === 'log') {
     consume(); 
     if (peek() !== '(') throw new Error("log must be followed by '('");
@@ -238,6 +222,7 @@ function parseFactor() {
     }
   }
 
+  // 6. NATURAL LOGARITHM: Handles ln(a)
   if (peek() === 'ln') {
     consume(); 
     if (peek() !== '(') throw new Error("ln must be followed by '('");
@@ -248,6 +233,7 @@ function parseFactor() {
     return executeLn(arg);
   }
 
+  // FALLBACK TO BASIC NUMBERS
   let token = consume();
   if (!token) throw new Error("Missing number or expression!");
   if (isNaN(parseFloat(token))) throw new Error("Unexpected token: " + token);
@@ -256,98 +242,31 @@ function parseFactor() {
 }
 
 // ============================================================================
-// HARDWARE PROCESSING & BYPASS ENGINE UTILITIES
+// TOWER ARITHMETIC UTILITIES
 // ============================================================================
 
 function createTower(val, heights = [0, 0]) {
   return { value: val, heights: [...heights] };
 }
 
-// Internal raw calculator loop for Gamma calculations
-function rawLanczosGamma(z) {
-  if (z < 0.5) return Math.PI / (Math.sin(Math.PI * z) * rawLanczosGamma(1 - z));
-  z -= 1;
-  let x = LANCZOS_P[0];
-  for (let i = 1; i < LANCZOS_P.length; i++) x += LANCZOS_P[i] / (z + i);
-  let t = z + LANCZOS_G + 0.5;
-  return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
-}
-
-// UPGRADED: Exponentiation with Automatic Floating-Point Bypass Protection!
-function executeExponentiation(A, B) {
-  let hA = A.heights[0] + A.heights[1];
-  let hB = B.heights[0] + B.heights[1];
-
-  if (hA === 0 && hB === 0) {
-    // If the calculation will breach ~10^300 limit, intercept and convert to a tower layout!
-    if (A.value > 0 && B.value * Math.log10(A.value) > 300) {
-      let towerExponent = B.value * Math.log10(A.value);
-      return createTower(towerExponent, [1, 0]); // Moves the number safely out of standard JS limits
-    }
-    return createTower(Math.pow(A.value, B.value));
-  }
-  
-  if (hB > 0) return B;
-  if (hA > 0) return createTower(A.value + Math.log10(B.value), [A.heights[0], A.heights[1]]);
-  return hA >= hB ? A : B;
-}
-
-// NEW: Crash-proof Factorial Processing Engine (with Stirling large-scale bypass)
-function executeFactorial(A) {
-  if (A.heights[0] + A.heights[1] > 0) return A; 
-  let val = A.value;
-
-  // CRASH CONTROL: Factorials are mathematically undefined for negative integers
-  if (val < 0 && Number.isInteger(val)) {
-    throw new Error("Factorial is undefined for negative integers!");
-  }
-
-  // BYPASS ACTIVE: Anything over 170! breaks standard computers. We switch to Stirling log limits!
-  if (val > 170) {
-    let logScale = 0.5 * Math.log10(2 * Math.PI * val) + val * Math.log10(val / Math.E);
-    return createTower(logScale, [1, 0]);
-  }
-
-  // x! = Γ(x + 1)
-  return createTower(rawLanczosGamma(val + 1));
-}
-
-// NEW: Crash-proof Gamma Function Processing Engine
-function executeGamma(A) {
-  if (A.heights[0] + A.heights[1] > 0) return A;
-  let val = A.value;
-
-  // CRASH CONTROL: Gamma is mathematically undefined for zero and negative integers
-  if (val <= 0 && Number.isInteger(val)) {
-    throw new Error("Gamma function is undefined for non-positive integers!");
-  }
-
-  // BYPASS ACTIVE: If the parameter scales past standard floating bounds, use log towers
-  if (val > 171) {
-    let n = val - 1;
-    let logScale = 0.5 * Math.log10(2 * Math.PI * n) + n * Math.log10(n / Math.E);
-    return createTower(logScale, [1, 0]);
-  }
-
-  return createTower(rawLanczosGamma(val));
-}
-
-// Standard operations framework
 function executeAddition(A, B) {
   let hA = A.heights[0] + A.heights[1];
   let hB = B.heights[0] + B.heights[1];
   return (hA === 0 && hB === 0) ? createTower(A.value + B.value) : (hA >= hB ? A : B);
 }
+
 function executeSubtraction(A, B) {
   let hA = A.heights[0] + A.heights[1];
   let hB = B.heights[0] + B.heights[1];
   return (hA === 0 && hB === 0) ? createTower(A.value - B.value) : A;
 }
+
 function executeMultiplication(A, B) {
   let hA = A.heights[0] + A.heights[1];
   let hB = B.heights[0] + B.heights[1];
   return (hA === 0 && hB === 0) ? createTower(A.value * B.value) : (hA >= hB ? A : B);
 }
+
 function executeDivision(A, B) {
   let hA = A.heights[0] + A.heights[1];
   let hB = B.heights[0] + B.heights[1];
@@ -357,6 +276,13 @@ function executeDivision(A, B) {
   }
   return A;
 }
+
+function executeExponentiation(A, B) {
+  let hA = A.heights[0] + A.heights[1];
+  let hB = B.heights[0] + B.heights[1];
+  return (hA === 0 && hB === 0) ? createTower(Math.pow(A.value, B.value)) : (hA >= hB ? A : B);
+}
+
 function executeRoot(degree, rad) {
   let hDeg = degree.heights[0] + degree.heights[1];
   let hRad = rad.heights[0] + rad.heights[1];
@@ -366,17 +292,26 @@ function executeRoot(degree, rad) {
   }
   return rad;
 }
+
+// Upgraded Log function with base-10 precision patch!
 function executeLog(base, arg) {
   let hBase = base.heights[0] + base.heights[1];
   let hArg = arg.heights[0] + arg.heights[1];
+  
   if (hBase === 0 && hArg === 0) {
     if (base.value <= 0 || base.value === 1) throw new Error("Invalid log base");
     if (arg.value <= 0) throw new Error("Log parameter must be greater than 0");
-    if (base.value === 10) return createTower(Math.log10(arg.value));
+    
+    // PRECISION FIX: If it's a standard base-10 log, use Math.log10 to completely eliminate floating point errors!
+    if (base.value === 10) {
+      return createTower(Math.log10(arg.value));
+    }
+    
     return createTower(Math.log(arg.value) / Math.log(base.value));
   }
   return arg;
 }
+
 function executeLn(arg) {
   let hArg = arg.heights[0] + arg.heights[1];
   if (hArg === 0) {
@@ -385,17 +320,18 @@ function executeLn(arg) {
   }
   return arg;
 }
+
+// NEW: Trigonometry Processing Block (Processes in Radians)
 function executeTrig(type, target) {
   let hTarget = target.heights[0] + target.heights[1];
+  
   if (hTarget === 0) {
-    let result = 0;
-    if (type === 'sin') result = Math.sin(target.value);
-    if (type === 'cos') result = Math.cos(target.value);
-    if (type === 'tan') result = Math.tan(target.value);
-    if (Math.abs(result) < 1e-15) result = 0;
-    if (type === 'tan' && Math.abs(result) > 1e15) throw new Error("Tangent is undefined (Asymptote reached!)");
-    return createTower(result);
+    if (type === 'sin') return createTower(Math.sin(target.value));
+    if (type === 'cos') return createTower(Math.cos(target.value));
+    if (type === 'tan') return createTower(Math.tan(target.value));
   }
+  
+  // If a number is an infinitely massive tower, its trig state oscillates infinitely (Undefined)
   return createTower(NaN); 
 }
 
@@ -403,60 +339,44 @@ function executeTrig(type, target) {
 // SECTION 3: DISPLAY ROUTER & RENDERMATH BRIDGE
 // ============================================================================
 
-function formatTower(tower) {
-  // SAFETY NET: If a raw number sneaks in, wrap it into a tower structure automatically!
-  if (typeof tower === 'number') {
-    tower = createTower(tower);
+function formatTower(displayElement, current) {
+  if (isNaN(current.value)) {
+    renderMath(displayElement, "\\text{Undefined}");
+    return;
   }
   
-  // Guardrail for broken inputs
-  if (!tower || isNaN(tower.value)) return "Undefined";
-  
-  let h0 = tower.heights[0];
-  let h1 = tower.heights[1];
+  let expCount = current.heights[0];
+  let val = current.value;
 
-  // CASE 1: Standard Everyday Numbers
-  if (h0 === 0 && h1 === 0) {
-    let val = tower.value;
-    if (val === 0) return "0";
-
-    // If the number is huge (>= 1,000,000) or tiny (< 0.0001)
-    if (Math.abs(val) >= 1e6 || Math.abs(val) < 1e-4) {
-      let nativeExp = val.toExponential(4); // Converts to computer "1.2345e+7"
-      return nativeExp.replace(/e\+?/, " * 10^"); // Cleans it up to "1.2345 * 10^7"
-    }
-
-    // Otherwise, print it as a clean, normal decimal up to 6 places
-    return Number(val.toFixed(6)).toString();
+  // 1. Build the base layout string
+  let latex = val.toString();
+  if (Math.abs(val) >= 1e6) {
+    let exp = Math.floor(Math.log10(Math.abs(val)));
+    let coeff = val / Math.pow(10, exp);
+    latex = `${coeff.toFixed(4)} \\times 10^{${exp}}`;
   }
 
-  // CASE 2: Bypassed Massive Numbers (Tower Height 1)
-  if (h0 === 1 && h1 === 0) {
-    let logValue = tower.value;
-    
-    let b = Math.floor(logValue); // Grab the integer exponent chunk
-    let f = logValue - b;         // Grab the fractional chunk
-    let a = Math.pow(10, f);      // Rebuild the coefficient safely
-
-    // Rounding patch: If rounding pushes 'a' up to 10, roll it over to the exponent
-    if (a >= 9.9999) {
-      a = 1;
-      b += 1;
+  // 2. Wrap it if exponent layers are active
+  if (expCount > 0) {
+    if (expCount < 5) {
+      for (let i = 0; i < expCount; i++) {
+        latex = `10^{${latex}}`;
+      }
+    } else {
+      latex = `10 \\uparrow\\uparrow {${expCount}} > {${latex}}`;
     }
-
-    return `${a.toFixed(4)} * 10^${b}`;
   }
 
-  // CASE 3: Infinitely Stacked Hyper-Towers (Tower Height > 1)
-  if (h0 > 1 && h1 === 0) {
-    let visualTower = tower.value.toFixed(4);
-    for (let i = 0; i < h0; i++) {
-      visualTower = "10^" + visualTower;
-    }
-    return visualTower;
-  }
+  // 3. Fire your required render math engine
+  renderMath(displayElement, latex);
+}
 
-  return "Tower scale out of bounds";
+// Fallback safety utility for Section 4 rendering
+function renderMath(element, latexString) {
+  element.innerHTML = `\\[ ${latexString} \\]`;
+  if (window.MathJax && typeof window.MathJax.typesetPromise === "function") {
+    window.MathJax.typesetPromise([element]);
+  }
 }
 
 // ===================================================================
