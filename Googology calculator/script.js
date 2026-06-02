@@ -404,8 +404,13 @@ function executeTrig(type, target) {
 // ============================================================================
 
 function formatTower(tower) {
-  // Guardrail: If something went totally wrong in the matrix
-  if (isNaN(tower.value)) return "Undefined";
+  // SAFETY NET: If a raw number sneaks in, wrap it into a tower structure automatically!
+  if (typeof tower === 'number') {
+    tower = createTower(tower);
+  }
+  
+  // Guardrail for broken inputs
+  if (!tower || isNaN(tower.value)) return "Undefined";
   
   let h0 = tower.heights[0];
   let h1 = tower.heights[1];
@@ -415,7 +420,7 @@ function formatTower(tower) {
     let val = tower.value;
     if (val === 0) return "0";
 
-    // If the standard number is quite large (>= 1,000,000) or tiny (< 0.0001)
+    // If the number is huge (>= 1,000,000) or tiny (< 0.0001)
     if (Math.abs(val) >= 1e6 || Math.abs(val) < 1e-4) {
       let nativeExp = val.toExponential(4); // Converts to computer "1.2345e+7"
       return nativeExp.replace(/e\+?/, " * 10^"); // Cleans it up to "1.2345 * 10^7"
@@ -431,9 +436,9 @@ function formatTower(tower) {
     
     let b = Math.floor(logValue); // Grab the integer exponent chunk
     let f = logValue - b;         // Grab the fractional chunk
-    let a = Math.pow(10, f);      // Rebuild the coefficient safely!
+    let a = Math.pow(10, f);      // Rebuild the coefficient safely
 
-    // Tiny patch: If rounding pushes 'a' up to 10 (like 9.99999), roll it over
+    // Rounding patch: If rounding pushes 'a' up to 10, roll it over to the exponent
     if (a >= 9.9999) {
       a = 1;
       b += 1;
