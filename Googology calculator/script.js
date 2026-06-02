@@ -90,7 +90,7 @@ function calculate() {
 }
 
 // ============================================================================
-// SECTION 2: THE SIMPLIFIED PARSER (NOW WITH EXPONENTS!)
+// SECTION 2: THE SIMPLIFIED PARSER & MATH BRAIN (WITH FUNCTIONS)
 // ============================================================================
 
 // LEVEL 1: Handles Addition and Subtraction
@@ -113,7 +113,6 @@ function parseExpression() {
 
 // LEVEL 2: Handles Multiplication and Division
 function parseTerm() {
-  // 1. UPDATED: We now check for Exponents BEFORE we multiply or divide!
   let expr = parsePower();
 
   while (peek() === '*' || peek() === '/') {
@@ -130,48 +129,103 @@ function parseTerm() {
   return expr;
 }
 
-// LEVEL 2.5: NEW! Handles Exponents
+// LEVEL 2.5: Handles Exponents
 function parsePower() {
-  // Go one level deeper to grab the number or parentheses first
   let expr = parseFactor();
 
-  // Keep reading as long as there is a '^' symbol
   while (peek() === '^') {
-    consume(); // Eat the '^' token
-    let nextTower = parseFactor(); // Grab the next number
+    consume(); 
+    let nextTower = parseFactor(); 
     expr = executeExponentiation(expr, nextTower);
   }
 
   return expr;
 }
 
-// LEVEL 3: Grabs raw numbers OR intercepts Parentheses
+// LEVEL 3: Grabs numbers, Parentheses, or intercept Functions!
 function parseFactor() {
+  // 1. STANDARD PARENTHESES
   if (peek() === '(') {
     consume(); 
     let insideExpr = parseExpression(); 
-    
-    if (peek() !== ')') {
-      throw new Error("Missing closing parenthesis ')'");
-    }
+    if (peek() !== ')') throw new Error("Missing closing parenthesis ')'");
     consume(); 
     return insideExpr; 
   }
 
+  // 2. ROOTS: Handles √a AND √(a,b)
+  if (peek() === '√') {
+    consume(); // Eat the '√'
+    
+    if (peek() === '(') {
+      consume(); // Eat the '('
+      let arg1 = parseExpression();
+      
+      // If there's a comma, it's a custom root degree like √(3,8)
+      if (peek() === ',') {
+        consume(); // Eat the ','
+        let arg2 = parseExpression();
+        if (peek() !== ')') throw new Error("Missing closing parenthesis in root");
+        consume(); // Eat the ')'
+        return executeRoot(arg1, arg2); // arg1-th root of arg2
+      } else {
+        // No comma means standard square root written like √(a)
+        if (peek() !== ')') throw new Error("Missing closing parenthesis in root");
+        consume(); // Eat the ')'
+        return executeRoot(createTower(2), arg1); 
+      }
+    } else {
+      // Allows simple typing without brackets like: √4
+      let arg = parseFactor();
+      return executeRoot(createTower(2), arg);
+    }
+  }
+
+  // 3. LOGARITHMS: Handles log(a) AND log(a,b)
+  if (peek() === 'log') {
+    consume(); // Eat 'log'
+    if (peek() !== '(') throw new Error("log must be followed by '('");
+    consume(); // Eat '('
+    
+    let arg1 = parseExpression();
+    
+    // If there's a comma, it's a custom base like log(2,8)
+    if (peek() === ',') {
+      consume(); // Eat the ','
+      let arg2 = parseExpression();
+      if (peek() !== ')') throw new Error("Missing closing parenthesis in log");
+      consume(); // Eat the ')'
+      return executeLog(arg1, arg2); // log base arg1 of arg2
+    } else {
+      // No comma means standard base-10 log written like log(a)
+      if (peek() !== ')') throw new Error("Missing closing parenthesis in log");
+      consume(); // Eat the ')'
+      return executeLog(createTower(10), arg1);
+    }
+  }
+
+  // 4. NATURAL LOGARITHM: Handles ln(a)
+  if (peek() === 'ln') {
+    consume(); // Eat 'ln'
+    if (peek() !== '(') throw new Error("ln must be followed by '('");
+    consume(); // Eat '('
+    
+    let arg = parseExpression();
+    if (peek() !== ')') throw new Error("Missing closing parenthesis in ln");
+    consume(); // Eat the ')'
+    return executeLn(arg);
+  }
+
+  // FALLBACK TO BASIC NUMBERS
   let token = consume();
-  if (!token) {
-    throw new Error("Missing number or expression!");
-  }
-  
-  if (isNaN(parseFloat(token))) {
-    throw new Error("Unexpected token: " + token);
-  }
+  if (!token) throw new Error("Missing number or expression!");
+  if (isNaN(parseFloat(token))) throw new Error("Unexpected token: " + token);
   
   return createTower(parseFloat(token));
 }
 
 // ============================================================================
-// TOWER ARITHMETIC UTILITIES
+// TOWER ARITHMETIC UTILITIES (THE CALCULATOR PROCESSING BRAIN)
 // ============================================================================
 
 function createTower(val, heights = [0, 0]) {
@@ -179,58 +233,74 @@ function createTower(val, heights = [0, 0]) {
 }
 
 function executeAddition(A, B) {
-  let heightA = A.heights[0] + A.heights[1];
-  let heightB = B.heights[0] + B.heights[1];
-  if (heightA === 0 && heightB === 0) {
-    return createTower(A.value + B.value);
-  } else {
-    return heightA >= heightB ? A : B;
-  }
+  let hA = A.heights[0] + A.heights[1];
+  let hB = B.heights[0] + B.heights[1];
+  return (hA === 0 && hB === 0) ? createTower(A.value + B.value) : (hA >= hB ? A : B);
 }
 
 function executeSubtraction(A, B) {
-  let heightA = A.heights[0] + A.heights[1];
-  let heightB = B.heights[0] + B.heights[1];
-  if (heightA === 0 && heightB === 0) {
-    return createTower(A.value - B.value);
-  } else {
-    return A; 
-  }
+  let hA = A.heights[0] + A.heights[1];
+  let hB = B.heights[0] + B.heights[1];
+  return (hA === 0 && hB === 0) ? createTower(A.value - B.value) : A;
 }
 
 function executeMultiplication(A, B) {
-  let heightA = A.heights[0] + A.heights[1];
-  let heightB = B.heights[0] + B.heights[1];
-  if (heightA === 0 && heightB === 0) {
-    return createTower(A.value * B.value);
-  } else {
-    return heightA >= heightB ? A : B; 
-  }
+  let hA = A.heights[0] + A.heights[1];
+  let hB = B.heights[0] + B.heights[1];
+  return (hA === 0 && hB === 0) ? createTower(A.value * B.value) : (hA >= hB ? A : B);
 }
 
 function executeDivision(A, B) {
-  let heightA = A.heights[0] + A.heights[1];
-  let heightB = B.heights[0] + B.heights[1];
-  if (heightA === 0 && heightB === 0) {
+  let hA = A.heights[0] + A.heights[1];
+  let hB = B.heights[0] + B.heights[1];
+  if (hA === 0 && hB === 0) {
     if (B.value === 0) throw new Error("Cannot divide by zero!");
     return createTower(A.value / B.value);
-  } else {
-    return A; 
   }
+  return A;
 }
 
-// NEW: Clean Exponentiation Function
 function executeExponentiation(A, B) {
-  let heightA = A.heights[0] + A.heights[1];
-  let heightB = B.heights[0] + B.heights[1];
+  let hA = A.heights[0] + A.heights[1];
+  let hB = B.heights[0] + B.heights[1];
+  return (hA === 0 && hB === 0) ? createTower(Math.pow(A.value, B.value)) : (hA >= hB ? A : B);
+}
+
+// NEW: Root Processing Block
+function executeRoot(degree, rad) {
+  let hDeg = degree.heights[0] + degree.heights[1];
+  let hRad = rad.heights[0] + rad.heights[1];
   
-  // IF IT'S IN HEIGHT 0: Standard exponents
-  if (heightA === 0 && heightB === 0) {
-    return createTower(Math.pow(A.value, B.value));
-  } else {
-    // If working with massive numbers, the larger tower absorbs the smaller one
-    return heightA >= heightB ? A : B; 
+  if (hDeg === 0 && hRad === 0) {
+    if (degree.value === 0) throw new Error("Root degree cannot be zero!");
+    // b^(1/a) calculation rule
+    return createTower(Math.pow(rad.value, 1 / degree.value));
   }
+  return rad; // Huge tower fallback rule
+}
+
+// NEW: Logarithm Processing Block
+function executeLog(base, arg) {
+  let hBase = base.heights[0] + base.heights[1];
+  let hArg = arg.heights[0] + arg.heights[1];
+  
+  if (hBase === 0 && hArg === 0) {
+    if (base.value <= 0 || base.value === 1) throw new Error("Invalid log base");
+    if (arg.value <= 0) throw new Error("Log parameter must be greater than 0");
+    return createTower(Math.log(arg.value) / Math.log(base.value));
+  }
+  return arg; // Huge tower fallback rule
+}
+
+// NEW: Natural Log Processing Block
+function executeLn(arg) {
+  let hArg = arg.heights[0] + arg.heights[1];
+  
+  if (hArg === 0) {
+    if (arg.value <= 0) throw new Error("ln parameter must be greater than 0");
+    return createTower(Math.log(arg.value));
+  }
+  return arg; // Huge tower fallback rule
 }
 
 // ============================================================================
