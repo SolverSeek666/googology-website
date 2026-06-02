@@ -90,7 +90,7 @@ function calculate() {
 }
 
 // ============================================================================
-// SECTION 2: THE SIMPLIFIED PARSER & MATH BRAIN (WITH FUNCTIONS)
+// SECTION 2: THE PARSER ENGINE (NOW WITH TRIG, CONSTANTS, & PRECISION FIXES)
 // ============================================================================
 
 // LEVEL 1: Handles Addition and Subtraction
@@ -142,7 +142,7 @@ function parsePower() {
   return expr;
 }
 
-// LEVEL 3: Grabs numbers, Parentheses, or intercept Functions!
+// LEVEL 3: Grabs numbers, Parentheses, Functions, OR Constants!
 function parseFactor() {
   // 1. STANDARD PARENTHESES
   if (peek() === '(') {
@@ -153,66 +153,83 @@ function parseFactor() {
     return insideExpr; 
   }
 
-  // 2. ROOTS: Handles √a AND √(a,b)
-  if (peek() === '√') {
-    consume(); // Eat the '√'
+  // 2. INTERCEPT TRIGNOMETRY: sin(a), cos(a), tan(a)
+  if (peek() === 'sin' || peek() === 'cos' || peek() === 'tan') {
+    let trigOp = consume(); // Grab 'sin', 'cos', or 'tan'
+    if (peek() !== '(') throw new Error(`${trigOp} must be followed by '('`);
+    consume(); // Eat '('
     
+    let arg = parseExpression();
+    if (peek() !== ')') throw new Error(`Missing closing parenthesis in ${trigOp}`);
+    consume(); // Eat ')'
+    
+    return executeTrig(trigOp, arg);
+  }
+
+  // 3. INTERCEPT CONSTANT SYMBOLS (Reads the exact symbols from your layout regex)
+  if (peek() === 'π') {
+    consume();
+    return createTower(Math.PI);
+  }
+  if (peek() === 'e') {
+    consume();
+    return createTower(Math.E);
+  }
+  if (peek() === 'ϕ') {
+    consume();
+    return createTower(PHI); // Hooks directly into your global PHI constant!
+  }
+
+  // 4. ROOTS: Handles √a AND √(a,b)
+  if (peek() === '√') {
+    consume(); 
     if (peek() === '(') {
-      consume(); // Eat the '('
+      consume(); 
       let arg1 = parseExpression();
-      
-      // If there's a comma, it's a custom root degree like √(3,8)
       if (peek() === ',') {
-        consume(); // Eat the ','
+        consume(); 
         let arg2 = parseExpression();
         if (peek() !== ')') throw new Error("Missing closing parenthesis in root");
-        consume(); // Eat the ')'
-        return executeRoot(arg1, arg2); // arg1-th root of arg2
+        consume(); 
+        return executeRoot(arg1, arg2); 
       } else {
-        // No comma means standard square root written like √(a)
         if (peek() !== ')') throw new Error("Missing closing parenthesis in root");
-        consume(); // Eat the ')'
+        consume(); 
         return executeRoot(createTower(2), arg1); 
       }
     } else {
-      // Allows simple typing without brackets like: √4
       let arg = parseFactor();
       return executeRoot(createTower(2), arg);
     }
   }
 
-  // 3. LOGARITHMS: Handles log(a) AND log(a,b)
+  // 5. LOGARITHMS: Handles log(a) AND log(a,b)
   if (peek() === 'log') {
-    consume(); // Eat 'log'
+    consume(); 
     if (peek() !== '(') throw new Error("log must be followed by '('");
-    consume(); // Eat '('
-    
+    consume(); 
     let arg1 = parseExpression();
-    
-    // If there's a comma, it's a custom base like log(2,8)
     if (peek() === ',') {
-      consume(); // Eat the ','
+      consume(); 
       let arg2 = parseExpression();
       if (peek() !== ')') throw new Error("Missing closing parenthesis in log");
-      consume(); // Eat the ')'
-      return executeLog(arg1, arg2); // log base arg1 of arg2
+      consume(); 
+      return executeLog(arg1, arg2); 
     } else {
-      // No comma means standard base-10 log written like log(a)
       if (peek() !== ')') throw new Error("Missing closing parenthesis in log");
-      consume(); // Eat the ')'
+      consume(); 
       return executeLog(createTower(10), arg1);
     }
   }
 
-  // 4. NATURAL LOGARITHM: Handles ln(a)
+  // 6. NATURAL LOGARITHM: Handles ln(a)
   if (peek() === 'ln') {
-    consume(); // Eat 'ln'
+    consume(); 
     if (peek() !== '(') throw new Error("ln must be followed by '('");
-    consume(); // Eat '('
-    
+    consume(); 
     let arg = parseExpression();
     if (peek() !== ')') throw new Error("Missing closing parenthesis in ln");
-    consume(); // Eat the ')'
+    consume(); 
     return executeLn(arg);
   }
 
@@ -225,7 +242,7 @@ function parseFactor() {
 }
 
 // ============================================================================
-// TOWER ARITHMETIC UTILITIES (THE CALCULATOR PROCESSING BRAIN)
+// TOWER ARITHMETIC UTILITIES
 // ============================================================================
 
 function createTower(val, heights = [0, 0]) {
@@ -266,20 +283,17 @@ function executeExponentiation(A, B) {
   return (hA === 0 && hB === 0) ? createTower(Math.pow(A.value, B.value)) : (hA >= hB ? A : B);
 }
 
-// NEW: Root Processing Block
 function executeRoot(degree, rad) {
   let hDeg = degree.heights[0] + degree.heights[1];
   let hRad = rad.heights[0] + rad.heights[1];
-  
   if (hDeg === 0 && hRad === 0) {
     if (degree.value === 0) throw new Error("Root degree cannot be zero!");
-    // b^(1/a) calculation rule
     return createTower(Math.pow(rad.value, 1 / degree.value));
   }
-  return rad; // Huge tower fallback rule
+  return rad;
 }
 
-// NEW: Logarithm Processing Block
+// Upgraded Log function with base-10 precision patch!
 function executeLog(base, arg) {
   let hBase = base.heights[0] + base.heights[1];
   let hArg = arg.heights[0] + arg.heights[1];
@@ -287,20 +301,38 @@ function executeLog(base, arg) {
   if (hBase === 0 && hArg === 0) {
     if (base.value <= 0 || base.value === 1) throw new Error("Invalid log base");
     if (arg.value <= 0) throw new Error("Log parameter must be greater than 0");
+    
+    // PRECISION FIX: If it's a standard base-10 log, use Math.log10 to completely eliminate floating point errors!
+    if (base.value === 10) {
+      return createTower(Math.log10(arg.value));
+    }
+    
     return createTower(Math.log(arg.value) / Math.log(base.value));
   }
-  return arg; // Huge tower fallback rule
+  return arg;
 }
 
-// NEW: Natural Log Processing Block
 function executeLn(arg) {
   let hArg = arg.heights[0] + arg.heights[1];
-  
   if (hArg === 0) {
     if (arg.value <= 0) throw new Error("ln parameter must be greater than 0");
     return createTower(Math.log(arg.value));
   }
-  return arg; // Huge tower fallback rule
+  return arg;
+}
+
+// NEW: Trigonometry Processing Block (Processes in Radians)
+function executeTrig(type, target) {
+  let hTarget = target.heights[0] + target.heights[1];
+  
+  if (hTarget === 0) {
+    if (type === 'sin') return createTower(Math.sin(target.value));
+    if (type === 'cos') return createTower(Math.cos(target.value));
+    if (type === 'tan') return createTower(Math.tan(target.value));
+  }
+  
+  // If a number is an infinitely massive tower, its trig state oscillates infinitely (Undefined)
+  return createTower(NaN); 
 }
 
 // ============================================================================
