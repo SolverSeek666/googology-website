@@ -90,8 +90,15 @@ function calculate() {
 }
 
 // ============================================================================
-// SECTION 2: THE PARSER ENGINE (NOW WITH TRIG, CONSTANTS, & PRECISION FIXES)
+// SECTION 2: THE PARSER ENGINE (NOW WITH TRIG, CONSTANTS, FACTORIAL & GAMMA)
 // ============================================================================
+
+// Helper coefficients for high-precision Gamma calculation of small numbers
+const LANCZOS_P = [
+  0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+  771.32342877765313, -176.61502916214059, 12.507343278686905,
+  -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7
+];
 
 // LEVEL 1: Handles Addition and Subtraction
 function parseExpression() {
@@ -131,12 +138,24 @@ function parseTerm() {
 
 // LEVEL 2.5: Handles Exponents
 function parsePower() {
-  let expr = parseFactor();
+  let expr = parsePostfix(); // Routes to postfix layer first to catch factorials!
 
   while (peek() === '^') {
     consume(); 
-    let nextTower = parseFactor(); 
+    let nextTower = parsePostfix(); 
     expr = executeExponentiation(expr, nextTower);
+  }
+
+  return expr;
+}
+
+// LEVEL 2.7: NEW! Postfix Handler for Factorials (e.g., 5!)
+function parsePostfix() {
+  let expr = parseFactor();
+
+  while (peek() === '!') {
+    consume(); // Eat the '!' token
+    expr = executeFactorial(expr);
   }
 
   return expr;
@@ -155,18 +174,31 @@ function parseFactor() {
 
   // 2. INTERCEPT TRIGNOMETRY: sin(a), cos(a), tan(a)
   if (peek() === 'sin' || peek() === 'cos' || peek() === 'tan') {
-    let trigOp = consume(); // Grab 'sin', 'cos', or 'tan'
+    let trigOp = consume(); 
     if (peek() !== '(') throw new Error(`${trigOp} must be followed by '('`);
-    consume(); // Eat '('
+    consume(); 
     
     let arg = parseExpression();
     if (peek() !== ')') throw new Error(`Missing closing parenthesis in ${trigOp}`);
-    consume(); // Eat ')'
+    consume(); 
     
     return executeTrig(trigOp, arg);
   }
 
-  // 3. INTERCEPT CONSTANT SYMBOLS (Reads the exact symbols from your layout regex)
+  // NEW: INTERCEPT GAMMA FUNCTION: Γ(a) or γ(a)
+  if (peek() === 'Γ' || peek() === 'γ') {
+    let gammaOp = consume();
+    if (peek() !== '(') throw new Error(`${gammaOp} must be followed by '('`);
+    consume();
+
+    let arg = parseExpression();
+    if (peek() !== ')') throw new Error(`Missing closing parenthesis in ${gammaOp}`);
+    consume();
+
+    return executeGamma(arg);
+  }
+
+  // 3. INTERCEPT CONSTANT SYMBOLS
   if (peek() === 'π') {
     consume();
     return createTower(Math.PI);
@@ -177,7 +209,7 @@ function parseFactor() {
   }
   if (peek() === 'ϕ') {
     consume();
-    return createTower(PHI); // Hooks directly into your global PHI constant!
+    return createTower(PHI); 
   }
 
   // 4. ROOTS: Handles √a AND √(a,b)
@@ -249,6 +281,59 @@ function createTower(val, heights = [0, 0]) {
   return { value: val, heights: [...heights] };
 }
 
+// Math engine behind Gamma and precise small factorials
+function rawLanczosGamma(z) {
+  if (z < 0.5) return Math.PI / (Math.sin(Math.PI * z) * rawLanczosGamma(1 - z));
+  z -= 1;
+  let x = LANCZOS_P[0];
+  for (let i = 1; i < LANCZOS_P.length; i++) x += LANCZOS_P[i] / (z + i);
+  let t = z + 7.5; // Using g = 7
+  return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
+}
+
+// NEW: Crash-Proof Factorial via Stirling Bypass
+function executeFactorial(A) {
+  let hA = A.heights[0] + A.heights[1];
+  if (hA > 0) return A; // Already an extreme tower
+
+  let val = A.value;
+
+  // CRASH CONTROL: Factorials are mathematically undefined for negative integers
+  if (val < 0 && Number.isInteger(val)) {
+    throw new Error("Factorial is undefined for negative integers!");
+  }
+
+  // STIRLING BYPASS: Intercept right before breaking 2^1024 limit (~170!)
+  if (val > 170) {
+    let logScale = 0.5 * Math.log10(2 * Math.PI * val) + val * Math.log10(val / Math.E);
+    return createTower(logScale, [1, 0]); // Save directly as base-10 exponent tower
+  }
+
+  // x! = Γ(x + 1)
+  return createTower(rawLanczosGamma(val + 1));
+}
+
+// NEW: Crash-Proof Gamma via Stirling Bypass
+function executeGamma(A) {
+  let hA = A.heights[0] + A.heights[1];
+  if (hA > 0) return A;
+
+  let val = A.value;
+
+  // CRASH CONTROL: Gamma is mathematically undefined for zero and negative integers
+  if (val <= 0 && Number.isInteger(val)) {
+    throw new Error("Gamma function is undefined for non-positive integers!");
+  }
+
+  // STIRLING BYPASS: Intercept right before breaking 2^1024 limit (~171)
+  if (val > 171) {
+    let logScale = (val - 0.5) * Math.log10(val) - val * Math.log10(Math.E) + 0.5 * Math.log10(2 * Math.PI);
+    return createTower(logScale, [1, 0]);
+  }
+
+  return createTower(rawLanczosGamma(val));
+}
+
 function executeAddition(A, B) {
   let hA = A.heights[0] + A.heights[1];
   let hB = B.heights[0] + B.heights[1];
@@ -293,7 +378,6 @@ function executeRoot(degree, rad) {
   return rad;
 }
 
-// Upgraded Log function with base-10 precision patch!
 function executeLog(base, arg) {
   let hBase = base.heights[0] + base.heights[1];
   let hArg = arg.heights[0] + arg.heights[1];
@@ -302,7 +386,6 @@ function executeLog(base, arg) {
     if (base.value <= 0 || base.value === 1) throw new Error("Invalid log base");
     if (arg.value <= 0) throw new Error("Log parameter must be greater than 0");
     
-    // PRECISION FIX: If it's a standard base-10 log, use Math.log10 to completely eliminate floating point errors!
     if (base.value === 10) {
       return createTower(Math.log10(arg.value));
     }
@@ -321,17 +404,22 @@ function executeLn(arg) {
   return arg;
 }
 
-// NEW: Trigonometry Processing Block (Processes in Radians)
 function executeTrig(type, target) {
   let hTarget = target.heights[0] + target.heights[1];
   
   if (hTarget === 0) {
-    if (type === 'sin') return createTower(Math.sin(target.value));
-    if (type === 'cos') return createTower(Math.cos(target.value));
-    if (type === 'tan') return createTower(Math.tan(target.value));
+    let result = 0;
+    if (type === 'sin') result = Math.sin(target.value);
+    if (type === 'cos') result = Math.cos(target.value);
+    if (type === 'tan') result = Math.tan(target.value);
+    
+    // Floating point cleanup
+    if (Math.abs(result) < 1e-15) result = 0;
+    if (type === 'tan' && Math.abs(result) > 1e15) throw new Error("Tangent is undefined (Asymptote reached!)");
+    
+    return createTower(result);
   }
   
-  // If a number is an infinitely massive tower, its trig state oscillates infinitely (Undefined)
   return createTower(NaN); 
 }
 
