@@ -475,39 +475,57 @@ function formatTower(displayElement, current) {
   let val = current.value;
   let latex = "";
 
-  // 1. Unpack single layer values or format standard values
-  if (expCount === 1) {
+  // Helper to format any standard base numbers cleanly
+  function formatBaseValue(v) {
+    if (v === 0) return "0";
+    let absVal = Math.abs(v);
+    if (absVal >= 1e10 || absVal < 1e-4) {
+      let exp = Math.floor(Math.log10(absVal));
+      let coeff = v / Math.pow(10, exp);
+      return `${coeff.toFixed(4)} \\times 10^{${exp}}`;
+    }
+    // Snap close floats to clean integers to eliminate precision crumbs
+    if (Math.abs(v - Math.round(v)) < 1e-12) {
+      return Math.round(v).toString();
+    }
+    return v.toString();
+  }
+
+  // ROUTING ENGINE BASED ON LAYER HEIGHT
+  if (expCount === 0) {
+    // Ground level numbers
+    latex = formatBaseValue(val);
+
+  } else if (expCount === 1) {
+    // Single-tier exponents convert into beautiful standard scientific notation
     let b = Math.floor(val); 
     let f = val - b;         
     let a = Math.pow(10, f); 
 
     if (a >= 9.9999) { a = 1; b += 1; } 
     latex = `${a.toFixed(4)} \\times 10^{${b}}`;
-    expCount = 0; 
-  } else {
-    latex = val.toString();
-    if (val !== 0) {
-      let absVal = Math.abs(val);
-      if (absVal >= 1e10 || absVal < 1e-4) {
-        let exp = Math.floor(Math.log10(absVal));
-        let coeff = val / Math.pow(10, exp);
-        latex = `${coeff.toFixed(4)} \\times 10^{${exp}}`;
-      }
-    }
-  }
 
-  // 2. Wrap iterative exponential layers
-  if (expCount > 0) {
-    if (expCount < 5) {
-      for (let i = 0; i < expCount; i++) {
-        latex = `10^{${latex}}`;
+  } else {
+    // High-tier active towers (h >= 2)
+    if (val === 1) {
+      // FIX: Clean tower of exact tens! No trailing "^1" allowed.
+      if (expCount <= 5) {
+        latex = "10";
+        for (let i = 1; i < expCount; i++) {
+          latex = `10^{${latex}}`;
+        }
+      } else {
+        latex = `10 \\uparrow\\uparrow {${expCount}}`;
       }
     } else {
-      // If normalized cleanly to 1, display a pristine hyper-operation state!
-      if (val === 1) {
-        latex = `10 \\uparrow\\uparrow {${expCount}}`;
+      // Tower topped by a non-1 fractional value (e.g., 10^10^3.5)
+      if (expCount <= 5) {
+        latex = formatBaseValue(val);
+        for (let i = 0; i < expCount; i++) {
+          latex = `10^{${latex}}`;
+        }
       } else {
-        latex = `10 \\uparrow\\uparrow {${expCount}} > {${latex}}`;
+        latex = `10 \\uparrow\\uparrow {${expCount}} > {${formatBaseValue(val)}}`;
       }
     }
   }
