@@ -491,7 +491,7 @@ function formatTower(displayElement, current) {
 
   // 2. Wrap iterative exponential layers
   if (expCount > 0) {
-    if (expCount < 6) {
+    if (expCount < 5) {
       for (let i = 0; i < expCount; i++) {
         latex = `10^{${latex}}`;
       }
