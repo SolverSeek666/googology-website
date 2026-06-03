@@ -446,16 +446,34 @@ function formatTower(displayElement, current) {
   
   let expCount = current.heights[0];
   let val = current.value;
+  let latex = "";
 
   // 1. Build the base layout string
-  let latex = val.toString();
-  if (Math.abs(val) >= 1e6) {
-    let exp = Math.floor(Math.log10(Math.abs(val)));
-    let coeff = val / Math.pow(10, exp);
-    latex = `${coeff.toFixed(4)} \\times 10^{${exp}}`;
+  if (expCount === 1) {
+    // STIRLING DECODER: Unpacks log-scale towers back into standard a * 10^b format
+    let b = Math.floor(val); 
+    let f = val - b;         
+    let a = Math.pow(10, f); 
+
+    if (a >= 9.9999) { a = 1; b += 1; } // Handle rounding overflows gracefully
+    latex = `${a.toFixed(4)} \\times 10^{${b}}`;
+    expCount = 0; // Lower the flag so it doesn't get double-wrapped by the 10^ loop
+  } else {
+    // Normal everyday numbers
+    latex = val.toString();
+    if (val !== 0) {
+      let absVal = Math.abs(val);
+      
+      // THRESHOLD MOVED: Compresses to a * 10^b ONLY at 10^10 or tiny decimals (< 0.0001)
+      if (absVal >= 1e10 || absVal < 1e-4) {
+        let exp = Math.floor(Math.log10(absVal));
+        let coeff = val / Math.pow(10, exp);
+        latex = `${coeff.toFixed(4)} \\times 10^{${exp}}`;
+      }
+    }
   }
 
-  // 2. Wrap it if exponent layers are active
+  // 2. Wrap it if extreme exponent layers are active (> 0 remaining)
   if (expCount > 0) {
     if (expCount < 5) {
       for (let i = 0; i < expCount; i++) {
