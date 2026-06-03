@@ -272,33 +272,57 @@ function canonicalize(val, h) {
   if (isNaN(val)) return createTower(NaN, 0);
   if (val === Infinity) return createTower(Infinity, 0);
 
-  // 1. Ground level handling (h === 0)
-  if (h === 0) {
-    if (val >= 1e10) {
-      return canonicalize(Math.log10(val), 1);
-    }
-    return createTower(val, 0);
-  }
-
-  // 2. High-tier scaling loop (h >= 1)
-  // Since the implicit base is 10, hitting 10 completes a full extra tower layer!
-  while (val >= 10 && isFinite(val)) {
-    val = Math.log10(val);
-    h++;
-  }
-
-  // 3. Collapse loop for values dropping below 1
-  while (h > 0 && val < 1) {
-    val = Math.pow(10, val);
-    h--;
+  // 1. UPWARD EVOLUTION: Scale heights based on localized thresholds
+  while (true) {
     if (h === 0) {
-      if (val >= 1e10) return canonicalize(Math.log10(val), 1);
+      if (val >= 1e10) {
+        val = Math.log10(val);
+        h = 1;
+      } else {
+        break;
+      }
+    } else if (h === 1) {
+      // Let standard exponents grow up to 10 billion before stacking towers!
+      if (val >= 1e10) {
+        val = Math.log10(val);
+        h = 2;
+      } else {
+        break;
+      }
+    } else { 
+      // High-tier active towers (h >= 2) collapse strictly on 10 for clean tetration
+      if (val >= 10 && isFinite(val)) {
+        val = Math.log10(val);
+        h++;
+      } else {
+        break;
+      }
+    }
+  }
+
+  // 2. DOWNWARD DEVOLUTION: Fall back gracefully if values shrink
+  while (true) {
+    if (h >= 2) {
+      if (val < 1) {
+        val = Math.pow(10, val);
+        h--;
+      } else {
+        break;
+      }
+    } else if (h === 1) {
+      if (val < 10) {
+        val = Math.pow(10, val);
+        h = 0;
+      } else {
+        break;
+      }
+    } else { 
       break;
     }
   }
 
-  // Floating-point safety guard: snap clean integers back to 1
-  if (Math.abs(val - 1) < 1e-12) {
+  // Floating-point safety snap for exact integer towers
+  if (h >= 2 && Math.abs(val - 1) < 1e-12) {
     val = 1;
   }
 
@@ -475,7 +499,6 @@ function formatTower(displayElement, current) {
   let val = current.value;
   let latex = "";
 
-  // Helper to format any standard base numbers cleanly
   function formatBaseValue(v) {
     if (v === 0) return "0";
     let absVal = Math.abs(v);
@@ -484,31 +507,34 @@ function formatTower(displayElement, current) {
       let coeff = v / Math.pow(10, exp);
       return `${coeff.toFixed(4)} \\times 10^{${exp}}`;
     }
-    // Snap close floats to clean integers to eliminate precision crumbs
     if (Math.abs(v - Math.round(v)) < 1e-12) {
       return Math.round(v).toString();
     }
     return v.toString();
   }
 
-  // ROUTING ENGINE BASED ON LAYER HEIGHT
+  // ROUTING ENGINE
   if (expCount === 0) {
-    // Ground level numbers
     latex = formatBaseValue(val);
 
   } else if (expCount === 1) {
-    // Single-tier exponents convert into beautiful standard scientific notation
+    // Standard single-tier exponents
     let b = Math.floor(val); 
     let f = val - b;         
     let a = Math.pow(10, f); 
 
     if (a >= 9.9999) { a = 1; b += 1; } 
-    latex = `${a.toFixed(4)} \\times 10^{${b}}`;
+    
+    // FIX: If coefficient is basically 1, strip the "1.0000 x " noise!
+    if (Math.abs(a - 1) < 1e-4) {
+      latex = `10^{${b}}`;
+    } else {
+      latex = `${a.toFixed(4)} \\times 10^{${b}}`;
+    }
 
   } else {
     // High-tier active towers (h >= 2)
     if (val === 1) {
-      // FIX: Clean tower of exact tens! No trailing "^1" allowed.
       if (expCount <= 5) {
         latex = "10";
         for (let i = 1; i < expCount; i++) {
@@ -518,7 +544,6 @@ function formatTower(displayElement, current) {
         latex = `10 \\uparrow\\uparrow {${expCount}}`;
       }
     } else {
-      // Tower topped by a non-1 fractional value (e.g., 10^10^3.5)
       if (expCount <= 5) {
         latex = formatBaseValue(val);
         for (let i = 0; i < expCount; i++) {
