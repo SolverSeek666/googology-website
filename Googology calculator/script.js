@@ -474,6 +474,7 @@ function formatTower(displayElement, current) {
   let val = current.value;
   let latex = "";
 
+  // Helper for Height 0 base values
   function formatBaseValue(v) {
     if (v === 0) return "0";
     let absVal = Math.abs(v);
@@ -488,38 +489,45 @@ function formatTower(displayElement, current) {
     return v.toString();
   }
 
+  // Helper to convert top float into a * 10^b
+  function getScientificTop(v) {
+    let b = Math.floor(v);
+    let f = v - b;
+    let a = Math.pow(10, f);
+    
+    if (a >= 9.9999) { a = 1; b += 1; } 
+    
+    if (Math.abs(a - 1) < 1e-4) {
+      return `10^{${b}}`; 
+    } else {
+      return `${a.toFixed(4)} \\times 10^{${b}}`;
+    }
+  }
+
   // ROUTING ENGINE
   if (expCount === 0) {
     latex = formatBaseValue(val);
 
   } else if (expCount === 1) {
-    // Standard single-tier scientific notation
-    let b = Math.floor(val); 
-    let f = val - b;         
-    let a = Math.pow(10, f); 
-
-    if (a >= 9.9999) { a = 1; b += 1; } 
-    
-    if (Math.abs(a - 1) < 1e-4) {
-      latex = `10^{${b}}`;
-    } else {
-      latex = `${a.toFixed(4)} \\times 10^{${b}}`;
-    }
+    latex = getScientificTop(val);
 
   } else {
     // High-tier active towers (h >= 2)
     if (expCount <= 5) {
-      // Loop explicitly to build a beautiful stacked tower representation
-      latex = formatBaseValue(val);
-      for (let i = 0; i < expCount; i++) {
+      latex = getScientificTop(val);
+      
+      // Build the tower stack cleanly without extra wrappers
+      for (let i = 0; i < expCount - 1; i++) {
         latex = `10^{${latex}}`;
       }
     } else {
-      // Tetration collapse rule: if the top value is exactly 10, account for it as +1 height
+      // Tetration collapse rule (h > 5)
       if (Math.abs(val - 10) < 1e-12) {
         latex = `10 \\uparrow\\uparrow {${expCount + 1}}`;
       } else {
-        latex = `10 \\uparrow\\uparrow {${expCount}} > {${formatBaseValue(val)}}`;
+        let topExp = getScientificTop(val);
+        let remainingHeight = expCount - 1;
+        latex = `10 \\uparrow\\uparrow {${remainingHeight}} > {${topExp}}`;
       }
     }
   }
