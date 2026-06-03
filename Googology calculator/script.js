@@ -90,7 +90,7 @@ function calculate() {
 }
 
 // ============================================================================
-// SECTION 2: THE PARSER ENGINE (NOW WITH TRUNCATED [a] ARROW TOWER HEIGHTS)
+// SECTION 2: THE PARSER ENGINE (NOW WITH PRIMITIVE CODENAMED "height")
 // ============================================================================
 
 // LEVEL 1: Handles Addition and Subtraction
@@ -129,20 +129,20 @@ function parseTerm() {
   return expr;
 }
 
-// LEVEL 2.5: Handles Exponents
+// LEVEL 2.5: Handles Exponents (Right-Associative)
 function parsePower() {
   let expr = parsePostfix(); 
 
-  while (peek() === '^') {
+  if (peek() === '^') {
     consume(); 
-    let nextTower = parsePostfix(); 
+    let nextTower = parsePower(); 
     expr = executeExponentiation(expr, nextTower);
   }
 
   return expr;
 }
 
-// LEVEL 2.7: Postfix Handler for Factorials (e.g., 5!)
+// LEVEL 2.7: Postfix Handler for Factorials
 function parsePostfix() {
   let expr = parseFactor();
 
@@ -154,7 +154,7 @@ function parsePostfix() {
   return expr;
 }
 
-// LEVEL 3: Grabs numbers, Parentheses, Functions, OR Constants!
+// LEVEL 3: Base Factors, Parentheses, Functions, and Constants
 function parseFactor() {
   if (peek() === '(') {
     consume(); 
@@ -259,23 +259,50 @@ function parseFactor() {
 }
 
 // ============================================================================
-// TOWER ARITHMETIC UTILITIES (UPDATED TO SINGLE ARROW [a] SYSTEM)
+// TOWER ARITHMETIC UTILITIES (BRACKETLESS ENGINE)
 // ============================================================================
 
-// NEW: Default heights setup mapping directly to a single element array
-function createTower(val, heights = [0]) {
-  return { value: val, heights: [...heights] };
+// Clean primitive setup
+function createTower(val, height = 0) {
+  return { value: val, height: height };
+}
+
+// Canonicalizer now works with direct numbers instead of array elements
+function canonicalize(val, h) {
+  if (isNaN(val)) return createTower(NaN, 0);
+  if (val === Infinity) return createTower(Infinity, 0);
+
+  if (h === 0) {
+    if (val > 0 && val >= 1e10) {
+      return canonicalize(Math.log10(val), 1);
+    }
+    return createTower(val, 0);
+  }
+
+  while (val >= 1e10 && isFinite(val)) {
+    val = Math.log10(val);
+    h++;
+  }
+
+  while (h > 0 && val < 10) {
+    if (h === 1) {
+      val = Math.pow(10, val);
+      h = 0;
+      break;
+    } else {
+      val = Math.pow(10, val);
+      h--;
+    }
+  }
+
+  return createTower(val, h);
 }
 
 function executeGamma(A) {
-  let hA = A.heights[0];
-  
-  if (hA > 0) {
-    return createTower(A.value, [A.heights[0] + 1]);
-  }
+  let hA = A.height;
+  if (hA > 0) return createTower(A.value, A.height + 1);
 
   let val = A.value;
-
   if (val === Infinity) return createTower(Infinity);
   if (val === 0 || (val < 0 && Number.isInteger(val))) {
     throw new Error("Gamma function is undefined for non-positive integers!");
@@ -299,100 +326,95 @@ function executeGamma(A) {
   }
   
   let log10Gamma = (shiftedVal - 0.5) * Math.log10(shiftedVal) - shiftedVal * Math.LOG10E + 0.5 * Math.log10(2 * Math.PI);
+  if (shift > 0) log10Gamma -= Math.log10(shiftFactor);
   
-  if (shift > 0) {
-    log10Gamma -= Math.log10(shiftFactor);
-  }
-  
-  if (log10Gamma < 300) {
-    return createTower(Math.pow(10, log10Gamma));
-  }
-  
-  return createTower(log10Gamma, [1]); // 1 active arrow/layer
+  if (log10Gamma < 300) return createTower(Math.pow(10, log10Gamma));
+  return canonicalize(log10Gamma, 1);
 }
 
 function executeFactorial(A) {
-  let hA = A.heights[0];
-  if (hA > 0) {
-    return createTower(A.value, [A.heights[0] + 1]);
-  }
-
-  let val = A.value;
-  if (val < 0 && Number.isInteger(val)) {
-    throw new Error("Factorial is undefined for negative integers!");
-  }
-
-  return executeGamma(createTower(val + 1));
+  if (A.height > 0) return createTower(A.value, A.height + 1);
+  if (A.value < 0 && Number.isInteger(A.value)) throw new Error("Factorial undefined for negative integers!");
+  return executeGamma(createTower(A.value + 1));
 }
 
 function executeAddition(A, B) {
-  let hA = A.heights[0];
-  let hB = B.heights[0];
-  return (hA === 0 && hB === 0) ? createTower(A.value + B.value) : (hA >= hB ? A : B);
+  return (A.height === 0 && B.height === 0) ? canonicalize(A.value + B.value, 0) : (A.height >= B.height ? A : B);
 }
 
 function executeSubtraction(A, B) {
-  let hA = A.heights[0];
-  let hB = B.heights[0];
-  return (hA === 0 && hB === 0) ? createTower(A.value - B.value) : A;
+  return (A.height === 0 && B.height === 0) ? canonicalize(A.value - B.value, 0) : A;
 }
 
 function executeMultiplication(A, B) {
-  let hA = A.heights[0];
-  let hB = B.heights[0];
-  return (hA === 0 && hB === 0) ? createTower(A.value * B.value) : (hA >= hB ? A : B);
+  return (A.height === 0 && B.height === 0) ? canonicalize(A.value * B.value, 0) : (A.height >= B.height ? A : B);
 }
 
 function executeDivision(A, B) {
-  let hA = A.heights[0];
-  let hB = B.heights[0];
-  if (hA === 0 && hB === 0) {
+  if (A.height === 0 && B.height === 0) {
     if (B.value === 0) throw new Error("Cannot divide by zero!");
-    return createTower(A.value / B.value);
+    return canonicalize(A.value / B.value, 0);
   }
   return A;
 }
 
 function executeExponentiation(A, B) {
-  let hA = A.heights[0];
-  let hB = B.heights[0];
+  let hA = A.height;
+  let hB = B.height;
 
-  // CASE 1: Both ground level numbers
+  if (A.value === 0 && B.value === 0) return createTower(NaN, 0);
+  if (A.value === 0) return createTower(0, 0);
+  if (B.value === 0) return createTower(1, 0);
+
+  // CASE 1: Ground level standard powers
   if (hA === 0 && hB === 0) {
-    if (A.value === 0 && B.value === 0) return createTower(NaN);
-    if (A.value === 0) return createTower(0);
-    if (B.value === 0) return createTower(1);
-
     if (A.value > 0) {
       let log10Result = B.value * Math.log10(A.value);
-      if (log10Result >= 300) {
-        return createTower(log10Result, [1]); // Escalate to 1 arrow tier
-      }
+      if (log10Result >= 10) return canonicalize(log10Result, 1);
     }
-    return createTower(Math.pow(A.value, B.value));
+    return canonicalize(Math.pow(A.value, B.value), 0);
   }
 
-  // CASE 2: Base has 1 arrow level (10^A), Exponent is normal
-  if (A.heights[0] === 1 && hB === 0) {
-    let combinedLog = A.value * B.value;
-    if (combinedLog >= 1e10) {
-      return createTower(Math.log10(combinedLog), [2]); // Escalate to 2 arrow tier
+  // CASE 2: Base is tower, Exponent is real number
+  if (hA > 0 && hB === 0) {
+    if (B.value === 1) return A;
+    if (hA === 1) return canonicalize(A.value * B.value, 1);
+    if (hA === 2) return canonicalize(A.value + Math.log10(B.value), 2);
+    if (hA === 3) {
+      let Y = (A.value > 15) ? A.value : Math.log10(Math.pow(10, A.value) + Math.log10(B.value));
+      return canonicalize(Y, 3);
     }
-    return createTower(combinedLog, [1]);
+    return A;
   }
 
-  // CASE 3: Exponent contains active arrows
-  if (hB > 0) {
-    return createTower(B.value, [B.heights[0] + 1]);
+  // CASE 3: Base is real number, Exponent is tower
+  if (hA === 0 && hB > 0) {
+    if (A.value <= 0 || A.value === 1) return createTower(1, 0);
+    let logLogA = Math.log10(Math.log10(A.value));
+    if (hB === 1) return canonicalize(B.value + logLogA, 2);
+    if (hB === 2) {
+      let Y = (B.value > 15) ? B.value : Math.log10(Math.pow(10, B.value) + logLogA);
+      return canonicalize(Y, 3);
+    }
+    return canonicalize(B.value, hB + 1);
+  }
+
+  // CASE 4: Active Tower vs Active Tower
+  if (hA > 0 && hB > 0) {
+    if (hB >= hA) return canonicalize(B.value, hB + 1);
+    if (hA === 2 && hB === 1) return canonicalize(A.value + B.value, 2);
+    if (hA === 3 && hB === 1) {
+      let Y = (A.value > 15) ? A.value : Math.log10(Math.pow(10, A.value) + B.value);
+      return canonicalize(Y, 3);
+    }
+    return A;
   }
 
   return hA >= hB ? A : B;
 }
 
 function executeRoot(degree, rad) {
-  let hDeg = degree.heights[0];
-  let hRad = rad.heights[0];
-  if (hDeg === 0 && hRad === 0) {
+  if (degree.height === 0 && rad.height === 0) {
     if (degree.value === 0) throw new Error("Root degree cannot be zero!");
     return createTower(Math.pow(rad.value, 1 / degree.value));
   }
@@ -400,12 +422,7 @@ function executeRoot(degree, rad) {
 }
 
 function executeLog(base, arg) {
-  let hBase = degree.heights[0]; // safety mapping alignment
-  let hArg = rad.heights[0];
-  hBase = base.heights[0];
-  hArg = arg.heights[0];
-  
-  if (hBase === 0 && hArg === 0) {
+  if (base.height === 0 && arg.height === 0) {
     if (base.value <= 0 || base.value === 1) throw new Error("Invalid log base");
     if (arg.value <= 0) throw new Error("Log parameter must be greater than 0");
     if (base.value === 10) return createTower(Math.log10(arg.value));
@@ -415,8 +432,7 @@ function executeLog(base, arg) {
 }
 
 function executeLn(arg) {
-  let hArg = arg.heights[0];
-  if (hArg === 0) {
+  if (arg.height === 0) {
     if (arg.value <= 0) throw new Error("ln parameter must be greater than 0");
     return createTower(Math.log(arg.value));
   }
@@ -424,15 +440,14 @@ function executeLn(arg) {
 }
 
 function executeTrig(type, target) {
-  let hTarget = target.heights[0];
-  if (hTarget === 0) {
+  if (target.height === 0) {
     let result = 0;
     if (type === 'sin') result = Math.sin(target.value);
     if (type === 'cos') result = Math.cos(target.value);
     if (type === 'tan') result = Math.tan(target.value);
     
     if (Math.abs(result) < 1e-15) result = 0;
-    if (type === 'tan' && Math.abs(result) > 1e15) throw new Error("Tangent is undefined (Asymptote reached!)");
+    if (type === 'tan' && Math.abs(result) > 1e15) throw new Error("Tangent is undefined");
     
     return createTower(result);
   }
@@ -440,7 +455,7 @@ function executeTrig(type, target) {
 }
 
 // ============================================================================
-// SECTION 3: DISPLAY ROUTER & RENDERMATH BRIDGE ([a] TIER INTEGRATED)
+// SECTION 3: DISPLAY ROUTER & RENDERMATH BRIDGE (BRACKETLESS CLEAN EDITION)
 // ============================================================================
 
 function formatTower(displayElement, current) {
@@ -449,13 +464,12 @@ function formatTower(displayElement, current) {
     return;
   }
   
-  let expCount = current.heights[0]; // Directly evaluates arrow intensity count
+  let expCount = current.height; // Instantly pulls primitive height count integer
   let val = current.value;
   let latex = "";
 
-  // 1. Build the base layout string
+  // 1. Unpack single layer values or format standard values
   if (expCount === 1) {
-    // Stirling base value unpacker
     let b = Math.floor(val); 
     let f = val - b;         
     let a = Math.pow(10, f); 
@@ -467,8 +481,6 @@ function formatTower(displayElement, current) {
     latex = val.toString();
     if (val !== 0) {
       let absVal = Math.abs(val);
-      
-      // Strict 10^10 ceiling compression layout checkpoint
       if (absVal >= 1e10 || absVal < 1e-4) {
         let exp = Math.floor(Math.log10(absVal));
         let coeff = val / Math.pow(10, exp);
@@ -477,9 +489,9 @@ function formatTower(displayElement, current) {
     }
   }
 
-  // 2. Wrap it if multiple arrow levels remain active
+  // 2. Wrap iterative exponential layers
   if (expCount > 0) {
-    if (expCount < 5) {
+    if (expCount < 6) {
       for (let i = 0; i < expCount; i++) {
         latex = `10^{${latex}}`;
       }
