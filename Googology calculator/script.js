@@ -142,6 +142,37 @@ function parsePower() {
   return expr;
 }
 
+function parseTetration() {
+  // 1. Pass through to the next highest precedence level (Power)
+  let expr = parsePower(); 
+
+  // 2. Check if the next token matches the Tetration operator
+  if (peek() === '^^') {
+    consume(); // Eat the '^^'
+    
+    // Parse the height tower expression
+    let heightExpr = parsePower(); 
+    let heightVal = heightExpr.value;
+    let remainderVal = 10; // Default base remainder if '>' is omitted
+
+    // 3. Check for your custom linear remainder modifier '>'
+    if (peek() === '>') {
+      consume(); // Eat the '>'
+      let remainderExpr = parsePower();
+      remainderVal = remainderExpr.value;
+    } else {
+      // Math catch: If '10^^3' is written without '>', it means 10^10^10.
+      // In our format, that translates to 10^^2 > 10.
+      heightVal = heightVal - 1;
+    }
+
+    // 4. Package and run it through the execution engine
+    let tetObj = createTetration(remainderVal, heightVal);
+    expr = executeTetration(tetObj);
+  }
+
+  return expr;
+}
 // LEVEL 2.7: Postfix Handler for Factorials
 function parsePostfix() {
   let expr = parseFactor();
@@ -436,6 +467,50 @@ function executeExponentiation(A, B) {
   }
 
   return hA >= hB ? A : B;
+}
+
+function executeTetration(tetObj) {
+  let val = tetObj.value;
+  let h = tetObj.height;
+
+  if (isNaN(val) || h < 0) return createTower(NaN, 0);
+
+  // 1. BOUNDARY COLLAPSE: If tetration height hits 0, it collapses back to a flat base value
+  if (h === 0) {
+    return canonicalize(val, 0);
+  }
+
+  // 2. TETRATION EVOLUTION: If the top remainder hits 10^10, absorb it up into the tetration height
+  while (true) {
+    if (val >= 1e10 && isFinite(val)) {
+      val = Math.log10(val);
+      h++;
+    } else {
+      break;
+    }
+  }
+
+  // 3. TETRATION DEVOLUTION: If the remainder falls below 10, pull a layer down to feed it
+  while (true) {
+    if (h > 1 && val < 10) {
+      val = Math.pow(10, val);
+      h--;
+    } else {
+      break;
+    }
+  }
+
+  // 4. TOWERS TRANSITION: If height reduces all the way to 1, it's just a standard tower layer (10^val)
+  if (h === 1) {
+    return canonicalize(val, 1);
+  }
+
+  // Precision snap to eliminate floating-point crumbs on clean exponents
+  if (Math.abs(val - Math.round(val)) < 1e-12) {
+    val = Math.round(val);
+  }
+
+  return createTetration(val, h);
 }
 
 function executeRoot(degree, rad) {
