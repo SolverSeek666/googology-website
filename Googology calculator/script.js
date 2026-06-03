@@ -267,6 +267,25 @@ function createTower(val, height = 0) {
   return { value: val, height: height };
 }
 
+// Creates a Tetration object: 10^^b > a
+function createTetration(a, b) {
+  return {
+    type: "tetration",
+    value: a,   // The top remainder value
+    height: b   // The tetration height
+  };
+}
+
+// Skeleton for the future Arrow expansion: 10^...^a with c arrows, height b
+function createArrow(a, b, c) {
+  return {
+    type: "arrow",
+    value: a,
+    height: b,
+    arrows: c
+  };
+}
+
 // Canonicalizer now works with direct numbers instead of array elements
 function canonicalize(val, h) {
   if (isNaN(val)) return createTower(NaN, 0);
@@ -474,7 +493,6 @@ function formatTower(displayElement, current) {
   let val = current.value;
   let latex = "";
 
-  // Helper for Height 0 base values
   function formatBaseValue(v) {
     if (v === 0) return "0";
     let absVal = Math.abs(v);
@@ -489,21 +507,6 @@ function formatTower(displayElement, current) {
     return v.toString();
   }
 
-  // Helper to convert top float into a * 10^b
-  function getScientificTop(v) {
-    let b = Math.floor(v);
-    let f = v - b;
-    let a = Math.pow(10, f);
-    
-    if (a >= 9.9999) { a = 1; b += 1; } 
-    
-    if (Math.abs(a - 1) < 1e-4) {
-      return `10^{${b}}`; 
-    } else {
-      return `${a.toFixed(4)} \\times 10^{${b}}`;
-    }
-  }
-
   // ROUTING ENGINE
   if (expCount === 0) {
     latex = formatBaseValue(val);
@@ -512,27 +515,52 @@ function formatTower(displayElement, current) {
     latex = getScientificTop(val);
 
   } else {
-    // High-tier active towers (h >= 2)
     if (expCount <= 5) {
+      // Standard Tower Generation
       latex = getScientificTop(val);
-      
-      // Build the tower stack cleanly without extra wrappers
       for (let i = 0; i < expCount - 1; i++) {
         latex = `10^{${latex}}`;
       }
     } else {
-      // Tetration collapse rule (h > 5)
-      if (Math.abs(val - 10) < 1e-12) {
-        latex = `10 \\uparrow\\uparrow {${expCount + 1}}`;
-      } else {
-        let topExp = getScientificTop(val);
-        let remainingHeight = expCount - 1;
-        latex = `10 \\uparrow\\uparrow {${remainingHeight}} > {${topExp}}`;
-      }
+      // THE NEW TETRATION HANDOFF
+      // Convert the tall tower into a tetration object: 10^^expCount > val
+      let tetrationObj = createTetration(val, expCount);
+      latex = formatTetration(tetrationObj);
     }
   }
 
   renderMath(displayElement, latex);
+}
+
+// Shared helper for formatting the top of any tower or tetration
+function getScientificTop(v) {
+  let b = Math.floor(v);
+  let f = v - b;
+  let a = Math.pow(10, f);
+  
+  if (a >= 9.9999) { a = 1; b += 1; } 
+  
+  if (Math.abs(a - 1) < 1e-4) {
+    return `10^{${b}}`; 
+  } else {
+    return `${a.toFixed(4)} \\times 10^{${b}}`;
+  }
+}
+
+// Dedicated Tetration Formatter
+function formatTetration(tetObj) {
+  let val = tetObj.value;
+  let height = tetObj.height;
+
+  // Collapse rule: if the remainder is exactly 10, absorb it into the height
+  if (Math.abs(val - 10) < 1e-12) {
+    return `10 \\uparrow\\uparrow {${height + 1}}`;
+  } else {
+    let topExp = getScientificTop(val);
+    // Remember to subtract 1 from the height because the scientific top acts as one layer!
+    let remainingHeight = height - 1;
+    return `10 \\uparrow\\uparrow {${remainingHeight}} > {${topExp}}`;
+  }
 }
 
 function renderMath(element, latexString) {
