@@ -90,7 +90,7 @@ function calculate() {
 }
 
 // ============================================================================
-// SECTION 2: THE PARSER ENGINE (NOW WITH TRIG, CONSTANTS, FACTORIAL & GAMMA)
+// SECTION 2: THE PARSER ENGINE (NOW WITH TRUNCATED [a] ARROW TOWER HEIGHTS)
 // ============================================================================
 
 // LEVEL 1: Handles Addition and Subtraction
@@ -131,7 +131,7 @@ function parseTerm() {
 
 // LEVEL 2.5: Handles Exponents
 function parsePower() {
-  let expr = parsePostfix(); // Routes to postfix layer first to catch factorials!
+  let expr = parsePostfix(); 
 
   while (peek() === '^') {
     consume(); 
@@ -147,7 +147,7 @@ function parsePostfix() {
   let expr = parseFactor();
 
   while (peek() === '!') {
-    consume(); // Eat the '!' token
+    consume(); 
     expr = executeFactorial(expr);
   }
 
@@ -156,7 +156,6 @@ function parsePostfix() {
 
 // LEVEL 3: Grabs numbers, Parentheses, Functions, OR Constants!
 function parseFactor() {
-  // 1. STANDARD PARENTHESES
   if (peek() === '(') {
     consume(); 
     let insideExpr = parseExpression(); 
@@ -165,7 +164,6 @@ function parseFactor() {
     return insideExpr; 
   }
 
-  // 2. INTERCEPT TRIGNOMETRY: sin(a), cos(a), tan(a)
   if (peek() === 'sin' || peek() === 'cos' || peek() === 'tan') {
     let trigOp = consume(); 
     if (peek() !== '(') throw new Error(`${trigOp} must be followed by '('`);
@@ -178,7 +176,6 @@ function parseFactor() {
     return executeTrig(trigOp, arg);
   }
 
-  // INTERCEPT GAMMA FUNCTION: Γ(a) or γ(a)
   if (peek() === 'Γ' || peek() === 'γ') {
     let gammaOp = consume();
     if (peek() !== '(') throw new Error(`${gammaOp} must be followed by '('`);
@@ -191,7 +188,6 @@ function parseFactor() {
     return executeGamma(arg);
   }
 
-  // 3. INTERCEPT CONSTANT SYMBOLS
   if (peek() === 'π') {
     consume();
     return createTower(Math.PI);
@@ -205,7 +201,6 @@ function parseFactor() {
     return createTower(PHI); 
   }
 
-  // 4. ROOTS: Handles √a AND √(a,b)
   if (peek() === '√') {
     consume(); 
     if (peek() === '(') {
@@ -228,7 +223,6 @@ function parseFactor() {
     }
   }
 
-  // 5. LOGARITHMS: Handles log(a) AND log(a,b)
   if (peek() === 'log') {
     consume(); 
     if (peek() !== '(') throw new Error("log must be followed by '('");
@@ -247,7 +241,6 @@ function parseFactor() {
     }
   }
 
-  // 6. NATURAL LOGARITHM: Handles ln(a)
   if (peek() === 'ln') {
     consume(); 
     if (peek() !== '(') throw new Error("ln must be followed by '('");
@@ -258,7 +251,6 @@ function parseFactor() {
     return executeLn(arg);
   }
 
-  // FALLBACK TO BASIC NUMBERS
   let token = consume();
   if (!token) throw new Error("Missing number or expression!");
   if (isNaN(parseFloat(token))) throw new Error("Unexpected token: " + token);
@@ -267,39 +259,35 @@ function parseFactor() {
 }
 
 // ============================================================================
-// TOWER ARITHMETIC UTILITIES
+// TOWER ARITHMETIC UTILITIES (UPDATED TO SINGLE ARROW [a] SYSTEM)
 // ============================================================================
 
-function createTower(val, heights = [0, 0]) {
+// NEW: Default heights setup mapping directly to a single element array
+function createTower(val, heights = [0]) {
   return { value: val, heights: [...heights] };
 }
 
-// REWRITTEN: Shifting Stirling Engine for Gamma Function
 function executeGamma(A) {
-  let hA = A.heights[0] + A.heights[1];
+  let hA = A.heights[0];
   
-  // If input is an active tower, increment its power level
   if (hA > 0) {
-    return createTower(A.value, [A.heights[0] + 1, A.heights[1]]);
+    return createTower(A.value, [A.heights[0] + 1]);
   }
 
   let val = A.value;
 
-  // 1. Core Edge Cases
   if (val === Infinity) return createTower(Infinity);
   if (val === 0 || (val < 0 && Number.isInteger(val))) {
     throw new Error("Gamma function is undefined for non-positive integers!");
   }
   if (val === 1 || val === 2) return createTower(1);
   
-  // 2. Integer Shortcut Loop
   if (val <= 171 && Number.isInteger(val) && val > 0) {
     let g = 1;
     for (let i = 2; i < val; i++) g *= i;
     return createTower(g);
   }
   
-  // 3. Argument Shifting Core
   let shift = 0;
   let shiftFactor = 1;
   let shiftedVal = val;
@@ -310,62 +298,54 @@ function executeGamma(A) {
     shift++;
   }
   
-  // Base-10 Stirling scale conversion
   let log10Gamma = (shiftedVal - 0.5) * Math.log10(shiftedVal) - shiftedVal * Math.LOG10E + 0.5 * Math.log10(2 * Math.PI);
   
-  // Reverse shifting multiplication offsets
   if (shift > 0) {
     log10Gamma -= Math.log10(shiftFactor);
   }
   
-  // 4. Boundary Engine Routing
   if (log10Gamma < 300) {
     return createTower(Math.pow(10, log10Gamma));
   }
   
-  // Automatically hand off to Section 3 decoder layout via a tier-1 log tower
-  return createTower(log10Gamma, [1, 0]);
+  return createTower(log10Gamma, [1]); // 1 active arrow/layer
 }
 
-// REWRITTEN: Factorial Pipeline
 function executeFactorial(A) {
-  let hA = A.heights[0] + A.heights[1];
+  let hA = A.heights[0];
   if (hA > 0) {
-    return createTower(A.value, [A.heights[0] + 1, A.heights[1]]);
+    return createTower(A.value, [A.heights[0] + 1]);
   }
 
   let val = A.value;
-
-  // Crash Control
   if (val < 0 && Number.isInteger(val)) {
     throw new Error("Factorial is undefined for negative integers!");
   }
 
-  // x! = Γ(x + 1) -> Pipes directly into the argument shifter logic
   return executeGamma(createTower(val + 1));
 }
 
 function executeAddition(A, B) {
-  let hA = A.heights[0] + A.heights[1];
-  let hB = B.heights[0] + B.heights[1];
+  let hA = A.heights[0];
+  let hB = B.heights[0];
   return (hA === 0 && hB === 0) ? createTower(A.value + B.value) : (hA >= hB ? A : B);
 }
 
 function executeSubtraction(A, B) {
-  let hA = A.heights[0] + A.heights[1];
-  let hB = B.heights[0] + B.heights[1];
+  let hA = A.heights[0];
+  let hB = B.heights[0];
   return (hA === 0 && hB === 0) ? createTower(A.value - B.value) : A;
 }
 
 function executeMultiplication(A, B) {
-  let hA = A.heights[0] + A.heights[1];
-  let hB = B.heights[0] + B.heights[1];
+  let hA = A.heights[0];
+  let hB = B.heights[0];
   return (hA === 0 && hB === 0) ? createTower(A.value * B.value) : (hA >= hB ? A : B);
 }
 
 function executeDivision(A, B) {
-  let hA = A.heights[0] + A.heights[1];
-  let hB = B.heights[0] + B.heights[1];
+  let hA = A.heights[0];
+  let hB = B.heights[0];
   if (hA === 0 && hB === 0) {
     if (B.value === 0) throw new Error("Cannot divide by zero!");
     return createTower(A.value / B.value);
@@ -374,14 +354,44 @@ function executeDivision(A, B) {
 }
 
 function executeExponentiation(A, B) {
-  let hA = A.heights[0] + A.heights[1];
-  let hB = B.heights[0] + B.heights[1];
-  return (hA === 0 && hB === 0) ? createTower(Math.pow(A.value, B.value)) : (hA >= hB ? A : B);
+  let hA = A.heights[0];
+  let hB = B.heights[0];
+
+  // CASE 1: Both ground level numbers
+  if (hA === 0 && hB === 0) {
+    if (A.value === 0 && B.value === 0) return createTower(NaN);
+    if (A.value === 0) return createTower(0);
+    if (B.value === 0) return createTower(1);
+
+    if (A.value > 0) {
+      let log10Result = B.value * Math.log10(A.value);
+      if (log10Result >= 300) {
+        return createTower(log10Result, [1]); // Escalate to 1 arrow tier
+      }
+    }
+    return createTower(Math.pow(A.value, B.value));
+  }
+
+  // CASE 2: Base has 1 arrow level (10^A), Exponent is normal
+  if (A.heights[0] === 1 && hB === 0) {
+    let combinedLog = A.value * B.value;
+    if (combinedLog >= 1e10) {
+      return createTower(Math.log10(combinedLog), [2]); // Escalate to 2 arrow tier
+    }
+    return createTower(combinedLog, [1]);
+  }
+
+  // CASE 3: Exponent contains active arrows
+  if (hB > 0) {
+    return createTower(B.value, [B.heights[0] + 1]);
+  }
+
+  return hA >= hB ? A : B;
 }
 
 function executeRoot(degree, rad) {
-  let hDeg = degree.heights[0] + degree.heights[1];
-  let hRad = rad.heights[0] + rad.heights[1];
+  let hDeg = degree.heights[0];
+  let hRad = rad.heights[0];
   if (hDeg === 0 && hRad === 0) {
     if (degree.value === 0) throw new Error("Root degree cannot be zero!");
     return createTower(Math.pow(rad.value, 1 / degree.value));
@@ -390,24 +400,22 @@ function executeRoot(degree, rad) {
 }
 
 function executeLog(base, arg) {
-  let hBase = base.heights[0] + base.heights[1];
-  let hArg = arg.heights[0] + arg.heights[1];
+  let hBase = degree.heights[0]; // safety mapping alignment
+  let hArg = rad.heights[0];
+  hBase = base.heights[0];
+  hArg = arg.heights[0];
   
   if (hBase === 0 && hArg === 0) {
     if (base.value <= 0 || base.value === 1) throw new Error("Invalid log base");
     if (arg.value <= 0) throw new Error("Log parameter must be greater than 0");
-    
-    if (base.value === 10) {
-      return createTower(Math.log10(arg.value));
-    }
-    
+    if (base.value === 10) return createTower(Math.log10(arg.value));
     return createTower(Math.log(arg.value) / Math.log(base.value));
   }
   return arg;
 }
 
 function executeLn(arg) {
-  let hArg = arg.heights[0] + arg.heights[1];
+  let hArg = arg.heights[0];
   if (hArg === 0) {
     if (arg.value <= 0) throw new Error("ln parameter must be greater than 0");
     return createTower(Math.log(arg.value));
@@ -416,26 +424,23 @@ function executeLn(arg) {
 }
 
 function executeTrig(type, target) {
-  let hTarget = target.heights[0] + target.heights[1];
-  
+  let hTarget = target.heights[0];
   if (hTarget === 0) {
     let result = 0;
     if (type === 'sin') result = Math.sin(target.value);
     if (type === 'cos') result = Math.cos(target.value);
     if (type === 'tan') result = Math.tan(target.value);
     
-    // Floating point cleanup
     if (Math.abs(result) < 1e-15) result = 0;
     if (type === 'tan' && Math.abs(result) > 1e15) throw new Error("Tangent is undefined (Asymptote reached!)");
     
     return createTower(result);
   }
-  
   return createTower(NaN); 
 }
 
 // ============================================================================
-// SECTION 3: DISPLAY ROUTER & RENDERMATH BRIDGE
+// SECTION 3: DISPLAY ROUTER & RENDERMATH BRIDGE ([a] TIER INTEGRATED)
 // ============================================================================
 
 function formatTower(displayElement, current) {
@@ -444,27 +449,26 @@ function formatTower(displayElement, current) {
     return;
   }
   
-  let expCount = current.heights[0];
+  let expCount = current.heights[0]; // Directly evaluates arrow intensity count
   let val = current.value;
   let latex = "";
 
   // 1. Build the base layout string
   if (expCount === 1) {
-    // STIRLING DECODER: Unpacks log-scale towers back into standard a * 10^b format
+    // Stirling base value unpacker
     let b = Math.floor(val); 
     let f = val - b;         
     let a = Math.pow(10, f); 
 
-    if (a >= 9.9999) { a = 1; b += 1; } // Handle rounding overflows gracefully
+    if (a >= 9.9999) { a = 1; b += 1; } 
     latex = `${a.toFixed(4)} \\times 10^{${b}}`;
-    expCount = 0; // Lower the flag so it doesn't get double-wrapped by the 10^ loop
+    expCount = 0; 
   } else {
-    // Normal everyday numbers
     latex = val.toString();
     if (val !== 0) {
       let absVal = Math.abs(val);
       
-      // THRESHOLD MOVED: Compresses to a * 10^b ONLY at 10^10 or tiny decimals (< 0.0001)
+      // Strict 10^10 ceiling compression layout checkpoint
       if (absVal >= 1e10 || absVal < 1e-4) {
         let exp = Math.floor(Math.log10(absVal));
         let coeff = val / Math.pow(10, exp);
@@ -473,7 +477,7 @@ function formatTower(displayElement, current) {
     }
   }
 
-  // 2. Wrap it if extreme exponent layers are active (> 0 remaining)
+  // 2. Wrap it if multiple arrow levels remain active
   if (expCount > 0) {
     if (expCount < 5) {
       for (let i = 0; i < expCount; i++) {
@@ -484,11 +488,9 @@ function formatTower(displayElement, current) {
     }
   }
 
-  // 3. Fire your required render math engine
   renderMath(displayElement, latex);
 }
 
-// Fallback safety utility for Section 4 rendering
 function renderMath(element, latexString) {
   element.innerHTML = `\\[ ${latexString} \\]`;
   if (window.MathJax && typeof window.MathJax.typesetPromise === "function") {
