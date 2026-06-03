@@ -90,7 +90,7 @@ function calculate() {
 }
 
 // ============================================================================
-// SECTION 2: THE PARSER ENGINE (NOW WITH PRIMITIVE CODENAMED "height")
+// SECTION 2: THE PARSER ENGINE (NOW WITH SEAMLESS TETRATION PRECEDENCE)
 // ============================================================================
 
 // LEVEL 1: Handles Addition and Subtraction
@@ -113,11 +113,12 @@ function parseExpression() {
 
 // LEVEL 2: Handles Multiplication and Division
 function parseTerm() {
-  let expr = parsePower();
+  // ROUTING FIX: Now points to parseTetration instead of parsePower
+  let expr = parseTetration();
 
   while (peek() === '*' || peek() === '/') {
     let opToken = consume(); 
-    let nextTower = parsePower(); 
+    let nextTower = parseTetration(); // ROUTING FIX: Points to parseTetration
 
     if (opToken === '*') {
       expr = executeMultiplication(expr, nextTower);
@@ -129,19 +130,7 @@ function parseTerm() {
   return expr;
 }
 
-// LEVEL 2.5: Handles Exponents (Right-Associative)
-function parsePower() {
-  let expr = parsePostfix(); 
-
-  if (peek() === '^') {
-    consume(); 
-    let nextTower = parsePower(); 
-    expr = executeExponentiation(expr, nextTower);
-  }
-
-  return expr;
-}
-
+// LEVEL 2.25: Handles Tetration (Right-Associative)
 function parseTetration() {
   // 1. Pass through to the next highest precedence level (Power)
   let expr = parsePower(); 
@@ -150,8 +139,8 @@ function parseTetration() {
   if (peek() === '^^') {
     consume(); // Eat the '^^'
     
-    // Parse the height tower expression
-    let heightExpr = parsePower(); 
+    // Parse the height expression (Calling parseTetration makes chains like 10^^3^^2 parse right-to-left)
+    let heightExpr = parseTetration(); 
     let heightVal = heightExpr.value;
     let remainderVal = 10; // Default base remainder if '>' is omitted
 
@@ -173,6 +162,20 @@ function parseTetration() {
 
   return expr;
 }
+
+// LEVEL 2.5: Handles Exponents (Right-Associative)
+function parsePower() {
+  let expr = parsePostfix(); 
+
+  if (peek() === '^') {
+    consume(); 
+    let nextTower = parsePower(); 
+    expr = executeExponentiation(expr, nextTower);
+  }
+
+  return expr;
+}
+
 // LEVEL 2.7: Postfix Handler for Factorials
 function parsePostfix() {
   let expr = parseFactor();
@@ -473,39 +476,27 @@ function executeTetration(tetObj) {
   let val = tetObj.value;
   let h = tetObj.height;
 
-  if (isNaN(val) || h < 0) return createTower(NaN, 0);
+  if (isNaN(val) || h < 0) return { type: "tower", value: NaN, height: 0 };
 
-  // 1. BOUNDARY COLLAPSE: If tetration height hits 0, it collapses back to a flat base value
-  if (h === 0) {
-    return canonicalize(val, 0);
+  if (h === 0) return canonicalize(val, 0); // Assuming canonicalize handles base values
+
+  // 1. EVOLUTION: Absorb upward only if the remainder overflows standard floats
+  while (isFinite(val) && val >= 1e10) {
+    val = Math.log10(val);
+    h++;
   }
 
-  // 2. TETRATION EVOLUTION: If the top remainder hits 10^10, absorb it up into the tetration height
-  while (true) {
-    if (val >= 1e10 && isFinite(val)) {
-      val = Math.log10(val);
-      h++;
-    } else {
-      break;
-    }
+  // 2. DEVOLUTION: Pull down only if the remainder drops below 1 (fractional floor)
+  while (h > 1 && val < 1) {
+    val = Math.pow(10, val);
+    h--;
   }
 
-  // 3. TETRATION DEVOLUTION: If the remainder falls below 10, pull a layer down to feed it
-  while (true) {
-    if (h > 1 && val < 10) {
-      val = Math.pow(10, val);
-      h--;
-    } else {
-      break;
-    }
-  }
-
-  // 4. TOWERS TRANSITION: If height reduces all the way to 1, it's just a standard tower layer (10^val)
+  // 3. COLLAPSE TO TOWER: If height reaches 1, it's just a height-1 standard tower layer (10^val)
   if (h === 1) {
-    return canonicalize(val, 1);
+    return canonicalize(val, 1); 
   }
 
-  // Precision snap to eliminate floating-point crumbs on clean exponents
   if (Math.abs(val - Math.round(val)) < 1e-12) {
     val = Math.round(val);
   }
@@ -559,13 +550,11 @@ function executeTrig(type, target) {
 // ============================================================================
 
 function formatTower(displayElement, current) {
-  if (isNaN(current.value)) {
+  if (!current || isNaN(current.value)) {
     renderMath(displayElement, "\\text{Undefined}");
     return;
   }
-  
-  let expCount = current.height; 
-  let val = current.value;
+
   let latex = "";
 
   function formatBaseValue(v) {
@@ -582,25 +571,41 @@ function formatTower(displayElement, current) {
     return v.toString();
   }
 
-  // ROUTING ENGINE
-  if (expCount === 0) {
-    latex = formatBaseValue(val);
+  // TYPE ROUTING ENGINE
+  if (current.type === "tetration") {
+    let val = current.value;
+    let h = current.height;
 
-  } else if (expCount === 1) {
-    latex = getScientificTop(val);
-
-  } else {
-    if (expCount <= 5) {
-      // Standard Tower Generation
+    // If the effective height is small, render as a gorgeous vertical power tower
+    if (h <= 5) {
       latex = getScientificTop(val);
-      for (let i = 0; i < expCount - 1; i++) {
+      for (let i = 0; i < h - 1; i++) {
         latex = `10^{${latex}}`;
       }
     } else {
-      // THE NEW TETRATION HANDOFF
-      // Convert the tall tower into a tetration object: 10^^expCount > val
-      let tetrationObj = createTetration(val, expCount);
-      latex = formatTetration(tetrationObj);
+      // High tier active tetration output
+      latex = formatTetration(current);
+    }
+  } else {
+    // Standard active tower rendering (current.type === "tower")
+    let expCount = current.height;
+    let val = current.value;
+
+    if (expCount === 0) {
+      latex = formatBaseValue(val);
+    } else if (expCount === 1) {
+      latex = getScientificTop(val);
+    } else {
+      if (expCount <= 5) {
+        latex = getScientificTop(val);
+        for (let i = 0; i < expCount - 1; i++) {
+          latex = `10^{${latex}}`;
+        }
+      } else {
+        // Automatically collapse giant standard towers into clean tetration formatting
+        let tetrationObj = createTetration(val, expCount);
+        latex = formatTetration(tetrationObj);
+      }
     }
   }
 
@@ -638,6 +643,7 @@ function formatTetration(tetObj) {
   }
 }
 
+// MathJax rendering pipeline
 function renderMath(element, latexString) {
   element.innerHTML = `\\[ ${latexString} \\]`;
   if (window.MathJax && typeof window.MathJax.typesetPromise === "function") {
