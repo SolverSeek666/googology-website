@@ -272,47 +272,22 @@ function canonicalize(val, h) {
   if (isNaN(val)) return createTower(NaN, 0);
   if (val === Infinity) return createTower(Infinity, 0);
 
-  // 1. UPWARD EVOLUTION: Scale heights based on localized thresholds
+  // 1. UNIFORM UPWARD EVOLUTION: Only climb a tier if value hits 10^10
   while (true) {
-    if (h === 0) {
-      if (val >= 1e10) {
-        val = Math.log10(val);
-        h = 1;
-      } else {
-        break;
-      }
-    } else if (h === 1) {
-      // Let standard exponents grow up to 10 billion before stacking towers!
-      if (val >= 1e10) {
-        val = Math.log10(val);
-        h = 2;
-      } else {
-        break;
-      }
-    } else { 
-      // High-tier active towers (h >= 2) collapse strictly on 10 for clean tetration
-      if (val >= 10 && isFinite(val)) {
-        val = Math.log10(val);
-        h++;
-      } else {
-        break;
-      }
+    if (val >= 1e10 && isFinite(val)) {
+      val = Math.log10(val);
+      h++;
+    } else {
+      break;
     }
   }
 
-  // 2. DOWNWARD DEVOLUTION: Fall back gracefully if values shrink
+  // 2. UNIFORM DOWNWARD DEVOLUTION: Pull down any tier whose value drops below 10
   while (true) {
-    if (h >= 2) {
-      if (val < 1) {
-        val = Math.pow(10, val);
-        h--;
-      } else {
-        break;
-      }
-    } else if (h === 1) {
+    if (h > 0) {
       if (val < 10) {
         val = Math.pow(10, val);
-        h = 0;
+        h--;
       } else {
         break;
       }
@@ -321,9 +296,9 @@ function canonicalize(val, h) {
     }
   }
 
-  // Floating-point safety snap for exact integer towers
-  if (h >= 2 && Math.abs(val - 1) < 1e-12) {
-    val = 1;
+  // Precision snap to eliminate floating-point crumbs on clean integers
+  if (h >= 1 && Math.abs(val - Math.round(val)) < 1e-12) {
+    val = Math.round(val);
   }
 
   return createTower(val, h);
@@ -518,14 +493,13 @@ function formatTower(displayElement, current) {
     latex = formatBaseValue(val);
 
   } else if (expCount === 1) {
-    // Standard single-tier exponents
+    // Standard single-tier scientific notation
     let b = Math.floor(val); 
     let f = val - b;         
     let a = Math.pow(10, f); 
 
     if (a >= 9.9999) { a = 1; b += 1; } 
     
-    // FIX: If coefficient is basically 1, strip the "1.0000 x " noise!
     if (Math.abs(a - 1) < 1e-4) {
       latex = `10^{${b}}`;
     } else {
@@ -534,21 +508,16 @@ function formatTower(displayElement, current) {
 
   } else {
     // High-tier active towers (h >= 2)
-    if (val === 1) {
-      if (expCount <= 5) {
-        latex = "10";
-        for (let i = 1; i < expCount; i++) {
-          latex = `10^{${latex}}`;
-        }
-      } else {
-        latex = `10 \\uparrow\\uparrow {${expCount}}`;
+    if (expCount <= 5) {
+      // Loop explicitly to build a beautiful stacked tower representation
+      latex = formatBaseValue(val);
+      for (let i = 0; i < expCount; i++) {
+        latex = `10^{${latex}}`;
       }
     } else {
-      if (expCount <= 5) {
-        latex = formatBaseValue(val);
-        for (let i = 0; i < expCount; i++) {
-          latex = `10^{${latex}}`;
-        }
+      // Tetration collapse rule: if the top value is exactly 10, account for it as +1 height
+      if (Math.abs(val - 10) < 1e-12) {
+        latex = `10 \\uparrow\\uparrow {${expCount + 1}}`;
       } else {
         latex = `10 \\uparrow\\uparrow {${expCount}} > {${formatBaseValue(val)}}`;
       }
