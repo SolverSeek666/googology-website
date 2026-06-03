@@ -272,27 +272,34 @@ function canonicalize(val, h) {
   if (isNaN(val)) return createTower(NaN, 0);
   if (val === Infinity) return createTower(Infinity, 0);
 
+  // 1. Ground level handling (h === 0)
   if (h === 0) {
-    if (val > 0 && val >= 1e10) {
+    if (val >= 1e10) {
       return canonicalize(Math.log10(val), 1);
     }
     return createTower(val, 0);
   }
 
-  while (val >= 1e10 && isFinite(val)) {
+  // 2. High-tier scaling loop (h >= 1)
+  // Since the implicit base is 10, hitting 10 completes a full extra tower layer!
+  while (val >= 10 && isFinite(val)) {
     val = Math.log10(val);
     h++;
   }
 
-  while (h > 0 && val < 10) {
-    if (h === 1) {
-      val = Math.pow(10, val);
-      h = 0;
+  // 3. Collapse loop for values dropping below 1
+  while (h > 0 && val < 1) {
+    val = Math.pow(10, val);
+    h--;
+    if (h === 0) {
+      if (val >= 1e10) return canonicalize(Math.log10(val), 1);
       break;
-    } else {
-      val = Math.pow(10, val);
-      h--;
     }
+  }
+
+  // Floating-point safety guard: snap clean integers back to 1
+  if (Math.abs(val - 1) < 1e-12) {
+    val = 1;
   }
 
   return createTower(val, h);
@@ -464,7 +471,7 @@ function formatTower(displayElement, current) {
     return;
   }
   
-  let expCount = current.height; // Instantly pulls primitive height count integer
+  let expCount = current.height; 
   let val = current.value;
   let latex = "";
 
@@ -496,7 +503,12 @@ function formatTower(displayElement, current) {
         latex = `10^{${latex}}`;
       }
     } else {
-      latex = `10 \\uparrow\\uparrow {${expCount}} > {${latex}}`;
+      // If normalized cleanly to 1, display a pristine hyper-operation state!
+      if (val === 1) {
+        latex = `10 \\uparrow\\uparrow {${expCount}}`;
+      } else {
+        latex = `10 \\uparrow\\uparrow {${expCount}} > {${latex}}`;
+      }
     }
   }
 
