@@ -93,13 +93,6 @@ function calculate() {
 // SECTION 2: THE PARSER ENGINE (NOW WITH TRIG, CONSTANTS, FACTORIAL & GAMMA)
 // ============================================================================
 
-// Helper coefficients for high-precision Gamma calculation of small numbers
-const LANCZOS_P = [
-  0.99999999999980993, 676.5203681218851, -1259.1392167224028,
-  771.32342877765313, -176.61502916214059, 12.507343278686905,
-  -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7
-];
-
 // LEVEL 1: Handles Addition and Subtraction
 function parseExpression() {
   let expr = parseTerm(); 
@@ -149,7 +142,7 @@ function parsePower() {
   return expr;
 }
 
-// LEVEL 2.7: NEW! Postfix Handler for Factorials (e.g., 5!)
+// LEVEL 2.7: Postfix Handler for Factorials (e.g., 5!)
 function parsePostfix() {
   let expr = parseFactor();
 
@@ -185,7 +178,7 @@ function parseFactor() {
     return executeTrig(trigOp, arg);
   }
 
-  // NEW: INTERCEPT GAMMA FUNCTION: Γ(a) or γ(a)
+  // INTERCEPT GAMMA FUNCTION: Γ(a) or γ(a)
   if (peek() === 'Γ' || peek() === 'γ') {
     let gammaOp = consume();
     if (peek() !== '(') throw new Error(`${gammaOp} must be followed by '('`);
@@ -281,57 +274,75 @@ function createTower(val, heights = [0, 0]) {
   return { value: val, heights: [...heights] };
 }
 
-// Math engine behind Gamma and precise small factorials
-function rawLanczosGamma(z) {
-  if (z < 0.5) return Math.PI / (Math.sin(Math.PI * z) * rawLanczosGamma(1 - z));
-  z -= 1;
-  let x = LANCZOS_P[0];
-  for (let i = 1; i < LANCZOS_P.length; i++) x += LANCZOS_P[i] / (z + i);
-  let t = z + 7.5; // Using g = 7
-  return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
-}
-
-// NEW: Crash-Proof Factorial via Stirling Bypass
-function executeFactorial(A) {
+// REWRITTEN: Shifting Stirling Engine for Gamma Function
+function executeGamma(A) {
   let hA = A.heights[0] + A.heights[1];
-  if (hA > 0) return A; // Already an extreme tower
+  
+  // If input is an active tower, increment its power level
+  if (hA > 0) {
+    return createTower(A.value, [A.heights[0] + 1, A.heights[1]]);
+  }
 
   let val = A.value;
 
-  // CRASH CONTROL: Factorials are mathematically undefined for negative integers
+  // 1. Core Edge Cases
+  if (val === Infinity) return createTower(Infinity);
+  if (val === 0 || (val < 0 && Number.isInteger(val))) {
+    throw new Error("Gamma function is undefined for non-positive integers!");
+  }
+  if (val === 1 || val === 2) return createTower(1);
+  
+  // 2. Integer Shortcut Loop
+  if (val <= 171 && Number.isInteger(val) && val > 0) {
+    let g = 1;
+    for (let i = 2; i < val; i++) g *= i;
+    return createTower(g);
+  }
+  
+  // 3. Argument Shifting Core
+  let shift = 0;
+  let shiftFactor = 1;
+  let shiftedVal = val;
+  
+  while (shiftedVal < 10) {
+    shiftFactor *= shiftedVal;
+    shiftedVal += 1;
+    shift++;
+  }
+  
+  // Base-10 Stirling scale conversion
+  let log10Gamma = (shiftedVal - 0.5) * Math.log10(shiftedVal) - shiftedVal * Math.LOG10E + 0.5 * Math.log10(2 * Math.PI);
+  
+  // Reverse shifting multiplication offsets
+  if (shift > 0) {
+    log10Gamma -= Math.log10(shiftFactor);
+  }
+  
+  // 4. Boundary Engine Routing
+  if (log10Gamma < 300) {
+    return createTower(Math.pow(10, log10Gamma));
+  }
+  
+  // Automatically hand off to Section 3 decoder layout via a tier-1 log tower
+  return createTower(log10Gamma, [1, 0]);
+}
+
+// REWRITTEN: Factorial Pipeline
+function executeFactorial(A) {
+  let hA = A.heights[0] + A.heights[1];
+  if (hA > 0) {
+    return createTower(A.value, [A.heights[0] + 1, A.heights[1]]);
+  }
+
+  let val = A.value;
+
+  // Crash Control
   if (val < 0 && Number.isInteger(val)) {
     throw new Error("Factorial is undefined for negative integers!");
   }
 
-  // STIRLING BYPASS: Intercept right before breaking 2^1024 limit (~170!)
-  if (val > 170) {
-    let logScale = 0.5 * Math.log10(2 * Math.PI * val) + val * Math.log10(val / Math.E);
-    return createTower(logScale, [1, 0]); // Save directly as base-10 exponent tower
-  }
-
-  // x! = Γ(x + 1)
-  return createTower(rawLanczosGamma(val + 1));
-}
-
-// NEW: Crash-Proof Gamma via Stirling Bypass
-function executeGamma(A) {
-  let hA = A.heights[0] + A.heights[1];
-  if (hA > 0) return A;
-
-  let val = A.value;
-
-  // CRASH CONTROL: Gamma is mathematically undefined for zero and negative integers
-  if (val <= 0 && Number.isInteger(val)) {
-    throw new Error("Gamma function is undefined for non-positive integers!");
-  }
-
-  // STIRLING BYPASS: Intercept right before breaking 2^1024 limit (~171)
-  if (val > 171) {
-    let logScale = (val - 0.5) * Math.log10(val) - val * Math.log10(Math.E) + 0.5 * Math.log10(2 * Math.PI);
-    return createTower(logScale, [1, 0]);
-  }
-
-  return createTower(rawLanczosGamma(val));
+  // x! = Γ(x + 1) -> Pipes directly into the argument shifter logic
+  return executeGamma(createTower(val + 1));
 }
 
 function executeAddition(A, B) {
