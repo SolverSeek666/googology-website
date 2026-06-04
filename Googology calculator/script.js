@@ -476,7 +476,7 @@ function executeExponentiation(A, B) {
 function executeTetration(tetObj) {
   let base = tetObj.base !== undefined ? tetObj.base : 10;
   let h = tetObj.height;
-  let val = tetObj.value; 
+  let val = tetObj.value !== undefined ? tetObj.value : 1; 
 
   // Dynamically calculated Euler boundaries using Math.E
   const UPPER_CONVERGENCE_BOUND = Math.pow(Math.E, 1 / Math.E); // ~1.44466
@@ -490,7 +490,7 @@ function executeTetration(tetObj) {
   for (let i = 0; i < manualLoops; i++) {
     let nextVal = Math.pow(base, currentVal);
 
-    // Safety tripwire for runaway bases (like base 10) before hitting 25 loops
+    // Safety tripwire for runaway bases before hitting JS limit (Infinity)
     if (!isFinite(nextVal)) {
       manualLoops = i; 
       break; 
@@ -503,9 +503,9 @@ function executeTetration(tetObj) {
   let leftoverHeight = h - manualLoops;
 
   if (base > UPPER_CONVERGENCE_BOUND && leftoverHeight > 0) {
-    // If it's over e^(1/e), the leftover uses the "10^ thing"
-    currentVal = currentVal * Math.log10(base);
-    currentHeight = 1 + leftoverHeight; 
+    // NATIVE TRACKING: Keep everything in the native base.
+    // No more multiplying by Math.log10(base)!
+    currentHeight = leftoverHeight; 
   } else {
     // Otherwise, it stops (it converged or has no leftover height)
     currentHeight = 0; 
@@ -514,7 +514,8 @@ function executeTetration(tetObj) {
   return {
     type: "tower",
     height: currentHeight,
-    value: currentVal
+    value: currentVal,
+    base: base // CRITICAL: Expose the base so Section 3 can read it
   };
 }
 
