@@ -302,11 +302,12 @@ function createTower(val, height = 0) {
 }
 
 // Creates a Tetration object: 10^^b > a
-function createTetration(a, b) {
+function createTetration(remainderVal, heightVal, baseVal = 10) {
   return {
     type: "tetration",
-    value: a,   // The top remainder value
-    height: b   // The tetration height
+    value: remainderVal,
+    height: heightVal,
+    base: baseVal
   };
 }
 
@@ -473,35 +474,48 @@ function executeExponentiation(A, B) {
 }
 
 function executeTetration(tetObj) {
-  let val = tetObj.value;
+  let base = tetObj.base !== undefined ? tetObj.base : 10;
   let h = tetObj.height;
+  let val = tetObj.value; 
 
-  if (isNaN(val) || h < 0) return { type: "tower", value: NaN, height: 0 };
+  // Dynamically calculated Euler boundaries using Math.E
+  const UPPER_CONVERGENCE_BOUND = Math.pow(Math.E, 1 / Math.E); // ~1.44466
+  
+  let currentVal = val;
+  let currentHeight = 0;
 
-  if (h === 0) return canonicalize(val, 0); // Assuming canonicalize handles base values
+  // 1. FIRST, REPEAT IT 25 TIMES
+  let manualLoops = Math.min(h, 25);
 
-  // 1. EVOLUTION: Absorb upward only if the remainder overflows standard floats
-  while (isFinite(val) && val >= 1e10) {
-    val = Math.log10(val);
-    h++;
+  for (let i = 0; i < manualLoops; i++) {
+    let nextVal = Math.pow(base, currentVal);
+
+    // Safety tripwire for runaway bases (like base 10) before hitting 25 loops
+    if (!isFinite(nextVal)) {
+      manualLoops = i; 
+      break; 
+    }
+    
+    currentVal = nextVal;
   }
 
-  // 2. DEVOLUTION: Pull down only if the remainder drops below 1 (fractional floor)
-  while (h > 1 && val < 1) {
-    val = Math.pow(10, val);
-    h--;
+  // 2. CHECK THE BASE FOR LEFTOVER HEIGHT
+  let leftoverHeight = h - manualLoops;
+
+  if (base > UPPER_CONVERGENCE_BOUND && leftoverHeight > 0) {
+    // If it's over e^(1/e), the leftover uses the "10^ thing"
+    currentVal = currentVal * Math.log10(base);
+    currentHeight = 1 + leftoverHeight; 
+  } else {
+    // Otherwise, it stops (it converged or has no leftover height)
+    currentHeight = 0; 
   }
 
-  // 3. COLLAPSE TO TOWER: If height reaches 1, it's just a height-1 standard tower layer (10^val)
-  if (h === 1) {
-    return canonicalize(val, 1); 
-  }
-
-  if (Math.abs(val - Math.round(val)) < 1e-12) {
-    val = Math.round(val);
-  }
-
-  return createTetration(val, h);
+  return {
+    type: "tower",
+    height: currentHeight,
+    value: currentVal
+  };
 }
 
 function executeRoot(degree, rad) {
