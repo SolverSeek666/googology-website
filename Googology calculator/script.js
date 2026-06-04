@@ -478,11 +478,11 @@ function executeTetration(tetObj) {
   let h = tetObj.height;
   let val = tetObj.value; 
 
-  // Dynamically calculated Euler boundaries using Math.E
   const UPPER_CONVERGENCE_BOUND = Math.pow(Math.E, 1 / Math.E); // ~1.44466
   
   let currentVal = val;
   let currentHeight = 0;
+  let finalBase = base; // Track the base structure of the resulting tower
 
   // 1. FIRST, REPEAT IT 25 TIMES
   let manualLoops = Math.min(h, 25);
@@ -490,12 +490,10 @@ function executeTetration(tetObj) {
   for (let i = 0; i < manualLoops; i++) {
     let nextVal = Math.pow(base, currentVal);
 
-    // Safety tripwire for runaway bases (like base 10) before hitting 25 loops
     if (!isFinite(nextVal)) {
       manualLoops = i; 
       break; 
     }
-    
     currentVal = nextVal;
   }
 
@@ -503,18 +501,20 @@ function executeTetration(tetObj) {
   let leftoverHeight = h - manualLoops;
 
   if (base > UPPER_CONVERGENCE_BOUND && leftoverHeight > 0) {
-    // If it's over e^(1/e), the leftover uses the "10^ thing"
+    // Shifting to base 10 operations ladder
     currentVal = currentVal * Math.log10(base);
     currentHeight = 1 + leftoverHeight; 
+    finalBase = 10; // Structure shifts into base-10 mode
   } else {
-    // Otherwise, it stops (it converged or has no leftover height)
-    currentHeight = 0; 
+    // Fits natively or converged
+    currentHeight = leftoverHeight > 0 ? leftoverHeight : 0; 
   }
 
   return {
     type: "tower",
     height: currentHeight,
-    value: currentVal
+    value: currentVal,
+    base: finalBase // Critical link to the display engine!
   };
 }
 
