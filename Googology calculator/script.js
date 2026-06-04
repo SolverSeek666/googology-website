@@ -560,7 +560,7 @@ function executeTrig(type, target) {
 }
 
 // ============================================================================
-// SECTION 3: DISPLAY ROUTER & RENDERMATH BRIDGE (BRACKETLESS CLEAN EDITION)
+// SECTION 3: DISPLAY ROUTER & RENDERMATH BRIDGE (DYNAMIC BASE EDITION)
 // ============================================================================
 
 function formatTower(displayElement, current) {
@@ -570,6 +570,7 @@ function formatTower(displayElement, current) {
   }
 
   let latex = "";
+  let base = current.base !== undefined ? current.base : 10; // Extract dynamic base
 
   function formatBaseValue(v) {
     if (v === 0) return "0";
@@ -594,7 +595,7 @@ function formatTower(displayElement, current) {
     if (h <= 5) {
       latex = getScientificTop(val);
       for (let i = 0; i < h - 1; i++) {
-        latex = `10^{${latex}}`;
+        latex = `${base}^{${latex}}`; // Use dynamic base
       }
     } else {
       // High tier active tetration output
@@ -613,11 +614,11 @@ function formatTower(displayElement, current) {
       if (expCount <= 5) {
         latex = getScientificTop(val);
         for (let i = 0; i < expCount - 1; i++) {
-          latex = `10^{${latex}}`;
+          latex = `${base}^{${latex}}`; // Use dynamic base
         }
       } else {
         // Automatically collapse giant standard towers into clean tetration formatting
-        let tetrationObj = createTetration(val, expCount);
+        let tetrationObj = createTetration(val, expCount, base); 
         latex = formatTetration(tetrationObj);
       }
     }
@@ -645,19 +646,18 @@ function getScientificTop(v) {
 function formatTetration(tetObj) {
   let val = tetObj.value;
   let height = tetObj.height;
+  let base = tetObj.base !== undefined ? tetObj.base : 10; // Extract dynamic base
 
-  // Collapse rule: if the remainder is exactly 10, absorb it into the height
-  if (Math.abs(val - 10) < 1e-12) {
-    return `10 \\uparrow\\uparrow {${height + 1}}`;
+  // Collapse rule: if the remainder is exactly the base, absorb it into the height
+  if (Math.abs(val - base) < 1e-12) {
+    return `${base} \\uparrow\\uparrow {${height + 1}}`;
   } else {
     let topExp = getScientificTop(val);
-    // Remember to subtract 1 from the height because the scientific top acts as one layer!
     let remainingHeight = height - 1;
-    return `10 \\uparrow\\uparrow {${remainingHeight}} > {${topExp}}`;
+    return `${base} \\uparrow\\uparrow {${remainingHeight}} > {${topExp}}`;
   }
 }
 
-// MathJax rendering pipeline
 function renderMath(element, latexString) {
   element.innerHTML = `\\[ ${latexString} \\]`;
   if (window.MathJax && typeof window.MathJax.typesetPromise === "function") {
