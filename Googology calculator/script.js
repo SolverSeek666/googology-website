@@ -133,13 +133,13 @@ function parseTerm() {
 // LEVEL 2.25: Handles Tetration (Right-Associative)
 function parseTetration() {
   // 1. Pass through to the next highest precedence level (Power)
-  let expr = parsePower(); 
+  let expr = parsePower(); // This represents 'A' (The Base)
 
   // 2. Check if the next token matches the Tetration operator
   if (peek() === '^^') {
     consume(); // Eat the '^^'
     
-    // Parse the height expression (Calling parseTetration makes chains like 10^^3^^2 parse right-to-left)
+    // Parse the height expression
     let heightExpr = parseTetration(); 
     let heightVal = heightExpr.value;
     let remainderVal = 10; // Default base remainder if '>' is omitted
@@ -155,9 +155,13 @@ function parseTetration() {
       heightVal = heightVal - 1;
     }
 
-    // 4. Package and run it through the execution engine
-    let tetObj = createTetration(remainderVal, heightVal);
-    expr = executeTetration(tetObj);
+    // 4. Package the Height (B) and Barrier into proper objects
+    // We retain heightExpr.height if it exists so giant tower heights aren't lost
+    let B_obj = createTetration(heightVal, heightExpr.height || 0);
+    let Barrier_obj = createTetration(remainderVal, 0);
+
+    // 5. Pass ALL THREE arguments to the execution engine
+    expr = executeTetration(expr, B_obj, Barrier_obj);
   }
 
   return expr;
