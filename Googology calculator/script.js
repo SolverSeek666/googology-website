@@ -473,50 +473,177 @@ function executeExponentiation(A, B) {
   return hA >= hB ? A : B;
 }
 
-function executeTetration(tetObj) {
-  let base = tetObj.base !== undefined ? tetObj.base : 10;
-  let h = tetObj.height;
-  let val = tetObj.value !== undefined ? tetObj.value : 1; 
-
-  // Dynamically calculated Euler boundaries using Math.E
-  const UPPER_CONVERGENCE_BOUND = Math.pow(Math.E, 1 / Math.E); // ~1.44466
-  
-  let currentVal = val;
-  let currentHeight = 0;
-
-  // 1. FIRST, REPEAT IT 25 TIMES
-  let manualLoops = Math.min(h, 25);
-
-  for (let i = 0; i < manualLoops; i++) {
-    let nextVal = Math.pow(base, currentVal);
-
-    // Safety tripwire for runaway bases before hitting JS limit (Infinity)
-    if (!isFinite(nextVal)) {
-      manualLoops = i; 
-      break; 
+function executeTetration(A, B, Barrier) {
+  // Safe helper to ensure every single output tower is explicitly marked as base 10
+  function finalize(tower) {
+    if (tower && typeof tower === 'object') {
+      tower.base = 10;
     }
+    return tower;
+  }
+
+  // Case 0: INFINITY / NaN checks
+  if (isNaN(A.value) || isNaN(B.value) || isNaN(Barrier.value)) return finalize(createTower(NaN, 0));
+  if (B.value === Infinity || A.value === Infinity) return finalize(createTower(Infinity, 0));
+  
+  // Check if the height B is itself an ultra-giant tower structure
+  let isBTower = (typeof B.height === 'object' && B.height !== null) || (typeof B.height === 'number' && B.height >= 1);
+
+  // ==========================================
+  // ZERO HEIGHT EDGE-CASE INTERCEPTOR
+  // ==========================================
+  if (!isBTower && B.value === 0) {
+    return finalize(createTower(Barrier.value, Barrier.height));
+  }
+  // ==========================================
+
+  // ==========================================
+  // PURE LINEAR FRACTIONAL TETRATION INTERCEPTOR
+  // ==========================================
+  if (A.height === 0 && B.height === 0 && !Number.isInteger(B.value)) {
+    let base = A.value;
+    let exponent = B.value;
+    if (exponent < 0) return finalize(createTower(NaN, 0));
+
+    let intPart = Math.floor(exponent);
+    let fracPart = exponent - intPart;
     
-    currentVal = nextVal;
+    // Pure Linear Approximation Baseline
+    let fracResult = Math.pow(base, fracPart);
+
+    let newB = createTower(intPart, 0);
+    let newBarrier = createTower(fracResult, 0);
+    
+    // Note: Ensure your computeTetration engine also forwards to executeTetration
+    return computeTetration(A, newB, newBarrier);
+  }
+  // ==========================================
+  
+  // Case 1: Base A is already a giant tower (height >= 1)
+  if (A.height >= 1) {
+    if (!isBTower) {
+      let y = B.value;
+      let bVal = Barrier.value;
+      let bHeight = Barrier.height;
+
+      // Handle trivial barrier (Barrier = 1) normally
+      if (bHeight === 0 && bVal === 1) {
+        if (y === 1) return finalize(A);
+      }
+
+      if (A.height === 1) {
+        if (bHeight === 0) {
+          if (y === 1) {
+            return finalize(createTower(A.value * bVal, 1));
+          } else {
+            let topVal = A.value * bVal;
+            if (A.value > 0) topVal += Math.log10(A.value);
+            return finalize(createTower(topVal, y));
+          }
+        } else {
+          return finalize(createTower(bVal, bHeight + y));
+        }
+      } else if (A.height === 2) {
+        if (bHeight === 0) {
+          if (y === 1) {
+            let topVal = A.value;
+            if (bVal > 0) topVal += Math.log10(bVal);
+            return finalize(createTower(topVal, 2));
+          } else {
+            if (A.value <= 308) {
+              let topVal = A.value + bVal * Math.pow(10, A.value);
+              return finalize(createTower(topVal, y));
+            } else {
+              let topVal = A.value;
+              if (bVal > 0) topVal += Math.log10(bVal);
+              return finalize(createTower(topVal, y + 1));
+            }
+          }
+        } else {
+          return finalize(createTower(bVal, bHeight + y));
+        }
+      } else if (A.height === 3) {
+        if (bHeight === 0) {
+          if (y === 1) {
+            if (A.value <= 308) {
+              let topVal = Math.pow(10, A.value) + Math.log10(bVal);
+              return finalize(createTower(topVal, 3));
+            } else {
+              return finalize(createTower(A.value, 3));
+            }
+          } else {
+            return finalize(createTower(A.value, y + 2));
+          }
+        } else {
+          return finalize(createTower(bVal, bHeight + y));
+        }
+      } else {
+        // Base is a height-4+ tower
+        if (bHeight === 0) {
+          if (y === 1) {
+            return finalize(createTower(A.value, A.height));
+          } else {
+            return finalize(createTower(A.value, A.height + y - 1));
+          }
+        } else {
+          return finalize(createTower(bVal, bHeight + y));
+        }
+      }
+    } else {
+      return finalize(createTower(1, B));
+    }
   }
 
-  // 2. CHECK THE BASE FOR LEFTOVER HEIGHT
-  let leftoverHeight = h - manualLoops;
+  // Case 2: Base A is a standard number (height === 0)
+  let base = A.value;
+  
+  if (Math.abs(base - 10) < 1e-7) {
+     if (Barrier.height === 0 && Barrier.value === 1 && !isBTower && B.value > 0 && B.value < 6) {
+        return finalize(createTower(10, B.value - 1));
+     } else if (!isBTower) {
+        let bVal = Barrier.value;
+        let bHeight = Barrier.height;
+        let y = B.value;
 
-  if (base > UPPER_CONVERGENCE_BOUND && leftoverHeight > 0) {
-    // NATIVE TRACKING: Keep everything in the native base.
-    // No more multiplying by Math.log10(base)!
-    currentHeight = leftoverHeight; 
+        if (bHeight === 0 && bVal < 308) {
+          let collapsedValue = Math.pow(10, bVal);
+          if (Number.isFinite(collapsedValue) && collapsedValue < 1e300) {
+            return finalize(createTower(collapsedValue, y - 1));
+          }
+        }
+        return finalize(createTower(bVal, y + bHeight));
+     } else {
+        return finalize(createTower(1, B));
+     }
+  }
+  
+  // Standard loop for small non-10 bases (Converts to Base-10 structure on overflow)
+  if (!isBTower) {
+    let y = B.value;
+    let iters = Math.min(y, 10);
+    let current = createTower(Barrier.value, Barrier.height);
+    
+    for (let i = 0; i < iters; i++) {
+      if (current.height === 0) {
+        let next = Math.pow(base, current.value);
+        if (Number.isFinite(next) && next < 1e300) {
+          current.value = next;
+        } else {
+          current.value = current.value * Math.log10(base);
+          current.height = 1;
+        }
+      } else if (current.height === 1) {
+        current.value = current.value + Math.log10(Math.log10(base));
+        current.height = 2;
+      } else {
+        current.height += 1;
+      }
+    }
+    if (y > 10) current.height += (y - 10);
+    return finalize(current);
   } else {
-    // Otherwise, it stops (it converged or has no leftover height)
-    currentHeight = 0; 
+    return finalize(createTower(1, B));
   }
-
-  return {
-    type: "tower",
-    height: currentHeight,
-    value: currentVal,
-    base: base // CRITICAL: Expose the base so Section 3 can read it
-  };
 }
 
 function executeRoot(degree, rad) {
