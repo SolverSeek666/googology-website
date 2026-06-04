@@ -478,11 +478,11 @@ function executeTetration(tetObj) {
   let h = tetObj.height;
   let val = tetObj.value; 
 
+  // Dynamically calculated Euler boundaries using Math.E
   const UPPER_CONVERGENCE_BOUND = Math.pow(Math.E, 1 / Math.E); // ~1.44466
   
   let currentVal = val;
   let currentHeight = 0;
-  let finalBase = base; // Track the base structure of the resulting tower
 
   // 1. FIRST, REPEAT IT 25 TIMES
   let manualLoops = Math.min(h, 25);
@@ -490,10 +490,12 @@ function executeTetration(tetObj) {
   for (let i = 0; i < manualLoops; i++) {
     let nextVal = Math.pow(base, currentVal);
 
+    // Safety tripwire for runaway bases (like base 10) before hitting 25 loops
     if (!isFinite(nextVal)) {
       manualLoops = i; 
       break; 
     }
+    
     currentVal = nextVal;
   }
 
@@ -501,20 +503,18 @@ function executeTetration(tetObj) {
   let leftoverHeight = h - manualLoops;
 
   if (base > UPPER_CONVERGENCE_BOUND && leftoverHeight > 0) {
-    // Shifting to base 10 operations ladder
+    // If it's over e^(1/e), the leftover uses the "10^ thing"
     currentVal = currentVal * Math.log10(base);
     currentHeight = 1 + leftoverHeight; 
-    finalBase = 10; // Structure shifts into base-10 mode
   } else {
-    // Fits natively or converged
-    currentHeight = leftoverHeight > 0 ? leftoverHeight : 0; 
+    // Otherwise, it stops (it converged or has no leftover height)
+    currentHeight = 0; 
   }
 
   return {
     type: "tower",
     height: currentHeight,
-    value: currentVal,
-    base: finalBase // Critical link to the display engine!
+    value: currentVal
   };
 }
 
@@ -560,7 +560,7 @@ function executeTrig(type, target) {
 }
 
 // ============================================================================
-// SECTION 3: DISPLAY ROUTER & RENDERMATH BRIDGE (DYNAMIC BASE EDITION)
+// SECTION 3: DISPLAY ROUTER & RENDERMATH BRIDGE (DYNAMIC BASE EDITION - FIXED)
 // ============================================================================
 
 function formatTower(displayElement, current) {
@@ -572,18 +572,31 @@ function formatTower(displayElement, current) {
   let latex = "";
   let base = current.base !== undefined ? current.base : 10; // Extract dynamic base
 
-  function formatBaseValue(v) {
+  // Formats raw values natively using the dynamic base when they get large
+  function formatBaseValue(v, bse) {
     if (v === 0) return "0";
     let absVal = Math.abs(v);
-    if (absVal >= 1e10 || absVal < 1e-4) {
-      let exp = Math.floor(Math.log10(absVal));
-      let coeff = v / Math.pow(10, exp);
-      return `${coeff.toFixed(4)} \\times 10^{${exp}}`;
+    
+    // If it's base 10, use standard base-10 scientific notation
+    if (bse === 10) {
+      if (absVal >= 1e10 || absVal < 1e-4) {
+        let exp = Math.floor(Math.log10(absVal));
+        let coeff = v / Math.pow(10, exp);
+        return `${coeff.toFixed(4)} \\times 10^{${exp}}`;
+      }
+    } else {
+      // DYNAMIC BASE SCIENTIFIC NOTATION: Keeps your custom base intact!
+      if (absVal >= Math.pow(bse, 5) || absVal < 1 / bse) {
+        let exp = Math.floor(Math.log(absVal) / Math.log(bse));
+        let coeff = v / Math.pow(bse, exp);
+        return `${coeff.toFixed(4)} \\times {${bse}}^{${exp}}`;
+      }
     }
+    
     if (Math.abs(v - Math.round(v)) < 1e-12) {
       return Math.round(v).toString();
     }
-    return v.toString();
+    return v.toFixed(4);
   }
 
   // TYPE ROUTING ENGINE
@@ -593,13 +606,13 @@ function formatTower(displayElement, current) {
 
     // If the effective height is small, render as a gorgeous vertical power tower
     if (h <= 5) {
-      latex = getScientificTop(val);
+      latex = formatBaseValue(val, base);
       for (let i = 0; i < h - 1; i++) {
-        latex = `${base}^{${latex}}`; // Use dynamic base
+        latex = `${base}^{${latex}}`; 
       }
     } else {
       // High tier active tetration output
-      latex = formatTetration(current);
+      latex = formatTetration(current, formatBaseValue);
     }
   } else {
     // Standard active tower rendering (current.type === "tower")
@@ -607,19 +620,19 @@ function formatTower(displayElement, current) {
     let val = current.value;
 
     if (expCount === 0) {
-      latex = formatBaseValue(val);
+      latex = formatBaseValue(val, base);
     } else if (expCount === 1) {
-      latex = getScientificTop(val);
+      latex = formatBaseValue(val, base);
     } else {
       if (expCount <= 5) {
-        latex = getScientificTop(val);
+        latex = formatBaseValue(val, base);
         for (let i = 0; i < expCount - 1; i++) {
-          latex = `${base}^{${latex}}`; // Use dynamic base
+          latex = `${base}^{${latex}}`; 
         }
       } else {
         // Automatically collapse giant standard towers into clean tetration formatting
         let tetrationObj = createTetration(val, expCount, base); 
-        latex = formatTetration(tetrationObj);
+        latex = formatTetration(tetrationObj, formatBaseValue);
       }
     }
   }
@@ -627,32 +640,17 @@ function formatTower(displayElement, current) {
   renderMath(displayElement, latex);
 }
 
-// Shared helper for formatting the top of any tower or tetration
-function getScientificTop(v) {
-  let b = Math.floor(v);
-  let f = v - b;
-  let a = Math.pow(10, f);
-  
-  if (a >= 9.9999) { a = 1; b += 1; } 
-  
-  if (Math.abs(a - 1) < 1e-4) {
-    return `10^{${b}}`; 
-  } else {
-    return `${a.toFixed(4)} \\times 10^{${b}}`;
-  }
-}
-
 // Dedicated Tetration Formatter
-function formatTetration(tetObj) {
+function formatTetration(tetObj, formatBaseValue) {
   let val = tetObj.value;
   let height = tetObj.height;
-  let base = tetObj.base !== undefined ? tetObj.base : 10; // Extract dynamic base
+  let base = tetObj.base !== undefined ? tetObj.base : 10; 
 
   // Collapse rule: if the remainder is exactly the base, absorb it into the height
   if (Math.abs(val - base) < 1e-12) {
     return `${base} \\uparrow\\uparrow {${height + 1}}`;
   } else {
-    let topExp = getScientificTop(val);
+    let topExp = formatBaseValue(val, base);
     let remainingHeight = height - 1;
     return `${base} \\uparrow\\uparrow {${remainingHeight}} > {${topExp}}`;
   }
