@@ -565,16 +565,12 @@ function executeTetration(A, B, Barrier) {
   // Case 2: Base A is a standard number (height === 0)
   let base = A.value;
   
+  // Clean Base-10 shortcut paths to fit UI rendering blueprints perfectly
   if (Math.abs(base - 10) < 1e-7) {
      if (Barrier.height === 0 && Barrier.value === 1 && !isBTower) {
         let y = B.value;
-        if (y === 1) return createTetration(10, 0);
-        if (y === 2) return createTetration(1e10, 0); 
-        if (y >= 3 && y < 6) return createTetration(10, y);
-        
-        // FIX: For 10^^6 and up, return a value of 1 so the UI shortcut 
-        // doesn't accidentally add an extra layer to the height string.
-        if (y >= 6) return createTetration(1, y); 
+        if (y >= 1 && y < 6) return createTetration(10, y);
+        if (y >= 6) return createTetration(1, y + 1); 
      } else if (!isBTower) {
         let bVal = Barrier.value;
         let bHeight = Barrier.height;
@@ -591,10 +587,9 @@ function executeTetration(A, B, Barrier) {
           }
           
           if (Number.isFinite(collapsedValue) && collapsedValue < 1e300) {
-             // FIX: Protect custom barriers from shifting the UI shortcut height up by one
              if (Math.abs(collapsedValue - 10) < 1e-7) {
                 if (y < 6) return createTetration(10, y);
-                return createTetration(1, y);
+                return createTetration(1, y + 1);
              }
              return createTetration(collapsedValue, y);
           }
@@ -605,36 +600,39 @@ function executeTetration(A, B, Barrier) {
      }
   }
   
-  // Standard loop for small non-10 bases
+  // ========================================================
+  // NON-10 BASES: Strictly evaluate and convert to Base-10
+  // ========================================================
   if (!isBTower) {
     let y = B.value;
-    let iters = Math.min(y, 10);
-    let current = createTetration(Barrier.value, Barrier.height, base);
+    let currentVal = Barrier.value;
+    let currentHeight = Barrier.height;
     
-    for (let i = 0; i < iters; i++) {
-      if (current.height === 0) {
-        let next = Math.pow(base, current.value);
+    for (let i = 0; i < y; i++) {
+      if (currentHeight === 0) {
+        let next = Math.pow(base, currentVal);
         if (Number.isFinite(next) && next < 1e300) {
-          current.value = next;
+          currentVal = next;
         } else {
-          // Shifting into Base-10 log space because the number exploded!
-          current.value = current.value * Math.log10(base);
-          // FIX: Changed starting height from 1 to 2 to force the UI to render the "10^" layer
-          current.height = 2; 
-          current.base = 10; 
+          // Overflows JS number limit! Force-convert to base-10 tower
+          // base^currentVal == 10^(currentVal * log10(base))
+          currentVal = currentVal * Math.log10(base);
+          currentHeight = 2; // Maps to exactly 1 layer of '10^' in your UI
         }
-      } else if (current.height === 2) { // FIX: Adjusted branch matching to catch the height-2 shift
-        current.value = current.value + Math.log10(Math.log10(base));
-        current.height = 3;
-        current.base = 10;
+      } else if (currentHeight === 2) { 
+        // base^(10^currentVal) == 10^(10^(currentVal + log10(log10(base))))
+        currentVal = currentVal + Math.log10(Math.log10(base));
+        currentHeight = 3; // Maps to 2 layers of '10^'
       } else {
-        current.height += 1;
+        // High tower scaling: base-change effects stabilize at higher layers
+        currentHeight += 1;
       }
     }
-    if (y > 10) current.height += (y - 10);
-    return current;
+    // Return completely clean without passing 'base', forcing native Base-10 parsing
+    return createTetration(currentVal, currentHeight);
   } else {
-    return createTetration(1, B, base);
+    // If B is already a massive tower, base scales infinitely close to a pure 10-tower
+    return createTetration(1, B);
   }
 }
 
