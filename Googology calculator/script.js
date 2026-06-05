@@ -749,19 +749,16 @@ function formatTower(displayElement, current) {
 
     if (expCount === 0) {
       latex = formatBaseValue(val, base);
-    } else if (expCount === 1) {
+    } else if (expCount <= 5) {
+      // FIX: Start with the formatted top value, then loop exactly expCount times
       latex = formatBaseValue(val, base);
-    } else {
-      if (expCount <= 5) {
-        latex = formatBaseValue(val, base);
-        for (let i = 0; i < expCount - 1; i++) {
-          latex = `${base}^{${latex}}`; 
-        }
-      } else {
-        // Automatically collapse giant standard towers into clean tetration formatting
-        let tetrationObj = createTetration(val, expCount, base); 
-        latex = formatTetration(tetrationObj, formatBaseValue);
+      for (let i = 0; i < expCount; i++) {
+        latex = `${base}^{${latex}}`; 
       }
+    } else {
+      // Automatically collapse giant standard towers into clean tetration formatting
+      let tetrationObj = createTetration(val, expCount, base); 
+      latex = formatTetration(tetrationObj, formatBaseValue);
     }
   }
 
