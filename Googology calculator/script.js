@@ -135,11 +135,10 @@ function parseTetration() {
   let node = parsePower(); 
   if (match('^^')) {
     let right = parseTetration(); 
-    let barrier = createTower(1, 0);
+    let barrier = createTetration(1, 0); // FIXED: Changed from createTower to createTetration
     if (match('>')) {
       barrier = parseExpression();
     }
-    // FIXED: Changed computeTetration to executeTetration to match your engine
     node = executeTetration(node, right, barrier);
   }
   return node;
