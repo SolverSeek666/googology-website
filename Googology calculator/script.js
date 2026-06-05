@@ -558,8 +558,9 @@ function executeTetration(A, B, Barrier) {
   if (Math.abs(base - 10) < 1e-7) {
      if (Barrier.height === 0 && Barrier.value === 1 && !isBTower) {
         let y = B.value;
-        if (y >= 1 && y < 6) return createTetration(10, y);
-        if (y >= 6) return createTetration(1, y + 1); 
+        // FIX: Retain clean base-10 objects up to height 6
+        if (y >= 1 && y <= 6) return createTetration(10, y);
+        if (y > 6) return createTetration(1, y); 
      } else if (!isBTower) {
         let bVal = Barrier.value;
         let bHeight = Barrier.height;
@@ -572,8 +573,9 @@ function executeTetration(A, B, Barrier) {
           
           if (Number.isFinite(collapsedValue) && collapsedValue < 1e300) {
              if (Math.abs(collapsedValue - 10) < 1e-7) {
-                if (y < 6) return createTetration(10, y);
-                return createTetration(1, y + 1);
+                // FIX: Sync nested structures with the height-6 rule
+                if (y <= 6) return createTetration(10, y);
+                return createTetration(1, y);
              }
              return createTetration(collapsedValue, y);
           }
@@ -596,12 +598,10 @@ function executeTetration(A, B, Barrier) {
         if (Number.isFinite(next) && next < 1e300) {
           currentVal = next;
         } else {
-          // FIX: Clean conversion to exactly 1 layer of base-10
           currentVal = currentVal * Math.log10(base);
           currentHeight = 1; 
         }
       } else if (currentHeight === 1) { 
-        // FIX: Clean conversion to exactly 2 layers of base-10
         currentVal = currentVal + Math.log10(Math.log10(base));
         currentHeight = 2; 
       } else {
@@ -696,7 +696,7 @@ function formatTower(displayElement, current) {
     let val = current.value;
     let h = current.height;
 
-    if (h <= 3) { // Lowered threshold for structural symmetry
+    if (h <= 6) { // FIX: Draw out explicit towers up to height 6
       latex = formatBaseValue(val, base);
       for (let i = 0; i < h; i++) {
         latex = `${base}^{${latex}}`; 
@@ -710,7 +710,7 @@ function formatTower(displayElement, current) {
 
     if (expCount === 0) {
       latex = formatBaseValue(val, base);
-    } else if (expCount <= 3) { // FIX: Collapse standard towers into tetration sooner
+    } else if (expCount <= 6) { // FIX: Keep towers explicit up to height 6
       latex = formatBaseValue(val, base);
       for (let i = 0; i < expCount; i++) {
         latex = `${base}^{${latex}}`; 
@@ -733,12 +733,10 @@ function formatTetration(tetObj, formatBaseValue) {
     return `${base} \\uparrow\\uparrow {${height + 1}}`;
   } 
   else if (Math.abs(val - 1) < 1e-12) {
-    // FIX: height layers of base topped with 1 simplifies directly to base^^height
     return `${base} \\uparrow\\uparrow {${height}}`;
   } 
   else {
     let topExp = formatBaseValue(val, base);
-    // FIX: Removed the arbitrary 'height - 1' offset. Reality is now 1:1.
     return `${base} \\uparrow\\uparrow {${height}} > {${topExp}}`;
   }
 }
