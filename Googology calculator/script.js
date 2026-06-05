@@ -132,39 +132,17 @@ function parseTerm() {
 
 // LEVEL 2.25: Handles Tetration (Right-Associative)
 function parseTetration() {
-  // 1. Pass through to the next highest precedence level (Power)
-  let expr = parsePower(); // This represents 'A' (The Base)
-
-  // 2. Check if the next token matches the Tetration operator
-  if (peek() === '^^') {
-    consume(); // Eat the '^^'
-    
-    // Parse the height expression
-    let heightExpr = parseTetration(); 
-    let heightVal = heightExpr.value;
-    let remainderVal = 10; // Default base remainder if '>' is omitted
-
-    // 3. Check for your custom linear remainder modifier '>'
-    if (peek() === '>') {
-      consume(); // Eat the '>'
-      let remainderExpr = parsePower();
-      remainderVal = remainderExpr.value;
-    } else {
-      // Math catch: If '10^^3' is written without '>', it means 10^10^10.
-      // In our format, that translates to 10^^2 > 10.
-      heightVal = heightVal - 1;
+  let node = parsePower(); 
+  if (match('^^')) {
+    let right = parseTetration(); 
+    let barrier = createTower(1, 0);
+    if (match('>')) {
+      barrier = parseExpression();
     }
-
-    // 4. Package the Height (B) and Barrier into proper objects
-    // We retain heightExpr.height if it exists so giant tower heights aren't lost
-    let B_obj = createTetration(heightVal, heightExpr.height || 0);
-    let Barrier_obj = createTetration(remainderVal, 0);
-
-    // 5. Pass ALL THREE arguments to the execution engine
-    expr = executeTetration(expr, B_obj, Barrier_obj);
+    // FIXED: Changed computeTetration to executeTetration to match your engine
+    node = executeTetration(node, right, barrier);
   }
-
-  return expr;
+  return node;
 }
 
 // LEVEL 2.5: Handles Exponents (Right-Associative)
@@ -478,17 +456,17 @@ function executeExponentiation(A, B) {
 }
 
 function executeTetration(A, B, Barrier) {
-  // Safe helper to ensure every single output tower is explicitly marked as base 10
-  function finalize(tower) {
-    if (tower && typeof tower === 'object') {
-      tower.base = 10;
+  // NEW: A simple helper that ensures whatever comes out of this function is stamped as Base 10
+  function toBase10(towerObj) {
+    if (towerObj && typeof towerObj === 'object') {
+      towerObj.base = 10;
     }
-    return tower;
+    return towerObj;
   }
 
   // Case 0: INFINITY / NaN checks
-  if (isNaN(A.value) || isNaN(B.value) || isNaN(Barrier.value)) return finalize(createTower(NaN, 0));
-  if (B.value === Infinity || A.value === Infinity) return finalize(createTower(Infinity, 0));
+  if (isNaN(A.value) || isNaN(B.value) || isNaN(Barrier.value)) return toBase10(createTower(NaN, 0));
+  if (B.value === Infinity || A.value === Infinity) return toBase10(createTower(Infinity, 0));
   
   // Check if the height B is itself an ultra-giant tower structure
   let isBTower = (typeof B.height === 'object' && B.height !== null) || (typeof B.height === 'number' && B.height >= 1);
@@ -497,7 +475,7 @@ function executeTetration(A, B, Barrier) {
   // ZERO HEIGHT EDGE-CASE INTERCEPTOR
   // ==========================================
   if (!isBTower && B.value === 0) {
-    return finalize(createTower(Barrier.value, Barrier.height));
+    return toBase10(Barrier);
   }
   // ==========================================
 
@@ -507,19 +485,19 @@ function executeTetration(A, B, Barrier) {
   if (A.height === 0 && B.height === 0 && !Number.isInteger(B.value)) {
     let base = A.value;
     let exponent = B.value;
-    if (exponent < 0) return finalize(createTower(NaN, 0));
+    if (exponent < 0) return toBase10(createTower(NaN, 0));
 
     let intPart = Math.floor(exponent);
     let fracPart = exponent - intPart;
     
-    // Pure Linear Approximation Baseline
+    // Pure Linear Approximation Baseline (x^^fracPart = base^fracPart)
     let fracResult = Math.pow(base, fracPart);
 
     let newB = createTower(intPart, 0);
     let newBarrier = createTower(fracResult, 0);
     
-    // Note: Ensure your computeTetration engine also forwards to executeTetration
-    return computeTetration(A, newB, newBarrier);
+    // Recursive call: make sure this also uses executeTetration!
+    return toBase10(executeTetration(A, newB, newBarrier));
   }
   // ==========================================
   
@@ -532,69 +510,70 @@ function executeTetration(A, B, Barrier) {
 
       // Handle trivial barrier (Barrier = 1) normally
       if (bHeight === 0 && bVal === 1) {
-        if (y === 1) return finalize(A);
+        if (y === 1) return toBase10(A);
       }
 
       if (A.height === 1) {
         if (bHeight === 0) {
           if (y === 1) {
-            return finalize(createTower(A.value * bVal, 1));
+            return toBase10(createTower(A.value * bVal, 1));
           } else {
             let topVal = A.value * bVal;
             if (A.value > 0) topVal += Math.log10(A.value);
-            return finalize(createTower(topVal, y));
+            return toBase10(createTower(topVal, y));
           }
         } else {
-          return finalize(createTower(bVal, bHeight + y));
+          return toBase10(createTower(bVal, bHeight + y));
         }
       } else if (A.height === 2) {
         if (bHeight === 0) {
           if (y === 1) {
             let topVal = A.value;
             if (bVal > 0) topVal += Math.log10(bVal);
-            return finalize(createTower(topVal, 2));
+            return toBase10(createTower(topVal, 2));
           } else {
             if (A.value <= 308) {
               let topVal = A.value + bVal * Math.pow(10, A.value);
-              return finalize(createTower(topVal, y));
+              return toBase10(createTower(topVal, y));
             } else {
               let topVal = A.value;
               if (bVal > 0) topVal += Math.log10(bVal);
-              return finalize(createTower(topVal, y + 1));
+              return toBase10(createTower(topVal, y + 1));
             }
           }
         } else {
-          return finalize(createTower(bVal, bHeight + y));
+          return toBase10(createTower(bVal, bHeight + y));
         }
       } else if (A.height === 3) {
         if (bHeight === 0) {
           if (y === 1) {
             if (A.value <= 308) {
               let topVal = Math.pow(10, A.value) + Math.log10(bVal);
-              return finalize(createTower(topVal, 3));
+              return toBase10(createTower(topVal, 3));
             } else {
-              return finalize(createTower(A.value, 3));
+              return toBase10(createTower(A.value, 3));
             }
           } else {
-            return finalize(createTower(A.value, y + 2));
+            return toBase10(createTower(A.value, y + 2));
           }
         } else {
-          return finalize(createTower(bVal, bHeight + y));
+          return toBase10(createTower(bVal, bHeight + y));
         }
       } else {
         // Base is a height-4+ tower
         if (bHeight === 0) {
           if (y === 1) {
-            return finalize(createTower(A.value, A.height));
+            return toBase10(createTower(A.value, A.height));
           } else {
-            return finalize(createTower(A.value, A.height + y - 1));
+            return toBase10(createTower(A.value, A.height + y - 1));
           }
         } else {
-          return finalize(createTower(bVal, bHeight + y));
+          return toBase10(createTower(bVal, bHeight + y));
         }
       }
     } else {
-      return finalize(createTower(1, B));
+      // Height B is an ultra-giant tower! The barrier is macroscopically irrelevant.
+      return toBase10(createTower(1, B));
     }
   }
 
@@ -603,7 +582,7 @@ function executeTetration(A, B, Barrier) {
   
   if (Math.abs(base - 10) < 1e-7) {
      if (Barrier.height === 0 && Barrier.value === 1 && !isBTower && B.value > 0 && B.value < 6) {
-        return finalize(createTower(10, B.value - 1));
+        return toBase10(createTower(10, B.value - 1));
      } else if (!isBTower) {
         let bVal = Barrier.value;
         let bHeight = Barrier.height;
@@ -612,16 +591,17 @@ function executeTetration(A, B, Barrier) {
         if (bHeight === 0 && bVal < 308) {
           let collapsedValue = Math.pow(10, bVal);
           if (Number.isFinite(collapsedValue) && collapsedValue < 1e300) {
-            return finalize(createTower(collapsedValue, y - 1));
+            return toBase10(createTower(collapsedValue, y - 1));
           }
         }
-        return finalize(createTower(bVal, y + bHeight));
+        return toBase10(createTower(bVal, y + bHeight));
      } else {
-        return finalize(createTower(1, B));
+        // Height B is an ultra-giant tower!
+        return toBase10(createTower(1, B));
      }
   }
   
-  // Standard loop for small non-10 bases (Converts to Base-10 structure on overflow)
+  // Standard loop for small non-10 bases
   if (!isBTower) {
     let y = B.value;
     let iters = Math.min(y, 10);
@@ -644,9 +624,9 @@ function executeTetration(A, B, Barrier) {
       }
     }
     if (y > 10) current.height += (y - 10);
-    return finalize(current);
+    return toBase10(current);
   } else {
-    return finalize(createTower(1, B));
+    return toBase10(createTower(1, B));
   }
 }
 
