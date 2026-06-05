@@ -575,11 +575,11 @@ function executeTetration(A, B, Barrier) {
   
   if (Math.abs(base - 10) < 1e-7) {
      if (Barrier.height === 0 && Barrier.value === 1 && !isBTower && B.value > 0 && B.value < 6) {
-        // FIXED: Fully evaluate small outputs that safely fit inside standard JS numbers (<1e308)
         if (B.value === 1) return toBase10(createTower(10, 0));
-        if (B.value === 2) return toBase10(createTower(1e10, 0)); // 10^^2 is 10 billion
+        if (B.value === 2) return toBase10(createTower(1e10, 0)); // 10^^2 collapses cleanly to 10 Billion
         
-        return toBase10(createTower(10, B.value - 1));
+        // FIX: Removed "- 1" so 10^^3 gets a true structural height of 3
+        return toBase10(createTower(10, B.value)); 
      } else if (!isBTower) {
         let bVal = Barrier.value;
         let bHeight = Barrier.height;
@@ -588,17 +588,16 @@ function executeTetration(A, B, Barrier) {
         if (bHeight === 0 && bVal < 308) {
           let collapsedValue = Math.pow(10, bVal);
           
-          // FIXED: If y=1, it evaluates to just the collapsed barrier
           if (y === 1) {
              return toBase10(createTower(collapsedValue, 0));
           }
-          // FIXED: If y=2 AND the final value won't overflow Infinity, evaluate it purely!
           if (y === 2 && collapsedValue < 308) {
              return toBase10(createTower(Math.pow(10, collapsedValue), 0));
           }
           
           if (Number.isFinite(collapsedValue) && collapsedValue < 1e300) {
-            return toBase10(createTower(collapsedValue, y - 1));
+            // FIX: Changed "y - 1" to "y" so custom modifier towers keep their correct height
+            return toBase10(createTower(collapsedValue, y));
           }
         }
         return toBase10(createTower(bVal, y + bHeight));
