@@ -566,11 +566,15 @@ function executeTetration(A, B, Barrier) {
   let base = A.value;
   
   if (Math.abs(base - 10) < 1e-7) {
-     if (Barrier.height === 0 && Barrier.value === 1 && !isBTower && B.value > 0 && B.value < 6) {
-        if (B.value === 1) return createTetration(10, 0);
-        if (B.value === 2) return createTetration(1e10, 0); 
+     if (Barrier.height === 0 && Barrier.value === 1 && !isBTower) {
+        let y = B.value;
+        if (y === 1) return createTetration(10, 0);
+        if (y === 2) return createTetration(1e10, 0); 
+        if (y >= 3 && y < 6) return createTetration(10, y);
         
-        return createTetration(10, B.value); 
+        // FIX: For 10^^6 and up, return a value of 1 so the UI shortcut 
+        // doesn't accidentally add an extra layer to the height string.
+        if (y >= 6) return createTetration(1, y); 
      } else if (!isBTower) {
         let bVal = Barrier.value;
         let bHeight = Barrier.height;
@@ -587,7 +591,12 @@ function executeTetration(A, B, Barrier) {
           }
           
           if (Number.isFinite(collapsedValue) && collapsedValue < 1e300) {
-            return createTetration(collapsedValue, y);
+             // FIX: Protect custom barriers from shifting the UI shortcut height up by one
+             if (Math.abs(collapsedValue - 10) < 1e-7) {
+                if (y < 6) return createTetration(10, y);
+                return createTetration(1, y);
+             }
+             return createTetration(collapsedValue, y);
           }
         }
         return createTetration(bVal, y + bHeight);
@@ -600,7 +609,6 @@ function executeTetration(A, B, Barrier) {
   if (!isBTower) {
     let y = B.value;
     let iters = Math.min(y, 10);
-    // Initialize with the custom base
     let current = createTetration(Barrier.value, Barrier.height, base);
     
     for (let i = 0; i < iters; i++) {
@@ -611,12 +619,13 @@ function executeTetration(A, B, Barrier) {
         } else {
           // Shifting into Base-10 log space because the number exploded!
           current.value = current.value * Math.log10(base);
-          current.height = 1;
+          // FIX: Changed starting height from 1 to 2 to force the UI to render the "10^" layer
+          current.height = 2; 
           current.base = 10; 
         }
-      } else if (current.height === 1) {
+      } else if (current.height === 2) { // FIX: Adjusted branch matching to catch the height-2 shift
         current.value = current.value + Math.log10(Math.log10(base));
-        current.height = 2;
+        current.height = 3;
         current.base = 10;
       } else {
         current.height += 1;
