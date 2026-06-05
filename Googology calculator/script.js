@@ -283,12 +283,12 @@ function createTower(val, height = 0) {
 }
 
 // Creates a Tetration object: 10^^b > a
-function createTetration(remainderVal, heightVal, baseVal = 10) {
+function createTetration(value, height, base = 10) {
   return {
     type: "tetration",
-    value: remainderVal,
-    height: heightVal,
-    base: baseVal
+    value: value,
+    height: height,
+    base: base
   };
 }
 
@@ -455,9 +455,13 @@ function executeExponentiation(A, B) {
 }
 
 function executeTetration(A, B, Barrier) {
+  // Extract base safely right at the start
+  let base = (A && typeof A.base === 'number') ? A.base : 10;
+  if (A && A.height === 0) base = A.value; // If it's a flat number, its value is the base
+
   // Case 0: INFINITY / NaN checks
-  if (isNaN(A.value) || isNaN(B.value) || isNaN(Barrier.value)) return createTetration(NaN, 0);
-  if (B.value === Infinity || A.value === Infinity) return createTetration(Infinity, 0);
+  if (isNaN(A.value) || isNaN(B.value) || isNaN(Barrier.value)) return createTetration(NaN, 0, base);
+  if (B.value === Infinity || A.value === Infinity) return createTetration(Infinity, 0, base);
   
   let isBTower = (typeof B.height === 'object' && B.height !== null) || (typeof B.height === 'number' && B.height >= 1);
 
@@ -466,16 +470,15 @@ function executeTetration(A, B, Barrier) {
   }
 
   if (A.height === 0 && B.height === 0 && !Number.isInteger(B.value)) {
-    let base = A.value;
     let exponent = B.value;
-    if (exponent < 0) return createTetration(NaN, 0);
+    if (exponent < 0) return createTetration(NaN, 0, base);
 
     let intPart = Math.floor(exponent);
     let fracPart = exponent - intPart;
     let fracResult = Math.pow(base, fracPart);
 
-    let newB = createTetration(intPart, 0);
-    let newBarrier = createTetration(fracResult, 0);
+    let newB = createTetration(intPart, 0, base);
+    let newBarrier = createTetration(fracResult, 0, base);
     return executeTetration(A, newB, newBarrier);
   }
   
@@ -493,96 +496,94 @@ function executeTetration(A, B, Barrier) {
       if (A.height === 1) {
         if (bHeight === 0) {
           if (y === 1) {
-            return createTetration(A.value * bVal, 1);
+            return createTetration(A.value * bVal, 1, base);
           } else {
             let topVal = A.value * bVal;
             if (A.value > 0) topVal += Math.log10(A.value);
-            return createTetration(topVal, y);
+            return createTetration(topVal, y, base);
           }
         } else {
-          return createTetration(bVal, bHeight + y);
+          return createTetration(bVal, bHeight + y, base);
         }
       } else if (A.height === 2) {
         if (bHeight === 0) {
           if (y === 1) {
             let topVal = A.value;
             if (bVal > 0) topVal += Math.log10(bVal);
-            return createTetration(topVal, 2);
+            return createTetration(topVal, 2, base);
           } else {
             if (A.value <= 308) {
               let topVal = A.value + bVal * Math.pow(10, A.value);
-              return createTetration(topVal, y);
+              return createTetration(topVal, y, base);
             } else {
               let topVal = A.value;
               if (bVal > 0) topVal += Math.log10(bVal);
-              return createTetration(topVal, y + 1);
+              return createTetration(topVal, y + 1, base);
             }
           }
         } else {
-          return createTetration(bVal, bHeight + y);
+          return createTetration(bVal, bHeight + y, base);
         }
       } else if (A.height === 3) {
         if (bHeight === 0) {
           if (y === 1) {
             if (A.value <= 308) {
               let topVal = Math.pow(10, A.value) + Math.log10(bVal);
-              return createTetration(topVal, 3);
+              return createTetration(topVal, 3, base);
             } else {
-              return createTetration(A.value, 3);
+              return createTetration(A.value, 3, base);
             }
           } else {
-            return createTetration(A.value, y + 2);
+            return createTetration(A.value, y + 2, base);
           }
         } else {
-          return createTetration(bVal, bHeight + y);
+          return createTetration(bVal, bHeight + y, base);
         }
       } else {
         if (bHeight === 0) {
           if (y === 1) {
-            return createTetration(A.value, A.height);
+            return createTetration(A.value, A.height, base);
           } else {
-            return createTetration(A.value, A.height + y - 1);
+            return createTetration(A.value, A.height + y - 1, base);
           }
         } else {
-          return createTetration(bVal, bHeight + y);
+          return createTetration(bVal, bHeight + y, base);
         }
       }
     } else {
-      return createTetration(1, B);
+      return createTetration(1, B, base);
     }
   }
 
-  // Inside executeTetration -> Case 2: Base A is a standard number
-if (Math.abs(base - 10) < 1e-7) {
-   if (Barrier.height === 0 && Barrier.value === 1 && !isBTower) {
-      let y = B.value;
-      // FIX: Only keep explicit towers up to 5 layers
-      if (y >= 1 && y <= 5) return createTetration(10, y - 1);
-      if (y > 5) return createTetration(1, y); 
-   } else if (!isBTower) {
-      let bVal = Barrier.value;
-      let bHeight = Barrier.height;
-      let y = B.value;
+  // Case 2: Base A is a standard number (height === 0)
+  if (Math.abs(base - 10) < 1e-7) {
+     if (Barrier.height === 0 && Barrier.value === 1 && !isBTower) {
+        let y = B.value;
+        if (y >= 1 && y <= 5) return createTetration(10, y - 1, base);
+        if (y > 5) return createTetration(1, y, base); 
+     } else if (!isBTower) {
+        let bVal = Barrier.value;
+        let bHeight = Barrier.height;
+        let y = B.value;
 
-      if (bHeight === 0 && bVal < 308) {
-        let collapsedValue = Math.pow(10, bVal);
-        if (y === 1) return createTetration(collapsedValue, 0);
-        if (y === 2 && collapsedValue < 308) return createTetration(Math.pow(10, collapsedValue), 0);
-        
-        if (Number.isFinite(collapsedValue) && collapsedValue < 1e300) {
-           if (Math.abs(collapsedValue - 10) < 1e-7) {
-              // FIX: Sync nested calculations to the same threshold
-              if (y <= 5) return createTetration(10, y - 1);
-              return createTetration(1, y);
-           }
-           return createTetration(collapsedValue, y);
+        if (bHeight === 0 && bVal < 308) {
+          let collapsedValue = Math.pow(10, bVal);
+          if (y === 1) return createTetration(collapsedValue, 0, base);
+          if (y === 2 && collapsedValue < 308) return createTetration(Math.pow(10, collapsedValue), 0, base);
+          
+          if (Number.isFinite(collapsedValue) && collapsedValue < 1e300) {
+             if (Math.abs(collapsedValue - 10) < 1e-7) {
+                if (y <= 5) return createTetration(10, y - 1, base);
+                return createTetration(1, y, base);
+             }
+             return createTetration(collapsedValue, y, base);
+          }
         }
-      }
-      return createTetration(bVal, y + bHeight);
-   } else {
-      return createTetration(1, B);
-   }
-}
+        return createTetration(bVal, y + bHeight, base);
+     } else {
+        return createTetration(1, B, base);
+     }
+  }
   
   // NON-10 BASES Evaluation
   if (!isBTower) {
@@ -606,9 +607,9 @@ if (Math.abs(base - 10) < 1e-7) {
         currentHeight += 1;
       }
     }
-    return createTetration(currentVal, currentHeight);
+    return createTetration(currentVal, currentHeight, base);
   } else {
-    return createTetration(1, B);
+    return createTetration(1, B, base);
   }
 }
 
