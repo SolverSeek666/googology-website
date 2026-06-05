@@ -558,8 +558,8 @@ function executeTetration(A, B, Barrier) {
   if (Math.abs(base - 10) < 1e-7) {
      if (Barrier.height === 0 && Barrier.value === 1 && !isBTower) {
         let y = B.value;
-        // FIX: Retain clean base-10 objects up to height 6
-        if (y >= 1 && y <= 6) return createTetration(10, y);
+        // FIX: y - 1 exponentiations stacked on top of 10
+        if (y >= 1 && y <= 6) return createTetration(10, y - 1);
         if (y > 6) return createTetration(1, y); 
      } else if (!isBTower) {
         let bVal = Barrier.value;
@@ -573,8 +573,8 @@ function executeTetration(A, B, Barrier) {
           
           if (Number.isFinite(collapsedValue) && collapsedValue < 1e300) {
              if (Math.abs(collapsedValue - 10) < 1e-7) {
-                // FIX: Sync nested structures with the height-6 rule
-                if (y <= 6) return createTetration(10, y);
+                // FIX: Same offset fix here for nested evaluations
+                if (y <= 6) return createTetration(10, y - 1);
                 return createTetration(1, y);
              }
              return createTetration(collapsedValue, y);
