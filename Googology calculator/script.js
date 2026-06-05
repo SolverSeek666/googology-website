@@ -700,6 +700,11 @@ function formatTower(displayElement, current) {
       if (absVal >= 1e10 || absVal < 1e-4) {
         let exp = Math.floor(Math.log10(absVal));
         let coeff = v / Math.pow(10, exp);
+        
+        // Suppress "1 \times" if coefficient is exactly 1
+        if (Math.abs(Math.abs(coeff) - 1) < 1e-11) {
+          return `${v < 0 ? "-" : ""}10^{${exp}}`;
+        }
         return `${coeff.toFixed(4)} \\times 10^{${exp}}`;
       }
     } else {
@@ -707,6 +712,11 @@ function formatTower(displayElement, current) {
       if (absVal >= Math.pow(bse, 5) || absVal < 1 / bse) {
         let exp = Math.floor(Math.log(absVal) / Math.log(bse));
         let coeff = v / Math.pow(bse, exp);
+        
+        // Suppress "1 \times" if coefficient is exactly 1
+        if (Math.abs(Math.abs(coeff) - 1) < 1e-11) {
+          return `${v < 0 ? "-" : ""}{${bse}}^{${exp}}`;
+        }
         return `${coeff.toFixed(4)} \\times {${bse}}^{${exp}}`;
       }
     }
@@ -767,7 +777,12 @@ function formatTetration(tetObj, formatBaseValue) {
   // Collapse rule: if the remainder is exactly the base, absorb it into the height
   if (Math.abs(val - base) < 1e-12) {
     return `${base} \\uparrow\\uparrow {${height + 1}}`;
-  } else {
+  } 
+  // Barrier Clean-up: If remainder/barrier is 1, drop the "> 1" payload
+  else if (Math.abs(val - 1) < 1e-12) {
+    return `${base} \\uparrow\\uparrow {${height - 1}}`;
+  } 
+  else {
     let topExp = formatBaseValue(val, base);
     let remainingHeight = height - 1;
     return `${base} \\uparrow\\uparrow {${remainingHeight}} > {${topExp}}`;
