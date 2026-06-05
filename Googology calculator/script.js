@@ -552,39 +552,37 @@ function executeTetration(A, B, Barrier) {
     }
   }
 
-  // Case 2: Base A is a standard number (height === 0)
-  let base = A.value;
-  
-  if (Math.abs(base - 10) < 1e-7) {
-     if (Barrier.height === 0 && Barrier.value === 1 && !isBTower) {
-        let y = B.value;
-        // FIX: y - 1 exponentiations stacked on top of 10
-        if (y >= 1 && y <= 6) return createTetration(10, y - 1);
-        if (y > 6) return createTetration(1, y); 
-     } else if (!isBTower) {
-        let bVal = Barrier.value;
-        let bHeight = Barrier.height;
-        let y = B.value;
+  // Inside executeTetration -> Case 2: Base A is a standard number
+if (Math.abs(base - 10) < 1e-7) {
+   if (Barrier.height === 0 && Barrier.value === 1 && !isBTower) {
+      let y = B.value;
+      // FIX: Only keep explicit towers up to 5 layers
+      if (y >= 1 && y <= 5) return createTetration(10, y - 1);
+      if (y > 5) return createTetration(1, y); 
+   } else if (!isBTower) {
+      let bVal = Barrier.value;
+      let bHeight = Barrier.height;
+      let y = B.value;
 
-        if (bHeight === 0 && bVal < 308) {
-          let collapsedValue = Math.pow(10, bVal);
-          if (y === 1) return createTetration(collapsedValue, 0);
-          if (y === 2 && collapsedValue < 308) return createTetration(Math.pow(10, collapsedValue), 0);
-          
-          if (Number.isFinite(collapsedValue) && collapsedValue < 1e300) {
-             if (Math.abs(collapsedValue - 10) < 1e-7) {
-                // FIX: Same offset fix here for nested evaluations
-                if (y <= 6) return createTetration(10, y - 1);
-                return createTetration(1, y);
-             }
-             return createTetration(collapsedValue, y);
-          }
+      if (bHeight === 0 && bVal < 308) {
+        let collapsedValue = Math.pow(10, bVal);
+        if (y === 1) return createTetration(collapsedValue, 0);
+        if (y === 2 && collapsedValue < 308) return createTetration(Math.pow(10, collapsedValue), 0);
+        
+        if (Number.isFinite(collapsedValue) && collapsedValue < 1e300) {
+           if (Math.abs(collapsedValue - 10) < 1e-7) {
+              // FIX: Sync nested calculations to the same threshold
+              if (y <= 5) return createTetration(10, y - 1);
+              return createTetration(1, y);
+           }
+           return createTetration(collapsedValue, y);
         }
-        return createTetration(bVal, y + bHeight);
-     } else {
-        return createTetration(1, B);
-     }
-  }
+      }
+      return createTetration(bVal, y + bHeight);
+   } else {
+      return createTetration(1, B);
+   }
+}
   
   // NON-10 BASES Evaluation
   if (!isBTower) {
@@ -696,7 +694,7 @@ function formatTower(displayElement, current) {
     let val = current.value;
     let h = current.height;
 
-    if (h <= 6) { // FIX: Draw out explicit towers up to height 6
+    if (h <= 5) { // FIX: Only render explicit towers if height is 5 or less
       latex = formatBaseValue(val, base);
       for (let i = 0; i < h; i++) {
         latex = `${base}^{${latex}}`; 
@@ -710,7 +708,7 @@ function formatTower(displayElement, current) {
 
     if (expCount === 0) {
       latex = formatBaseValue(val, base);
-    } else if (expCount <= 6) { // FIX: Keep towers explicit up to height 6
+    } else if (expCount <= 5) { // FIX: Match threshold here
       latex = formatBaseValue(val, base);
       for (let i = 0; i < expCount; i++) {
         latex = `${base}^{${latex}}`; 
