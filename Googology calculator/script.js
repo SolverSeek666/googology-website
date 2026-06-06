@@ -132,7 +132,7 @@ function parseTerm() {
 
 // LEVEL 2.25: Handles Tetration (Right-Associative)
 function parseTetration() {
-  let node = parsePower(); // Evaluates Powers tighter than Tetration
+  let node = parsePower(); // FIXED: Now evaluates Powers tighter than Tetration
   if (match('^^')) {
     let right = parseTetration(); 
     let barrier = createTower(1, 0);
@@ -459,17 +459,22 @@ function executeTetration(A, B, Barrier) {
   if (isNaN(A.value) || isNaN(B.value) || isNaN(Barrier.value)) return createTower(NaN, 0);
   if (B.value === Infinity || A.value === Infinity) return createTower(Infinity, 0);
   
-  // Check if the height B is itself an ultra-giant tower structure
+  // FIXED: Check if the height B is itself an ultra-giant tower structure
   let isBTower = (typeof B.height === 'object' && B.height !== null) || (typeof B.height === 'number' && B.height >= 1);
 
-  // ZERO HEIGHT EDGE-CASE INTERCEPTOR
+  // ==========================================
+  // FIX: ZERO HEIGHT EDGE-CASE INTERCEPTOR
   // Tetration to a height of 0 simply returns the baseline barrier
+  // ==========================================
   if (!isBTower && B.value === 0) {
     return Barrier;
   }
+  // ==========================================
 
+  // ==========================================
   // PURE LINEAR FRACTIONAL TETRATION INTERCEPTOR
   // Ensures a perfectly smooth, unbroken curve for all decimals
+  // ==========================================
   if (A.height === 0 && B.height === 0 && !Number.isInteger(B.value)) {
     let base = A.value;
     let exponent = B.value;
@@ -485,9 +490,9 @@ function executeTetration(A, B, Barrier) {
     let newB = createTower(intPart, 0);
     let newBarrier = createTower(fracResult, 0);
     
-    // Assumed typo fix: computeTetration -> executeTetration
-    return executeTetration(A, newB, newBarrier);
+    return executeTetration(A, newB, newBarrier); // Fixed computeTetration typo
   }
+  // ==========================================
   
   // Case 1: Base A is already a giant tower (height >= 1)
   if (A.height >= 1) {
@@ -561,7 +566,7 @@ function executeTetration(A, B, Barrier) {
       }
     } else {
       // Height B is an ultra-giant tower! The barrier is macroscopically irrelevant.
-      return createTetration(B);
+      return createTower(1, B);
     }
   }
 
@@ -585,7 +590,7 @@ function executeTetration(A, B, Barrier) {
         return createTower(bVal, y + bHeight);
      } else {
         // Height B is an ultra-giant tower!
-        return createTetration(B);
+        return createTower(1, B);
      }
   }
   
@@ -614,8 +619,7 @@ function executeTetration(A, B, Barrier) {
     if (y > 10) current.height += (y - 10);
     return current;
   } else {
-    // Escaped standard bounds
-    return createTetration(B);
+    return createTower(1, B);
   }
 }
 
@@ -661,28 +665,8 @@ function executeTrig(type, target) {
 }
 
 // ============================================================================
-// SECTION 3: DISPLAY FORMATTING ROUTER (AUTOMATIC TETRATION STACKER)
+// SECTION 3: DISPLAY FORMATTING ROUTER
 // ============================================================================
-
-function formatTetration(display, stack) {
-  let formattedStr = formatBaseTower(stack.topTower);
-  
-  if (stack.layers === 1) {
-    // Rule: Layer 1 after tetration adds parenthesis if it contains scientific notation (\times)
-    if (formattedStr.includes("\\times")) {
-      renderMath(display, `10 \\uparrow\\uparrow {(${formattedStr})}`);
-    } else {
-      renderMath(display, `10 \\uparrow\\uparrow {${formattedStr}}`);
-    }
-  } else {
-    // Rule: Layer 2 or higher requires NO parenthesis
-    let prefix = "";
-    for (let i = 0; i < stack.layers; i++) {
-      prefix += "10 \\uparrow\\uparrow ";
-    }
-    renderMath(display, `${prefix}{${formattedStr}}`);
-  }
-}
 
 function formatTower(display, current) {
   // 1. Handle Infinity & NaN explicitly at the very beginning
@@ -713,10 +697,34 @@ function formatTower(display, current) {
     }
   }
 
-  // 3. Resolve Tetration Stack -> Delegate to formatTetration
+  // 3. Resolve Tetration Stack
   let stack = resolveTetrationStack(current);
+  
   if (stack !== null) {
-    return formatTetration(display, stack);
+    // Exact mapping for "a > b" notation based on continuous heights
+    let totalValue = stack.topTower.value;
+    let a = Math.floor(totalValue);
+    let frac = totalValue - a;
+    let b = Math.pow(10, frac);
+
+    let bStr = b.toFixed(4);
+    if (bStr === "10.0000") {
+      a += 1;
+      bStr = "1.0000";
+    }
+
+    let latexStr = bStr === "1.0000" ? `${a}` : `${a} > ${bStr}`;
+    
+    if (stack.layers === 1) {
+      renderMath(display, `10 \\uparrow\\uparrow {${latexStr}}`);
+    } else {
+      let prefix = "";
+      for (let i = 0; i < stack.layers; i++) {
+        prefix += "10 \\uparrow\\uparrow ";
+      }
+      renderMath(display, `${prefix}{${latexStr}}`);
+    }
+    return;
   }
 
   // 4. FALLBACK BASE CASES (For numbers below the tetration threshold)
@@ -728,9 +736,8 @@ function formatTower(display, current) {
       let logVal = Math.log10(current.value);
       renderMath(display, `10^{${toLatexSci(logVal)}}`);
     }
-  } else if (current.height === 1) {
-    renderMath(display, `10^{${toLatexSci(current.value)}}`);
   } else {
+    // NEW: Height 1 now falls into this block, converting to exact standard Scientific Notation (a * 10^b)
     let exp = Math.floor(current.value);
     let coeff = Math.pow(10, current.value - exp);
     
@@ -748,10 +755,6 @@ function formatTower(display, current) {
     renderMath(display, `${latex}`);
   }
 }
-
-// ============================================================================
-// HELPERS & RENDERING
-// ============================================================================
 
 // Helper to extract the single continuous tetration height of any tower
 function getTetrationHeightTower(t) {
@@ -812,58 +815,11 @@ function resolveTetrationStack(current) {
   return { layers, topTower: curr };
 }
 
-// Formats the remaining top-level base tower into clean scientific notation or basic towers
-function formatBaseTower(t) {
-  if (!t) return "0";
-  
-  const cleanSci = (num) => {
-    let str = String(num);
-    if (str.includes('e')) {
-      let [coeff, exp] = str.split('e');
-      exp = exp.replace('+', ''); 
-      let parsedCoeff = parseFloat(coeff);
-      let coeffStr = parsedCoeff.toFixed(4);
-      if (coeff === '1' || coeffStr === '1.0000') return `10^{${exp}}`;
-      return `${coeffStr} \\times 10^{${exp}}`;
-    }
-    if (num >= 1e10) {
-      let log = Math.log10(num);
-      let exp = Math.floor(log);
-      let coeff = Math.pow(10, log - exp);
-      if (coeff.toFixed(4) === "10.0000") {
-        coeff = 1;
-        exp += 1;
-      }
-      let coeffStr = coeff.toFixed(4);
-      if (coeffStr === "1.0000") return `10^{${exp}}`;
-      return `${coeffStr} \\times 10^{${exp}}`;
-    }
-    return str;
-  };
+// (The formatBaseTower function is no longer required due to the direct "a > b" algebraic mapping)
 
-  if (t.height === 0) {
-    if (t.value < 100000) {
-      return Number(t.value.toFixed(4)).toString();
-    }
-    return cleanSci(t.value);
-  }
-  
-  let exp = Math.floor(t.value);
-  let coeff = Math.pow(10, t.value - exp);
-  if (coeff.toFixed(4) === "10.0000") {
-    coeff = 1;
-    exp += 1;
-  }
-  
-  let coeffStr = coeff.toFixed(4);
-  let expStr = exp >= 100000 ? cleanSci(exp) : exp.toString();
-  let latex = coeffStr === "1.0000" ? `10^{${expStr}}` : `${coeffStr} \\times 10^{${expStr}}`;
-  
-  for (let h = 0; h < t.height - 1; h++) {
-    latex = `10^{${latex}}`;
-  }
-  return latex;
-}
+// ============================================================================
+// SECTION 4: THE OUTPUT RENDERING
+// ============================================================================
 
 function renderMath(element, latex) {
   element.innerHTML = `\\[ ${latex} \\]`;
