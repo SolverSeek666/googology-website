@@ -464,19 +464,6 @@ function executeTetration(A, B, Barrier) {
     return Barrier;
   }
 
-  if (A.height === 0 && B.height === 0 && !Number.isInteger(B.value)) {
-    let exponent = B.value;
-    if (exponent < 0) return createTetration(NaN, 0);
-
-    let intPart = Math.floor(exponent);
-    let fracPart = exponent - intPart;
-    let fracResult = Math.pow(10, fracPart);
-
-    let newB = createTetration(intPart, 0);
-    let newBarrier = createTetration(fracResult, 0);
-    return executeTetration(A, newB, newBarrier);
-  }
-  
   // Case 1: Base A is already a giant tower (height >= 1)
   if (A.height >= 1) {
     if (!isBTower) {
@@ -550,32 +537,65 @@ function executeTetration(A, B, Barrier) {
     }
   }
 
-  // Case 2: Base A is a standard number (height === 0) -> ALWAYS BASE 10
-  if (Barrier.height === 0 && Barrier.value === 1 && !isBTower) {
-     let y = B.value;
-     if (y >= 1 && y <= 5) return createTetration(10, y - 1);
-     if (y > 5) return createTetration(1, y); 
-  } else if (!isBTower) {
-     let bVal = Barrier.value;
-     let bHeight = Barrier.height;
-     let y = B.value;
+  // Case 2: Base A is a standard number (height === 0)
+  let base = A.value;
 
-     if (bHeight === 0 && bVal < 308) {
-       let collapsedValue = Math.pow(10, bVal);
-       if (y === 1) return createTetration(collapsedValue, 0);
-       if (y === 2 && collapsedValue < 308) return createTetration(Math.pow(10, collapsedValue), 0);
-       
-       if (Number.isFinite(collapsedValue) && collapsedValue < 1e300) {
-          if (Math.abs(collapsedValue - 10) < 1e-7) {
-             if (y <= 5) return createTetration(10, y - 1);
-             return createTetration(1, y);
+  // STRICT CHECK: Only use shortcuts if the actual input base is 10
+  if (Math.abs(base - 10) < 1e-7) {
+     if (Barrier.height === 0 && Barrier.value === 1 && !isBTower) {
+        let y = B.value;
+        if (y >= 1 && y <= 5) return createTetration(10, y - 1);
+        if (y > 5) return createTetration(1, y); 
+     } else if (!isBTower) {
+        let bVal = Barrier.value;
+        let bHeight = Barrier.height;
+        let y = B.value;
+
+        if (bHeight === 0 && bVal < 308) {
+          let collapsedValue = Math.pow(10, bVal);
+          if (y === 1) return createTetration(collapsedValue, 0);
+          if (y === 2 && collapsedValue < 308) return createTetration(Math.pow(10, collapsedValue), 0);
+          
+          if (Number.isFinite(collapsedValue) && collapsedValue < 1e300) {
+             if (Math.abs(collapsedValue - 10) < 1e-7) {
+                if (y <= 5) return createTetration(10, y - 1);
+                return createTetration(1, y);
+             }
+             return createTetration(collapsedValue, y);
           }
-          return createTetration(collapsedValue, y);
-       }
+        }
+        return createTetration(bVal, y + bHeight);
+     } else {
+        return createTetration(1, B);
      }
-     return createTetration(bVal, y + bHeight);
+  }
+  
+  // FALLBACK FOR OTHER NUMBERS: Evaluates safely without altering the object structure
+  if (!isBTower) {
+    let y = B.value;
+    let currentVal = Barrier.value;
+    let currentHeight = Barrier.height;
+    
+    for (let i = 0; i < y; i++) {
+      if (currentHeight === 0) {
+        let next = Math.pow(base, currentVal);
+        if (Number.isFinite(next) && next < 1e300) {
+          currentVal = next;
+        } else {
+          // Converts to a base-10 tower representation on the fly once it overflows standard JS limits
+          currentVal = currentVal * Math.log10(base);
+          currentHeight = 1; 
+        }
+      } else if (currentHeight === 1) { 
+        currentVal = currentVal + Math.log10(Math.log10(base));
+        currentHeight = 2; 
+      } else {
+        currentHeight += 1;
+      }
+    }
+    return createTetration(currentVal, currentHeight);
   } else {
-     return createTetration(1, B);
+    return createTetration(1, B);
   }
 }
 
