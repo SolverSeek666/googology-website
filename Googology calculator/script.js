@@ -487,7 +487,6 @@ function executeTetration(A, B, Barrier) {
       let currentHeight = (A.type === "tetration" || A.type === "arrow") ? A.height : A.height;
       let finalHeight = currentHeight + y - 1;
       
-      // Upgrades to arrow ONLY if it eclipses the 10^10 limit
       if (finalHeight > 1e10 || A.type === "arrow") {
         return createArrow(A.value || 1, finalHeight, 2);
       }
@@ -567,15 +566,15 @@ function executeTetration(A, B, Barrier) {
     }
     if (y > 10) current.height += (y - 10);
     
-    // Normalize top values to base-10
     let normValue = current.value;
     let normHeight = current.height;
-    while (normValue >= 10) {
-      normHeight += 1;
-      normValue = Math.log10(normValue);
+    if (normHeight >= 1) {
+      while (normValue >= 1e10) {
+        normHeight += 1;
+        normValue = Math.log10(normValue);
+      }
     }
 
-    // Direct structural assignment based on height scale
     if (normHeight > 1e10) {
       return createArrow(normValue, normHeight, 2);
     } else if (normHeight >= 6) {
@@ -641,7 +640,7 @@ function formatTower(display, current) {
     if (isNaN(current.value)) return renderMath(display, "\\text{Undefined}");
   }
 
-  // CRITICAL INTERCEPTOR: Route Arrow objects immediately before they touch tower logic
+  // IMPLEMENTED ADDITION: Safe interceptor for Arrow objects
   if (current.type === "arrow") {
     return formatArrow(display, current);
   }
@@ -702,15 +701,19 @@ function formatTower(display, current) {
   }
 }
 
-// Your exact, beautiful Unwinding Tetration Formatter
+// NEW: Dedicated Tetration Formatter
 function formatTetration(display, stack) {
   let totalValue = stack.topTower.value;
   let a = Math.floor(totalValue);
   let frac = totalValue - a;
   let b = Math.pow(10, frac);
 
+  // Determine if the fractional part is effectively an integer boundary
   let isInteger = (b.toFixed(4) === "1.0000" || b.toFixed(4) === "10.0000");
 
+  // UNWIND LOGIC: Step down one base-10 layer to reveal the macroscopic top value.
+  // This expands `b` to the [10, 10^10) range, 
+  // transforming 10^^7 > 4.5600 directly into 10^^6 > 36305.xxxx
   if (!isInteger && a >= 1) {
     a -= 1;
     b = Math.pow(10, b);
@@ -792,9 +795,9 @@ function resolveTetrationStack(current) {
   return { layers, topTower: curr };
 }
 
-// NEW: Dedicated Arrow Formatter (Handles expressions when height eclipses 10^^10^10)
+// IMPLEMENTED ADDITION: Dedicated rendering engine for structural Knuth Arrow objects
 function formatArrow(display, current) {
-  let arrowSymbol = "\\uparrow".repeat(current.arrows); // Generates \uparrow\uparrow
+  let arrowSymbol = "\\uparrow".repeat(current.arrows);
   let heightLatex = "";
 
   if (typeof current.height === 'number') {
@@ -805,8 +808,6 @@ function formatArrow(display, current) {
       heightLatex = current.height.toString();
     }
   } else if (current.height && typeof current.height === 'object') {
-    // Elegant trick: Use a detached DOM node to seamlessly let formatTower 
-    // evaluate the complex inner height object without duplicate code!
     let dummy = document.createElement('div');
     formatTower(dummy, current.height);
     let match = dummy.innerHTML.match(/\\\[\s*([\s\S]*?)\s*\\\]/);
@@ -815,7 +816,6 @@ function formatArrow(display, current) {
 
   renderMath(display, `10 ${arrowSymbol} {${heightLatex}}`);
 }
-
 // ============================================================================
 // SECTION 4: THE OUTPUT RENDERING
 // ============================================================================
