@@ -697,34 +697,10 @@ function formatTower(display, current) {
     }
   }
 
-  // 3. Resolve Tetration Stack
+  // 3. Resolve Tetration Stack and delegate to formatTetration
   let stack = resolveTetrationStack(current);
-  
   if (stack !== null) {
-    // Exact mapping for "a > b" notation based on continuous heights
-    let totalValue = stack.topTower.value;
-    let a = Math.floor(totalValue);
-    let frac = totalValue - a;
-    let b = Math.pow(10, frac);
-
-    let bStr = b.toFixed(4);
-    if (bStr === "10.0000") {
-      a += 1;
-      bStr = "1.0000";
-    }
-
-    let latexStr = bStr === "1.0000" ? `${a}` : `${a} > ${bStr}`;
-    
-    if (stack.layers === 1) {
-      renderMath(display, `10 \\uparrow\\uparrow {${latexStr}}`);
-    } else {
-      let prefix = "";
-      for (let i = 0; i < stack.layers; i++) {
-        prefix += "10 \\uparrow\\uparrow ";
-      }
-      renderMath(display, `${prefix}{${latexStr}}`);
-    }
-    return;
+    return formatTetration(display, stack);
   }
 
   // 4. FALLBACK BASE CASES (For numbers below the tetration threshold)
@@ -737,7 +713,7 @@ function formatTower(display, current) {
       renderMath(display, `10^{${toLatexSci(logVal)}}`);
     }
   } else {
-    // NEW: Height 1 now falls into this block, converting to exact standard Scientific Notation (a * 10^b)
+    // Height 1+ fallback, converting to exact standard Scientific Notation (a * 10^b)
     let exp = Math.floor(current.value);
     let coeff = Math.pow(10, current.value - exp);
     
@@ -753,6 +729,41 @@ function formatTower(display, current) {
       latex = `10^{${latex}}`;
     }
     renderMath(display, `${latex}`);
+  }
+}
+
+// NEW: Dedicated Tetration Formatter
+function formatTetration(display, stack) {
+  let totalValue = stack.topTower.value;
+  let a = Math.floor(totalValue);
+  let frac = totalValue - a;
+  let b = Math.pow(10, frac);
+
+  // Determine if the fractional part is effectively an integer boundary
+  let isInteger = (b.toFixed(4) === "1.0000" || b.toFixed(4) === "10.0000");
+
+  // UNWIND LOGIC: Step down one base-10 layer to reveal the macroscopic top value.
+  // This expands `b` to the [10, 10^10) range, 
+  // transforming 10^^7 > 4.5600 directly into 10^^6 > 36305.xxxx
+  if (!isInteger && a >= 1) {
+    a -= 1;
+    b = Math.pow(10, b);
+  } else if (b.toFixed(4) === "10.0000") {
+    a += 1;
+    b = 1;
+  }
+
+  let bStr = b.toFixed(4);
+  let latexStr = (isInteger || bStr === "1.0000") ? `${a}` : `${a} > ${bStr}`;
+  
+  if (stack.layers === 1) {
+    renderMath(display, `10 \\uparrow\\uparrow {${latexStr}}`);
+  } else {
+    let prefix = "";
+    for (let i = 0; i < stack.layers; i++) {
+      prefix += "10 \\uparrow\\uparrow ";
+    }
+    renderMath(display, `${prefix}{${latexStr}}`);
   }
 }
 
@@ -792,7 +803,7 @@ function isPastDoubleTetrationThreshold(t) {
     v = Math.log10(v);
   }
   if (h > 6) return true;
-  if (h === 6) return v > 1; // Since 10^^6 fully normalizes down to height 6, value 1
+  if (h === 6) return v > 1; 
   return false;
 }
 
@@ -814,8 +825,6 @@ function resolveTetrationStack(current) {
   
   return { layers, topTower: curr };
 }
-
-// (The formatBaseTower function is no longer required due to the direct "a > b" algebraic mapping)
 
 // ============================================================================
 // SECTION 4: THE OUTPUT RENDERING
