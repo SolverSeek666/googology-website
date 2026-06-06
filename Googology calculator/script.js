@@ -459,8 +459,8 @@ function executeTetration(A, B, Barrier) {
   if (isNaN(A.value) || isNaN(B.value) || isNaN(Barrier.value)) return createTower(NaN, 0);
   if (B.value === Infinity || A.value === Infinity) return createTower(Infinity, 0);
   
-  // Check if the height B is itself an ultra-giant tower structure
-  let isBTower = (typeof B.height === 'object' && B.height !== null) || (typeof B.height === 'number' && B.height >= 1);
+  // Check if height B is a massive structural node
+  let isBTower = (B.type === "tetration" || B.type === "arrow" || (typeof B.height === 'number' && B.height >= 1));
 
   // ZERO HEIGHT EDGE-CASE INTERCEPTOR
   if (!isBTower && B.value === 0) {
@@ -468,92 +468,32 @@ function executeTetration(A, B, Barrier) {
   }
 
   // PURE LINEAR FRACTIONAL TETRATION INTERCEPTOR
-  if (A.height === 0 && B.height === 0 && !Number.isInteger(B.value)) {
+  if ((!A.type || A.type === "tower") && A.height === 0 && (!B.type || B.type === "tower") && B.height === 0 && !Number.isInteger(B.value)) {
     let base = A.value;
     let exponent = B.value;
     if (exponent < 0) return createTower(NaN, 0);
 
     let intPart = Math.floor(exponent);
     let fracPart = exponent - intPart;
-    
     let fracResult = Math.pow(base, fracPart);
 
-    let newB = createTower(intPart, 0);
-    let newBarrier = createTower(fracResult, 0);
-    
-    return executeTetration(A, newB, newBarrier);
+    return executeTetration(A, createTower(intPart, 0), createTower(fracResult, 0));
   }
   
-  // Case 1: Base A is already a giant tower (height >= 1)
-  if (A.height >= 1) {
+  // Case 1: Base A is already a large structural node
+  if (A.type === "tetration" || A.type === "arrow" || A.height >= 1) {
     if (!isBTower) {
       let y = B.value;
-      let bVal = Barrier.value;
-      let bHeight = Barrier.height;
-
-      if (bHeight === 0 && bVal === 1) {
-        if (y === 1) return A;
+      let currentHeight = (A.type === "tetration" || A.type === "arrow") ? A.height : A.height;
+      let finalHeight = currentHeight + y - 1;
+      
+      // Upgrades to arrow ONLY if it eclipses the 10^10 limit
+      if (finalHeight > 1e10 || A.type === "arrow") {
+        return createArrow(A.value || 1, finalHeight, 2);
       }
-
-      if (A.height === 1) {
-        if (bHeight === 0) {
-          if (y === 1) {
-            return createTower(A.value * bVal, 1);
-          } else {
-            let topVal = A.value * bVal;
-            if (A.value > 0) topVal += Math.log10(A.value);
-            return createTower(topVal, y);
-          }
-        } else {
-          return createTower(bVal, bHeight + y);
-        }
-      } else if (A.height === 2) {
-        if (bHeight === 0) {
-          if (y === 1) {
-            let topVal = A.value;
-            if (bVal > 0) topVal += Math.log10(bVal);
-            return createTower(topVal, 2);
-          } else {
-            if (A.value <= 308) {
-              let topVal = A.value + bVal * Math.pow(10, A.value);
-              return createTower(topVal, y);
-            } else {
-              let topVal = A.value;
-              if (bVal > 0) topVal += Math.log10(bVal);
-              return createTower(topVal, y + 1);
-            }
-          }
-        } else {
-          return createTower(bVal, bHeight + y);
-        }
-      } else if (A.height === 3) {
-        if (bHeight === 0) {
-          if (y === 1) {
-            if (A.value <= 308) {
-              let topVal = Math.pow(10, A.value) + Math.log10(bVal);
-              return createTower(topVal, 3);
-            } else {
-              return createTower(A.value, 3);
-            }
-          } else {
-            return createTower(A.value, y + 2);
-          }
-        } else {
-          return createTower(bVal, bHeight + y);
-        }
-      } else {
-        if (bHeight === 0) {
-          if (y === 1) {
-            return createTower(A.value, A.height);
-          } else {
-            return createTower(A.value, A.height + y - 1);
-          }
-        } else {
-          return createTower(bVal, bHeight + y);
-        }
-      }
+      return createTetration(A.value || 1, finalHeight);
     } else {
-      return createTower(1, B);
+      return createArrow(1, B, 2);
     }
   }
 
@@ -561,53 +501,53 @@ function executeTetration(A, B, Barrier) {
   let base = A.value;
   
   if (Math.abs(base - 10) < 1e-7) {
-     if (Barrier.height === 0 && Barrier.value === 1 && !isBTower && B.value > 0 && B.value < 6) {
+     if ((!Barrier.type || Barrier.type === "tower") && Barrier.height === 0 && Barrier.value === 1 && !isBTower && B.value > 0 && B.value < 6) {
         return createTower(10, B.value - 1);
      } else if (!isBTower) {
         let bVal = Barrier.value;
-        let bHeight = Barrier.height;
+        let bHeight = Barrier.height || 0;
         let y = B.value;
 
-        if (bHeight === 0 && bVal < 308) {
+        if ((!Barrier.type || Barrier.type === "tower") && bHeight === 0 && bVal < 308) {
           let collapsedValue = Math.pow(10, bVal);
           if (Number.isFinite(collapsedValue) && collapsedValue < 1e300) {
-            return createTower(collapsedValue, y - 1);
+            let h = y - 1;
+            if (h > 1e10) return createArrow(collapsedValue, h, 2);
+            if (h >= 6) return createTetration(collapsedValue, h);
+            return createTower(collapsedValue, h);
           }
         }
-        return createTower(bVal, y + bHeight);
+        
+        let h = y + bHeight;
+        if (h > 1e10) return createArrow(bVal, h, 2);
+        if (h >= 6) return createTetration(bVal, h);
+        return createTower(bVal, h);
      } else {
-        return createTower(1, B);
+        return createArrow(1, B, 2);
      }
   }
   
-  // ==========================================
-  // NEW: CONVERGING BASE INTERCEPTOR (Bases <= e^(1/e))
-  // Prevents height creeping and safely computes fixed-point stabilization
-  // ==========================================
+  // CONVERGING BASE INTERCEPTOR (Bases <= e^(1/e))
   if (base > 0 && base <= Math.exp(1 / Math.E)) {
-    let current = createTower(Barrier.value, Barrier.height);
-    if (current.height === 0) {
-      let limit = isBTower ? 2000 : Math.min(B.value, 2000);
-      for (let i = 0; i < limit; i++) {
-        let next = Math.pow(base, current.value);
-        if (!Number.isFinite(next) || isNaN(next)) break;
-        // If it stabilizes early, we can exit safely
-        if (Math.abs(next - current.value) < 1e-12) {
-          current.value = next;
-          break;
-        }
+    let current = createTower(Barrier.value, Barrier.height || 0);
+    let limit = isBTower ? 2000 : Math.min(B.value, 2000);
+    for (let i = 0; i < limit; i++) {
+      let next = Math.pow(base, current.value);
+      if (!Number.isFinite(next) || isNaN(next)) break;
+      if (Math.abs(next - current.value) < 1e-12) {
         current.value = next;
+        break;
       }
-      return current;
+      current.value = next;
     }
+    return current;
   }
-  // ==========================================
 
   // Standard loop for exploding small non-10 bases (Bases > e^(1/e))
   if (!isBTower) {
     let y = B.value;
     let iters = Math.min(y, 10);
-    let current = createTower(Barrier.value, Barrier.height);
+    let current = createTower(Barrier.value, Barrier.height || 0);
     
     for (let i = 0; i < iters; i++) {
       if (current.height === 0) {
@@ -626,9 +566,25 @@ function executeTetration(A, B, Barrier) {
       }
     }
     if (y > 10) current.height += (y - 10);
-    return current;
+    
+    // Normalize top values to base-10
+    let normValue = current.value;
+    let normHeight = current.height;
+    while (normValue >= 10) {
+      normHeight += 1;
+      normValue = Math.log10(normValue);
+    }
+
+    // Direct structural assignment based on height scale
+    if (normHeight > 1e10) {
+      return createArrow(normValue, normHeight, 2);
+    } else if (normHeight >= 6) {
+      return createTetration(normValue, normHeight);
+    } else {
+      return createTower(normValue, normHeight);
+    }
   } else {
-    return createTower(1, B);
+    return createArrow(1, B, 2);
   }
 }
 
@@ -683,6 +639,11 @@ function formatTower(display, current) {
     if (current.value === Infinity) return renderMath(display, "\\infty");
     if (current.value === -Infinity) return renderMath(display, "-\\infty");
     if (isNaN(current.value)) return renderMath(display, "\\text{Undefined}");
+  }
+
+  // CRITICAL INTERCEPTOR: Route Arrow objects immediately before they touch tower logic
+  if (current.type === "arrow") {
+    return formatArrow(display, current);
   }
 
   const toLatexSci = (num) => {
@@ -741,19 +702,15 @@ function formatTower(display, current) {
   }
 }
 
-// NEW: Dedicated Tetration Formatter
+// Your exact, beautiful Unwinding Tetration Formatter
 function formatTetration(display, stack) {
   let totalValue = stack.topTower.value;
   let a = Math.floor(totalValue);
   let frac = totalValue - a;
   let b = Math.pow(10, frac);
 
-  // Determine if the fractional part is effectively an integer boundary
   let isInteger = (b.toFixed(4) === "1.0000" || b.toFixed(4) === "10.0000");
 
-  // UNWIND LOGIC: Step down one base-10 layer to reveal the macroscopic top value.
-  // This expands `b` to the [10, 10^10) range, 
-  // transforming 10^^7 > 4.5600 directly into 10^^6 > 36305.xxxx
   if (!isInteger && a >= 1) {
     a -= 1;
     b = Math.pow(10, b);
@@ -833,6 +790,30 @@ function resolveTetrationStack(current) {
   }
   
   return { layers, topTower: curr };
+}
+
+// NEW: Dedicated Arrow Formatter (Handles expressions when height eclipses 10^^10^10)
+function formatArrow(display, current) {
+  let arrowSymbol = "\\uparrow".repeat(current.arrows); // Generates \uparrow\uparrow
+  let heightLatex = "";
+
+  if (typeof current.height === 'number') {
+    if (current.height >= 1e10) {
+      let logHeight = Math.log10(current.height);
+      heightLatex = `10^{${logHeight.toFixed(4)}}`;
+    } else {
+      heightLatex = current.height.toString();
+    }
+  } else if (current.height && typeof current.height === 'object') {
+    // Elegant trick: Use a detached DOM node to seamlessly let formatTower 
+    // evaluate the complex inner height object without duplicate code!
+    let dummy = document.createElement('div');
+    formatTower(dummy, current.height);
+    let match = dummy.innerHTML.match(/\\\[\s*([\s\S]*?)\s*\\\]/);
+    heightLatex = match ? match[1] : "{\\dots}";
+  }
+
+  renderMath(display, `10 ${arrowSymbol} {${heightLatex}}`);
 }
 
 // ============================================================================
