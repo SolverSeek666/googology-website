@@ -283,7 +283,7 @@ function createTower(val, height = 0) {
   return { value: val, height: height };
 }
 
-// Creates a Tetration object: 10^^b > a
+// Creates a Tetration object: 10^^height > value
 function createTetration(value, height) {
   return {
     type: "tetration",
@@ -293,12 +293,12 @@ function createTetration(value, height) {
 }
 
 // Skeleton for the future Arrow expansion: 10^...^a with c arrows, height b
-function createArrow(a, b, c) {
+function createArrow(value, height, arrows) {
   return {
     type: "arrow",
-    value: a,
-    height: b,
-    arrows: c
+    value: value,
+    height: height,
+    arrows: arrows
   };
 }
 
