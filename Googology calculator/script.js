@@ -540,37 +540,33 @@ function executeTetration(A, B, Barrier) {
   // Case 2: Base A is a standard number (height === 0)
   let base = A.value;
 
-  // STRICT CHECK: Only use shortcuts if the actual input base is 10
+  // BASE-10 DEEP SHORTCUTS
   if (Math.abs(base - 10) < 1e-7) {
-     if (Barrier.height === 0 && Barrier.value === 1 && !isBTower) {
-        let y = B.value;
-        if (y >= 1 && y <= 5) return createTetration(10, y - 1);
-        if (y > 5) return createTetration(1, y); 
-     } else if (!isBTower) {
-        let bVal = Barrier.value;
-        let bHeight = Barrier.height;
-        let y = B.value;
+    if (isBTower) return createTetration(1, B);
+    
+    let y = B.value;
+    let bVal = Barrier.value;
+    let bHeight = Barrier.height;
 
-        if (bHeight === 0 && bVal < 308) {
-          let collapsedValue = Math.pow(10, bVal);
-          if (y === 1) return createTetration(collapsedValue, 0);
-          if (y === 2 && collapsedValue < 308) return createTetration(Math.pow(10, collapsedValue), 0);
-          
-          if (Number.isFinite(collapsedValue) && collapsedValue < 1e300) {
-             if (Math.abs(collapsedValue - 10) < 1e-7) {
-                if (y <= 5) return createTetration(10, y - 1);
-                return createTetration(1, y);
-             }
-             return createTetration(collapsedValue, y);
-          }
+    if (bHeight === 0) {
+      if (Math.abs(bVal - 1) < 1e-7) {
+        if (y <= 5) return createTetration(10, y - 1);
+        return createTetration(1, y);
+      }
+      
+      if (bVal < 308) {
+        let collapsedValue = Math.pow(10, bVal);
+        if (Math.abs(collapsedValue - 10) < 1e-7) {
+          if (y + 1 <= 5) return createTetration(10, y);
+          return createTetration(1, y + 1);
         }
-        return createTetration(bVal, y + bHeight);
-     } else {
-        return createTetration(1, B);
-     }
+        return createTetration(collapsedValue, y);
+      }
+    }
+    return createTetration(bVal, y + bHeight);
   }
   
-  // FALLBACK FOR OTHER NUMBERS: Evaluates safely without altering the object structure
+  // FALLBACK PROCESSING FOR NON-10 BASES (e.g., 6^^1, 6^^2)
   if (!isBTower) {
     let y = B.value;
     let currentVal = Barrier.value;
@@ -582,7 +578,6 @@ function executeTetration(A, B, Barrier) {
         if (Number.isFinite(next) && next < 1e300) {
           currentVal = next;
         } else {
-          // Converts to a base-10 tower representation on the fly once it overflows standard JS limits
           currentVal = currentVal * Math.log10(base);
           currentHeight = 1; 
         }
@@ -644,59 +639,49 @@ function executeTrig(type, target) {
 // SECTION 3: DISPLAY ROUTER & RENDERMATH BRIDGE (DYNAMIC BASE EDITION - FIXED)
 // ============================================================================
 
-function formatTower(displayElement, current) {
-  if (!current || isNaN(current.value)) {
-    renderMath(displayElement, "\\text{Undefined}");
-    return;
-  }
-
-  let latex = "";
+function getTowerLatex(current) {
+  if (!current || isNaN(current.value)) return "\\text{Undefined}";
 
   function formatBaseValue(v) {
     if (v === 0) return "0";
     let absVal = Math.abs(v);
-    
     if (absVal >= 1e10 || absVal < 1e-4) {
       let exp = Math.floor(Math.log10(absVal));
       let coeff = v / Math.pow(10, exp);
       if (Math.abs(Math.abs(coeff) - 1) < 1e-11) return `${v < 0 ? "-" : ""}10^{${exp}}`;
       return `${coeff.toFixed(4)} \\times 10^{${exp}}`;
     }
-    
     if (Math.abs(v - Math.round(v)) < 1e-12) return Math.round(v).toString();
     return v.toFixed(4);
   }
 
-  if (current.type === "tetration") {
-    let val = current.value;
-    let h = current.height;
+  let val = current.value;
+  let h = current.height;
+  
+  // Recursively stringify the height if it is a sub-tower object
+  let heightStr = (typeof h === 'object' && h !== null) ? getTowerLatex(h) : h;
 
-    if (h <= 5) { 
-      latex = formatBaseValue(val);
+  if (current.type === "tetration" || (typeof h === 'number' && h > 0) || typeof h === 'object') {
+    if (typeof h === 'number' && h <= 5) {
+      let latex = formatBaseValue(val);
       for (let i = 0; i < h; i++) {
-        latex = `10^{${latex}}`; 
+        latex = `10^{${latex}}`;
       }
+      return latex;
     } else {
-      latex = formatTetration(current, formatBaseValue);
+      if (Math.abs(val - 1) < 1e-11) {
+        return `10\\uparrow\\uparrow${heightStr}`;
+      }
+      return `10\\uparrow\\uparrow${heightStr}^{${formatBaseValue(val)}}`;
     }
   } else {
-    let expCount = current.height;
-    let val = current.value;
-
-    if (expCount === 0) {
-      latex = formatBaseValue(val);
-    } else if (expCount <= 5) { 
-      latex = formatBaseValue(val);
-      for (let i = 0; i < expCount; i++) {
-        latex = `10^{${latex}}`; 
-      }
-    } else {
-      let tetrationObj = createTetration(val, expCount); 
-      latex = formatTetration(tetrationObj, formatBaseValue);
-    }
+    return formatBaseValue(val);
   }
+}
 
-  renderMath(displayElement, latex);
+// Main execution entry point for your display logic
+function formatTower(displayElement, current) {
+  renderMath(displayElement, getTowerLatex(current));
 }
 
 function formatTetration(current, formatBaseValue) {
