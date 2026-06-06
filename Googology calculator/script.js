@@ -459,22 +459,15 @@ function executeTetration(A, B, Barrier) {
   if (isNaN(A.value) || isNaN(B.value) || isNaN(Barrier.value)) return createTower(NaN, 0);
   if (B.value === Infinity || A.value === Infinity) return createTower(Infinity, 0);
   
-  // FIXED: Check if the height B is itself an ultra-giant tower structure
+  // Check if the height B is itself an ultra-giant tower structure
   let isBTower = (typeof B.height === 'object' && B.height !== null) || (typeof B.height === 'number' && B.height >= 1);
 
-  // ==========================================
-  // FIX: ZERO HEIGHT EDGE-CASE INTERCEPTOR
-  // Tetration to a height of 0 simply returns the baseline barrier
-  // ==========================================
+  // ZERO HEIGHT EDGE-CASE INTERCEPTOR
   if (!isBTower && B.value === 0) {
     return Barrier;
   }
-  // ==========================================
 
-  // ==========================================
   // PURE LINEAR FRACTIONAL TETRATION INTERCEPTOR
-  // Ensures a perfectly smooth, unbroken curve for all decimals
-  // ==========================================
   if (A.height === 0 && B.height === 0 && !Number.isInteger(B.value)) {
     let base = A.value;
     let exponent = B.value;
@@ -483,16 +476,13 @@ function executeTetration(A, B, Barrier) {
     let intPart = Math.floor(exponent);
     let fracPart = exponent - intPart;
     
-    // Pure Linear Approximation Baseline (x^^fracPart = base^fracPart)
     let fracResult = Math.pow(base, fracPart);
 
-    // Pass the fractional boundary safely into your integer tower engine
     let newB = createTower(intPart, 0);
     let newBarrier = createTower(fracResult, 0);
     
-    return executeTetration(A, newB, newBarrier); // Fixed computeTetration typo
+    return executeTetration(A, newB, newBarrier);
   }
-  // ==========================================
   
   // Case 1: Base A is already a giant tower (height >= 1)
   if (A.height >= 1) {
@@ -501,7 +491,6 @@ function executeTetration(A, B, Barrier) {
       let bVal = Barrier.value;
       let bHeight = Barrier.height;
 
-      // Handle trivial barrier (Barrier = 1) normally
       if (bHeight === 0 && bVal === 1) {
         if (y === 1) return A;
       }
@@ -553,7 +542,6 @@ function executeTetration(A, B, Barrier) {
           return createTower(bVal, bHeight + y);
         }
       } else {
-        // Base is a height-4+ tower
         if (bHeight === 0) {
           if (y === 1) {
             return createTower(A.value, A.height);
@@ -565,7 +553,6 @@ function executeTetration(A, B, Barrier) {
         }
       }
     } else {
-      // Height B is an ultra-giant tower! The barrier is macroscopically irrelevant.
       return createTower(1, B);
     }
   }
@@ -589,12 +576,34 @@ function executeTetration(A, B, Barrier) {
         }
         return createTower(bVal, y + bHeight);
      } else {
-        // Height B is an ultra-giant tower!
         return createTower(1, B);
      }
   }
   
-  // Standard loop for small non-10 bases
+  // ==========================================
+  // NEW: CONVERGING BASE INTERCEPTOR (Bases <= e^(1/e))
+  // Prevents height creeping and safely computes fixed-point stabilization
+  // ==========================================
+  if (base > 0 && base <= Math.exp(1 / Math.E)) {
+    let current = createTower(Barrier.value, Barrier.height);
+    if (current.height === 0) {
+      let limit = isBTower ? 2000 : Math.min(B.value, 2000);
+      for (let i = 0; i < limit; i++) {
+        let next = Math.pow(base, current.value);
+        if (!Number.isFinite(next) || isNaN(next)) break;
+        // If it stabilizes early, we can exit safely
+        if (Math.abs(next - current.value) < 1e-12) {
+          current.value = next;
+          break;
+        }
+        current.value = next;
+      }
+      return current;
+    }
+  }
+  // ==========================================
+
+  // Standard loop for exploding small non-10 bases (Bases > e^(1/e))
   if (!isBTower) {
     let y = B.value;
     let iters = Math.min(y, 10);
