@@ -62,7 +62,7 @@ function calculate() {
     let result = eval(expr);
 
     // Display the result using your MathJax format
-    displayEl.innerHTML = `\\[ \\text{Result: } ${result} \\]`;
+    displayEl.innerHTML = `\\[ ${result} \\]`;
 
   } catch (err) {
     // If the user types bad math (like "5 ++/ 2"), catch the error gracefully
