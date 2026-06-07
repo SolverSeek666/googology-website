@@ -70,7 +70,9 @@ function calculate() {
 
     // OPERATION
     
-    expr = expr.replace(/\^/g, '**'); 
+    while (expr.includes('^')) {
+      expr = expr.replace(/(\d+(?:\.\d+)?|[πeϕ∞]|\((?:[^()]+|\([^()]*\))*\))\^(-?\d+(?:\.\d+)?|[πeϕ∞]|\((?:[^()]+|\([^()]*\))*\))(?![^^]*\^)/, 'exponentiation($1,$2)');
+    }
 
     // EXPONENTIATION FIX
 
@@ -194,10 +196,39 @@ function cleanFloat(num) {
 }
 
 // ===================================================================
+// GOOGOLOGY STUFF
+// ===================================================================
+
+function createTower(value, height) {
+  return {
+    value: value,
+    height: height
+  };
+}
+
+function exponentiation(a, b) {
+  const predictedLog10 = b * Math.log10(a);
+  
+  if (predictedLog10 > 300) {
+    return createTower(predictedLog10, 1);
+  }
+  return a**b;
+}
+
+// ===================================================================
 // FORMAT STUFF
 // ===================================================================
 
+// Converts standard numbers to scientific notation AND handles Googology Tower Objects!
 function scientificFormat(num) {
+  // 1. Intercept Googology Tower Objects
+  if (typeof num === 'object' && num !== null && 'value' in num) {
+    // We recursively pass the internal value back through scientificFormat 
+    // just in case the value itself is massive!
+    let formattedValue = scientificFormat(num.value);
+    return `E${formattedValue}\\#${num.height}`;
+  }
+
   let str = num.toString();
 
   // If the number is beyond 10^10 or below 10^-6, force scientific notation
@@ -223,7 +254,6 @@ function scientificFormat(num) {
 
   return str;
 }
-
 // ===================================================================
 // WEBSITE STUFF ARCHIVE
 // ===================================================================
