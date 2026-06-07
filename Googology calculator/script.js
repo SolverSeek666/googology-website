@@ -81,13 +81,16 @@ function calculate() {
     let result = cleanFloat(rawResult);
 
     // 9. FIX: Format Infinity values for MathJax LaTeX display
-    let displayResult = result;
+    let displayResult;
     if (result === Infinity) {
       displayResult = '\\infty';
     } else if (result === -Infinity) {
       displayResult = '-\\infty';
     } else if (isNaN(result)) {
       throw new Error("Invalid Calculation");
+    } else {
+      // Pass standard numbers through our renamed LaTeX Scientific Formatter
+      displayResult = scientificFormat(result);
     }
 
     displayEl.innerHTML = `\\[ ${displayResult} \\]`;
@@ -184,6 +187,31 @@ function cleanFloat(num) {
   }
   
   return num;
+}
+
+// ===================================================================
+// FORMAT STUFF
+// ===================================================================
+
+// Converts ugly JavaScript "1.5e+22" into beautiful LaTeX "1.5 \times 10^{22}"
+function scientificFormat(num) {
+  let str = num.toString();
+
+  // If the number is beyond 10^10 or below 10^-6, force scientific notation
+  if (Math.abs(num) >= 1e10 || (Math.abs(num) > 0 && Math.abs(num) <= 1e-6)) {
+    // Keep up to 6 decimal places, but strip useless trailing zeros
+    str = num.toExponential(6).replace(/\.?0+e/, 'e');
+  }
+
+  // Translate the "e" format into MathJax
+  if (str.includes('e')) {
+    let [base, exponent] = str.toLowerCase().split('e');
+    // Parse Int cleans up the '+' sign (turns "+64" into "64")
+    exponent = parseInt(exponent, 10); 
+    return `${base} \\times 10^{${exponent}}`;
+  }
+
+  return str;
 }
 
 // ===================================================================
