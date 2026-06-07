@@ -71,7 +71,7 @@ function calculate() {
     // OPERATION
     
     while (expr.includes('^')) {
-      expr = expr.replace(/(\d+(?:\.\d+)?|[πeϕ∞]|\((?:[^()]+|\([^()]*\))*\))\^(-?\d+(?:\.\d+)?|[πeϕ∞]|\((?:[^()]+|\([^()]*\))*\))(?![^^]*\^)/, 'exponentiation($1,$2)');
+      expr = expr.replace(/(?:\w+(?:\.\w+)*\((?:[^()]+|\([^()]*\))*\)|\((?:[^()]+|\([^()]*\))*\)|\d+(?:\.\d+)?|[πeϕ∞])\^(-?(?:\w+(?:\.\w+)*\((?:[^()]+|\([^()]*\))*\)|\((?:[^()]+|\([^()]*\))*\)|\d+(?:\.\d+)?|[πeϕ∞]))(?![^^]*\^)/, 'exponentiation($1,$2)');
     }
 
     // EXPONENTIATION FIX
@@ -117,7 +117,7 @@ function calculate() {
 // Factorial logic mapped directly through the shifted continuous Gamma function
 function factorial(n) {
   if (n < 0 && Number.isInteger(n)) return NaN; // Factorials of negative integers are undefined
-  return customGamma(n + 1);
+  return gamma(n + 1);
 }
 
 // The Ultimate Hybrid Gamma Function Γ(z)
