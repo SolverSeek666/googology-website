@@ -71,8 +71,16 @@ function calculate() {
     expr = expr.replace(/ln/g, 'Math.log');
 
     // Robust Right-to-Left Exponentiation Converter
-    while (expr.includes('^')) {
-      expr = expr.replace(/(\w+(?:\.\w+)*\((?:[^()]+|\([^()]*\))*\)|\((?:[^()]+|\([^()]*\))*\)|\d+(?:\.\d+)?|[πeϕ∞])\^(-?(?:\w+(?:\.\w+)*\((?:[^()]+|\([^()]*\))*\)|\((?:[^()]+|\([^()]*\))*\)|\d+(?:\.\d+)?|[πeϕ∞]))(?![^^]*\^)/, 'exponentiation($1,$2)');
+    const expRegex = /(\w+(?:\.\w+)*\((?:[^()]+|\([^()]*\))*\)|\((?:[^()]+|\([^()]*\))*\)|\d+(?:\.\d+)?|[πeϕ∞])\^(-?(?:\w+(?:\.\w+)*\((?:[^()]+|\([^()]*\))*\)|\((?:[^()]+|\([^()]*\))*\)|\d+(?:\.\d+)?|[πeϕ∞]))(?![^^]*\^)/;
+    
+    // Loop only as long as there are VALID exponent patterns to replace
+    while (expRegex.test(expr)) {
+      expr = expr.replace(expRegex, 'exponentiation($1,$2)');
+    }
+
+    // If a '^' is STILL there, it means it's malformed (like `^ or ^`)
+    if (expr.includes('^')) {
+      throw new Error("Syntax Error: Malformed exponent");
     }
 
     // Native JS power patches (just in case raw ** is used)
