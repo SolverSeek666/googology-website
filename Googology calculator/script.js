@@ -1,5 +1,7 @@
 // I use gemini to help me lmao
 
+const PHI = (1 + Math.sqrt(5)) / 2;
+
 // ============================================================================
 // CALCULATION ENGINE
 // ============================================================================
@@ -43,37 +45,42 @@ function calculate() {
       throw new Error("Syntax Error: Invalid use of comma");
     }
 
-    // 2. FIXED: Implicit Multiplication Injector (Fixes 5ϕ -> 5*ϕ and 2π -> 2*π)
-    expr = expr.replace(/(\d+(?:\.\d+)?)([πeϕ∞√\(]|sin|cos|tan|log|ln)/g, '$1*$2');
-    expr = expr.replace(/([πeϕ∞\)])(\d+(?:\.\d+)?|[πeϕ∞√\(]|sin|cos|tan|log|ln)/g, '$1*$2');
+    // 2. FIXED: Implicit Multiplication Injector (Handles 5ϕ, 2π, and now 5Γ)
+    expr = expr.replace(/(\d+(?:\.\d+)?)([πeϕ∞√\(Γ]|sin|cos|tan|log|ln|gamma)/g, '$1*$2');
+    expr = expr.replace(/([πeϕ∞\)])(\d+(?:\.\d+)?|[πeϕ∞√\(Γ]|sin|cos|tan|log|ln|gamma)/g, '$1*$2');
 
-    // 3. AUTO-WRAP SQUARE ROOT: Safely wraps single numbers/constants (like √16 -> √(16))
+    // 3. FACTORIAL TRANSLATION: Converts trailing '!' into a proper functional wrapper
+    // It safely captures numbers (5!), constants (π!), and simple parenthesis calculations like (2+3)!
+    expr = expr.replace(/(\d+(?:\.\d+)?|[πeϕ∞]|\((?:[^()]+|\([^()]*\))*\))!/g, 'customFactorial($1)');
+
+    // 4. AUTO-WRAP SQUARE ROOT: Safely wraps single numbers/constants (like √16 -> √(16))
     expr = expr.replace(/√(\d+(?:\.\d+)?|[πeϕ∞])/g, '√($1)');
 
-    // 4. TRANSLATE: Connect custom symbols to our helpers
+    // 5. TRANSLATE: Connect custom symbols to our helpers
     expr = expr.replace(/√/g, 'customRoot');
     expr = expr.replace(/log/g, 'customLog');
     expr = expr.replace(/tan/g, 'customTan'); 
+    expr = expr.replace(/Γ|gamma/g, 'customGamma');
     
-    // 5. TRANSLATE: Everything else
+    // 6. TRANSLATE: Everything else
     expr = expr.replace(/x/g, '*'); 
     expr = expr.replace(/π/g, 'Math.PI'); 
     expr = expr.replace(/e/g, 'Math.E'); 
     expr = expr.replace(/∞/g, 'Infinity'); 
-    expr = expr.replace(/ϕ/g, '1.6180339887'); 
+    expr = expr.replace(/ϕ/g, 'PHI'); 
     
     expr = expr.replace(/sin/g, 'Math.sin');
     expr = expr.replace(/cos/g, 'Math.cos');
     expr = expr.replace(/ln/g, 'Math.log');
     expr = expr.replace(/\^/g, '**'); 
 
-    // 6. EVALUATE
+    // 7. EVALUATE
     let rawResult = eval(expr);
     
-    // 7. FIX: Clean up trailing floating-point fuzz
+    // 8. FIX: Clean up trailing floating-point fuzz
     let result = cleanFloat(rawResult);
 
-    // 8. FIX: Format Infinity values for MathJax LaTeX display
+    // 9. FIX: Format Infinity values for MathJax LaTeX display
     let displayResult = result;
     if (result === Infinity) {
       displayResult = '\\infty';
@@ -97,6 +104,48 @@ function calculate() {
 // ============================================================================
 // HELPER FUNCTIONS (Smart Math & Error Smasher)
 // ============================================================================
+
+// Factorial logic mapped directly through the shifted continuous Gamma function
+function customFactorial(n) {
+  if (n < 0 && Number.isInteger(n)) return NaN; // Factorials of negative integers are undefined
+  return customGamma(n + 1);
+}
+
+// The Ultimate Hybrid Gamma Function Γ(z)
+// Combines Lanczos precision for small numbers with Stirling speed for large numbers!
+function customGamma(z) {
+  // 1. SAFETY: Reflection Formula to handle negative numbers safely
+  if (z < 0.5) {
+    return Math.PI / (Math.sin(Math.PI * z) * customGamma(1 - z));
+  }
+
+  // 2. THE THRESHOLD: Determine which algorithm to use
+  if (z <= 15) {
+    // -> USE LANCZOS FOR SMALL NUMBERS (Flawless precision)
+    const p = [
+      0.99999999999980993,
+      676.5203681218851,
+      -1259.1392167224028,
+      771.32342877765313,
+      -176.61502916214059,
+      12.507343278686905,
+      -0.13857109526572012,
+      9.9843695780195716e-6,
+      1.5056327351493116e-7
+    ];
+    let z_temp = z - 1;
+    let x = p[0];
+    for (let i = 1; i < p.length; i++) {
+      x += p[i] / (z_temp + i);
+    }
+    let t = z_temp + 7 + 0.5;
+    return Math.sqrt(2 * Math.PI) * Math.pow(t, z_temp + 0.5) * Math.exp(-t) * x;
+    
+  } else {
+    // -> USE STIRLING FOR LARGE NUMBERS (Blazing fast and accurate)
+    return Math.sqrt((2 * Math.PI) / z) * Math.pow(z / Math.E, z);
+  }
+}
 
 // Handles BOTH square roots √(x) and custom roots √(degree, number)
 function customRoot(a, b) {
