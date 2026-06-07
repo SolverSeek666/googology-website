@@ -70,7 +70,7 @@ function calculate() {
     }
 
     // Display the final result using MathJax layout
-    displayEl.innerHTML = `\\[ \\text{Result: } ${displayResult} \\]`;
+    displayEl.innerHTML = `\\[ ${displayResult} \\]`;
 
   } catch (err) {
     displayEl.innerHTML = `\\[ \\text{Error: ${err.message}} \\]`;
