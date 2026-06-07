@@ -74,7 +74,6 @@ function calculate() {
     expr = expr.replace(/ln/g, 'Math.log');
     expr = expr.replace(/\^/g, '**'); 
 
-    // >>> PASTE THESE TWO FIXES HERE <<<
     // 1. Fixes negative exponents (e.g., 2**-3 becomes 2**(-3))
     expr = expr.replace(/\*\*-\s*(\d+(?:\.\d+)?|[πeϕ∞]|\([^)]+\))/g, '**(-$1)');
 
