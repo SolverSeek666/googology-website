@@ -38,46 +38,44 @@ function calculate() {
       throw new Error("Please enter an expression");
     }
 
-    // 1. FIXED: Comma Safety Scanner (Blocks things like √3,5)
     let commaCheck = expr;
     commaCheck = commaCheck.replace(/(?:√|log)\([^)]*,[^)]*\)/g, '');
     if (commaCheck.includes(',')) {
       throw new Error("Syntax Error: Invalid use of comma");
     }
 
-    // 2. FIXED: Implicit Multiplication Injector (Handles 5ϕ, 2π, and now 5Γ)
     expr = expr.replace(/(\d+(?:\.\d+)?)([πeϕ∞√\(Γ]|sin|cos|tan|log|ln|gamma)/g, '$1*$2');
     expr = expr.replace(/([πeϕ∞\)])(\d+(?:\.\d+)?|[πeϕ∞√\(Γ]|sin|cos|tan|log|ln|gamma)/g, '$1*$2');
 
-    // 3. FACTORIAL TRANSLATION: Converts trailing '!' into a proper functional wrapper
-    // It safely captures numbers (5!), constants (π!), and simple parenthesis calculations like (2+3)!
-    expr = expr.replace(/(\d+(?:\.\d+)?|[πeϕ∞]|\((?:[^()]+|\([^()]*\))*\))!/g, 'customFactorial($1)');
+    expr = expr.replace(/(\d+(?:\.\d+)?|[πeϕ∞]|\((?:[^()]+|\([^()]*\))*\))!/g, 'factorial($1)');
 
-    // 4. AUTO-WRAP SQUARE ROOT: Safely wraps single numbers/constants (like √16 -> √(16))
     expr = expr.replace(/√(\d+(?:\.\d+)?|[πeϕ∞])/g, '√($1)');
 
-    // 5. TRANSLATE: Connect custom symbols to our helpers
-    expr = expr.replace(/√/g, 'customRoot');
-    expr = expr.replace(/log/g, 'customLog');
-    expr = expr.replace(/tan/g, 'customTan'); 
-    expr = expr.replace(/Γ|gamma/g, 'customGamma');
+    expr = expr.replace(/√/g, 'root');
+    expr = expr.replace(/log/g, 'log');
+    expr = expr.replace(/tan/g, 'tan'); 
+    expr = expr.replace(/Γ/g, 'gamma');
     
-    // 6. TRANSLATE: Everything else
+    // CONSTANTS
     expr = expr.replace(/x/g, '*'); 
     expr = expr.replace(/π/g, 'Math.PI'); 
     expr = expr.replace(/e/g, 'Math.E'); 
     expr = expr.replace(/∞/g, 'Infinity'); 
     expr = expr.replace(/ϕ/g, 'PHI'); 
-    
+
+    // OTHER
     expr = expr.replace(/sin/g, 'Math.sin');
     expr = expr.replace(/cos/g, 'Math.cos');
     expr = expr.replace(/ln/g, 'Math.log');
+
+    // OPERATION
+    
     expr = expr.replace(/\^/g, '**'); 
 
-    // 1. Fixes negative exponents (e.g., 2**-3 becomes 2**(-3))
+    // EXPONENTIATION FIX
+
     expr = expr.replace(/\*\*-\s*(\d+(?:\.\d+)?|[πeϕ∞]|\([^)]+\))/g, '**(-$1)');
 
-    // 2. Fixes unary minus before powers (e.g., -10**10 becomes -(10**10))
     expr = expr.replace(/(?<![\d\)])-(\d+(?:\.\d+)?|[πeϕ∞]|\([^)]+\))\*\*(\d+(?:\.\d+)?|[πeϕ∞]|\([^)]+\))/g, '-($1**$2)');
 
     // 7. EVALUATE
@@ -111,18 +109,18 @@ function calculate() {
 }
 
 // ============================================================================
-// HELPER FUNCTIONS (Smart Math & Error Smasher)
+// HELPER FUNCTIONS
 // ============================================================================
 
 // Factorial logic mapped directly through the shifted continuous Gamma function
-function customFactorial(n) {
+function factorial(n) {
   if (n < 0 && Number.isInteger(n)) return NaN; // Factorials of negative integers are undefined
   return customGamma(n + 1);
 }
 
 // The Ultimate Hybrid Gamma Function Γ(z)
 // Combines Lanczos precision for small numbers with Stirling speed for large numbers!
-function customGamma(z) {
+function gamma(z) {
   // 1. SAFETY: Reflection Formula to handle negative numbers safely
   if (z < 0.5) {
     return Math.PI / (Math.sin(Math.PI * z) * customGamma(1 - z));
@@ -157,7 +155,7 @@ function customGamma(z) {
 }
 
 // Handles BOTH square roots √(x) and custom roots √(degree, number)
-function customRoot(a, b) {
+function root(a, b) {
   if (b === undefined) {
     return Math.sqrt(a);
   }
@@ -165,7 +163,7 @@ function customRoot(a, b) {
 }
 
 // Handles BOTH standard log(x) [base 10] and custom log(base, number)
-function customLog(a, b) {
+function log(a, b) {
   if (b === undefined) {
     return Math.log10(a);
   }
@@ -173,7 +171,7 @@ function customLog(a, b) {
 }
 
 // FIX: Prevents tan(π/2) from blowing up into a weird 16-quadrillion number
-function customTan(x) {
+function tan(x) {
   if (Math.abs(Math.cos(x)) < 1e-12) {
     return Infinity;
   }
