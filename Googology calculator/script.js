@@ -640,7 +640,7 @@ function formatTower(display, current) {
     if (isNaN(current.value)) return renderMath(display, "\\text{Undefined}");
   }
 
-  // IMPLEMENTED ADDITION: Safe interceptor for Arrow objects
+  // Safe interceptor for Arrow objects
   if (current.type === "arrow") {
     return formatArrow(display, current);
   }
@@ -701,19 +701,71 @@ function formatTower(display, current) {
   }
 }
 
-// NEW: Dedicated Tetration Formatter
+// UPGRADED: Core Tetration Formatting Engine with structural threshold matching
 function formatTetration(display, stack) {
-  let totalValue = stack.topTower.value;
+  // CASE A: Past Double Tetration Threshold (10^^10^^6)
+  if (stack.layers >= 2) {
+    let prefix = "";
+    for (let i = 0; i < stack.layers; i++) {
+      prefix += "10 \\uparrow\\uparrow ";
+    }
+    let decimalTop = stack.topTower.value.toFixed(4);
+    renderMath(display, `${prefix}{${decimalTop}}`);
+    return;
+  }
+
+  // CASE B: Single layer, but evaluating extremely massive tower heights
+  let top = stack.topTower;
+
+  // Sub-case B1: Height is a flat number >= 10^10
+  if (top.height === 0 && top.value >= 1e10) {
+    let V = top.value;
+    let exp = Math.floor(Math.log10(V));
+    let coeff = V / Math.pow(10, exp);
+    if (coeff.toFixed(4) === "10.0000") {
+      coeff = 1;
+      exp += 1;
+    }
+    let coeffStr = coeff.toFixed(4);
+    let sciStr = (coeffStr === "1.0000") ? `10^{${exp}}` : `${coeffStr} \\times 10^{${exp}}`;
+    renderMath(display, `10 \\uparrow\\uparrow {(${sciStr})}`);
+    return;
+  }
+
+  // Sub-case B2: Height is an active structural tower (height >= 1)
+  if (top.height >= 1) {
+    let h = top.height;
+    let V = top.value;
+    let exp = Math.floor(V);
+    let coeff = Math.pow(10, V - exp);
+    if (coeff.toFixed(4) === "10.0000") {
+      coeff = 1;
+      exp += 1;
+    }
+    let coeffStr = coeff.toFixed(4);
+    let sciStr = (coeffStr === "1.0000") ? `10^{${exp}}` : `${coeffStr} \\times 10^{${exp}}`;
+
+    let latexStr = sciStr;
+    for (let i = 0; i < h - 1; i++) {
+      latexStr = `10^{${latexStr}}`;
+    }
+
+    if (h === 1) {
+      renderMath(display, `10 \\uparrow\\uparrow {(${latexStr})}`);
+    } else {
+      renderMath(display, `10 \\uparrow\\uparrow {${latexStr}}`);
+    }
+    return;
+  }
+
+  // CASE C: Classic Unwinding Logic (For standard sub-10^10 heights)
+  let totalValue = top.value;
   let a = Math.floor(totalValue);
   let frac = totalValue - a;
   let b = Math.pow(10, frac);
 
-  // Determine if the fractional part is effectively an integer boundary
   let isInteger = (b.toFixed(4) === "1.0000" || b.toFixed(4) === "10.0000");
 
-  // UNWIND LOGIC: Step down one base-10 layer to reveal the macroscopic top value.
-  // This expands `b` to the [10, 10^10) range, 
-  // transforming 10^^7 > 4.5600 directly into 10^^6 > 36305.xxxx
   if (!isInteger && a >= 1) {
     a -= 1;
     b = Math.pow(10, b);
@@ -725,15 +777,7 @@ function formatTetration(display, stack) {
   let bStr = b.toFixed(4);
   let latexStr = (isInteger || bStr === "1.0000") ? `${a}` : `${a} > ${bStr}`;
   
-  if (stack.layers === 1) {
-    renderMath(display, `10 \\uparrow\\uparrow {${latexStr}}`);
-  } else {
-    let prefix = "";
-    for (let i = 0; i < stack.layers; i++) {
-      prefix += "10 \\uparrow\\uparrow ";
-    }
-    renderMath(display, `${prefix}{${latexStr}}`);
-  }
+  renderMath(display, `10 \\uparrow\\uparrow {${latexStr}}`);
 }
 
 // Helper to extract the single continuous tetration height of any tower
@@ -795,7 +839,7 @@ function resolveTetrationStack(current) {
   return { layers, topTower: curr };
 }
 
-// IMPLEMENTED ADDITION: Dedicated rendering engine for structural Knuth Arrow objects
+// Dedicated rendering engine for structural Knuth Arrow objects
 function formatArrow(display, current) {
   let arrowSymbol = "\\uparrow".repeat(current.arrows);
   let heightLatex = "";
@@ -816,6 +860,7 @@ function formatArrow(display, current) {
 
   renderMath(display, `10 ${arrowSymbol} {${heightLatex}}`);
 }
+
 // ============================================================================
 // SECTION 4: THE OUTPUT RENDERING
 // ============================================================================
