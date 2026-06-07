@@ -193,7 +193,6 @@ function cleanFloat(num) {
 // FORMAT STUFF
 // ===================================================================
 
-// Converts ugly JavaScript "1.5e+22" into beautiful LaTeX "1.5 \times 10^{22}"
 function scientificFormat(num) {
   let str = num.toString();
 
@@ -206,8 +205,15 @@ function scientificFormat(num) {
   // Translate the "e" format into MathJax
   if (str.includes('e')) {
     let [base, exponent] = str.toLowerCase().split('e');
-    // Parse Int cleans up the '+' sign (turns "+64" into "64")
     exponent = parseInt(exponent, 10); 
+
+    // Clean up "1 \times 10^b" or "-1 \times 10^b"
+    if (base === '1') {
+      return `10^{${exponent}}`;
+    } else if (base === '-1') {
+      return `-10^{${exponent}}`;
+    }
+
     return `${base} \\times 10^{${exponent}}`;
   }
 
