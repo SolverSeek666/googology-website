@@ -1,19 +1,17 @@
 // I use gemini to help me lmao
 
 // ============================================================================
-// SECTION 1: SETUP & INPUT (YOUR ORIGINAL ARCHITECTURE)
+// CALCULATION ENGINE
 // ============================================================================
 
-const PHI = (1 + Math.sqrt(5)) / 2;
-
-// 1. Listen for the "Enter" key in the input box to trigger the calculation
+// Listen for the "Enter" key in the input box
 document.getElementById('calcInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') {
     calculate(); 
   }
 });
 
-// 2. Appends values directly to the user's blinking cursor location
+// Appends values directly to the user's blinking cursor location
 function appendInput(value) {
   const inputEl = document.getElementById('calcInput');
   if (!inputEl) return;
@@ -28,13 +26,11 @@ function appendInput(value) {
   inputEl.selectionStart = inputEl.selectionEnd = startPos + value.length;
 }
 
-// 3. The actual calculation engine (No parser, just pure translation)
 function calculate() {
   const inputEl = document.getElementById('calcInput');
   const displayEl = document.getElementById('outputDisplay');
   if (!inputEl || !displayEl) return;
 
-  // Grab the raw text exactly as it looks in the text box
   let expr = inputEl.value;
 
   try {
@@ -42,37 +38,68 @@ function calculate() {
       throw new Error("Please enter an expression");
     }
 
-    // Translate symbols to what JavaScript actually understands
+    // 1. FIX: Auto-wrap square roots written without parentheses (like √16 or √π)
+    expr = expr.replace(/√(\d+(?:\.\d+)?|[πeϕ∞])/g, '√($1)');
+
+    // 2. TRANSLATE: Point your custom symbols to our helper functions
+    expr = expr.replace(/√/g, 'customRoot');
+    expr = expr.replace(/log/g, 'customLog');
+    
+    // 3. TRANSLATE: Standard constants and functions
+    expr = expr.replace(/x/g, '*'); 
     expr = expr.replace(/π/g, 'Math.PI'); 
     expr = expr.replace(/e/g, 'Math.E'); 
     expr = expr.replace(/∞/g, 'Infinity'); 
-    expr = expr.replace(/ϕ/g, 'PHI'); 
+    expr = expr.replace(/ϕ/g, '1.6180339887'); 
     
     expr = expr.replace(/sin/g, 'Math.sin');
     expr = expr.replace(/cos/g, 'Math.cos');
     expr = expr.replace(/tan/g, 'Math.tan');
-    expr = expr.replace(/√/g, 'Math.sqrt');
-    
-    expr = expr.replace(/log/g, 'Math.log10');
     expr = expr.replace(/ln/g, 'Math.log');
-    
-    expr = expr.replace(/\^/g, '**'); // Turn exponent ^ into JS **
+    expr = expr.replace(/\^/g, '**'); 
 
-    // Run the calculation directly on the translated string!
+    // 4. EVALUATE
     let result = eval(expr);
 
-    // Display the result using your MathJax format
-    displayEl.innerHTML = `\\[ ${result} \\]`;
+    // 5. FIX: If the output is Infinity, format it as a beautiful LaTeX symbol
+    let displayResult = result;
+    if (result === Infinity) {
+      displayResult = '\\infty';
+    } else if (result === -Infinity) {
+      displayResult = '-\\infty';
+    }
+
+    // Display the final result using MathJax layout
+    displayEl.innerHTML = `\\[ \\text{Result: } ${displayResult} \\]`;
 
   } catch (err) {
-    // If the user types bad math (like "5 ++/ 2"), catch the error gracefully
     displayEl.innerHTML = `\\[ \\text{Error: ${err.message}} \\]`;
   }
 
-  // Tell MathJax to make the math look pretty on screen
+  // Render LaTeX properly
   if (window.MathJax) {
     window.MathJax.typesetPromise([displayEl]);
   }
+}
+
+// ============================================================================
+// HELPER FUNCTIONS (Teaching JavaScript your custom math rules)
+// ============================================================================
+
+// Handles BOTH square roots √(x) and custom roots √(degree, number)
+function customRoot(a, b) {
+  if (b === undefined) {
+    return Math.sqrt(a); // If only one number, do normal square root
+  }
+  return Math.pow(b, 1 / a); // If two numbers, calculate the a-th root of b
+}
+
+// Handles BOTH standard log(x) [base 10] and custom log(base, number)
+function customLog(a, b) {
+  if (b === undefined) {
+    return Math.log10(a); // If only one number, default to base 10
+  }
+  return Math.log(b) / Math.log(a); // Change of base formula: ln(b) / ln(a)
 }
 
 // ===================================================================
