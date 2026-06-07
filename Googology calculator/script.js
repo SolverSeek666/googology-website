@@ -36,15 +36,26 @@ function calculate() {
       throw new Error("Please enter an expression");
     }
 
-    // 1. FIX: Smart auto-wrap for roots. Captures commas and numbers (like √3,5 or √327,473)
-    expr = expr.replace(/√([\d\.,πeϕ∞]+)/g, '√($1)');
+    // 1. FIXED: Comma Safety Scanner (Blocks things like √3,5)
+    let commaCheck = expr;
+    commaCheck = commaCheck.replace(/(?:√|log)\([^)]*,[^)]*\)/g, '');
+    if (commaCheck.includes(',')) {
+      throw new Error("Syntax Error: Invalid use of comma");
+    }
 
-    // 2. TRANSLATE: Connect custom symbols to our helpers
+    // 2. FIXED: Implicit Multiplication Injector (Fixes 5ϕ -> 5*ϕ and 2π -> 2*π)
+    expr = expr.replace(/(\d+(?:\.\d+)?)([πeϕ∞√\(]|sin|cos|tan|log|ln)/g, '$1*$2');
+    expr = expr.replace(/([πeϕ∞\)])(\d+(?:\.\d+)?|[πeϕ∞√\(]|sin|cos|tan|log|ln)/g, '$1*$2');
+
+    // 3. AUTO-WRAP SQUARE ROOT: Safely wraps single numbers/constants (like √16 -> √(16))
+    expr = expr.replace(/√(\d+(?:\.\d+)?|[πeϕ∞])/g, '√($1)');
+
+    // 4. TRANSLATE: Connect custom symbols to our helpers
     expr = expr.replace(/√/g, 'customRoot');
     expr = expr.replace(/log/g, 'customLog');
-    expr = expr.replace(/tan/g, 'customTan'); // Use our custom tan interceptor
+    expr = expr.replace(/tan/g, 'customTan'); 
     
-    // 3. TRANSLATE: Everything else
+    // 5. TRANSLATE: Everything else
     expr = expr.replace(/x/g, '*'); 
     expr = expr.replace(/π/g, 'Math.PI'); 
     expr = expr.replace(/e/g, 'Math.E'); 
@@ -56,18 +67,20 @@ function calculate() {
     expr = expr.replace(/ln/g, 'Math.log');
     expr = expr.replace(/\^/g, '**'); 
 
-    // 4. EVALUATE
+    // 6. EVALUATE
     let rawResult = eval(expr);
     
-    // 5. FIX: Clean up the result using our floating-point error smasher
+    // 7. FIX: Clean up trailing floating-point fuzz
     let result = cleanFloat(rawResult);
 
-    // 6. FIX: Turn internal "Infinity" into gorgeous LaTeX \infty
+    // 8. FIX: Format Infinity values for MathJax LaTeX display
     let displayResult = result;
     if (result === Infinity) {
       displayResult = '\\infty';
     } else if (result === -Infinity) {
       displayResult = '-\\infty';
+    } else if (isNaN(result)) {
+      throw new Error("Invalid Calculation");
     }
 
     displayEl.innerHTML = `\\[ ${displayResult} \\]`;
@@ -103,7 +116,6 @@ function customLog(a, b) {
 
 // FIX: Prevents tan(π/2) from blowing up into a weird 16-quadrillion number
 function customTan(x) {
-  // If the cosine is basically 0, tangent should be Infinity
   if (Math.abs(Math.cos(x)) < 1e-12) {
     return Infinity;
   }
@@ -114,12 +126,10 @@ function customTan(x) {
 function cleanFloat(num) {
   if (typeof num !== 'number' || !isFinite(num)) return num;
   
-  // If a number is practically an integer, snap it to that integer
   if (Math.abs(num - Math.round(num)) < 1e-12) {
     return Math.round(num);
   }
   
-  // Smooth out trailing decimal fuzz for smaller numbers
   if (Math.abs(num) < 1e12) {
     return parseFloat(num.toPrecision(12));
   }
