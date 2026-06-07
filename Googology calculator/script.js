@@ -4,14 +4,12 @@
 // CALCULATION ENGINE
 // ============================================================================
 
-// Listen for the "Enter" key in the input box
 document.getElementById('calcInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') {
     calculate(); 
   }
 });
 
-// Appends values directly to the user's blinking cursor location
 function appendInput(value) {
   const inputEl = document.getElementById('calcInput');
   if (!inputEl) return;
@@ -38,14 +36,15 @@ function calculate() {
       throw new Error("Please enter an expression");
     }
 
-    // 1. FIX: Auto-wrap square roots written without parentheses (like √16 or √π)
-    expr = expr.replace(/√(\d+(?:\.\d+)?|[πeϕ∞])/g, '√($1)');
+    // 1. FIX: Smart auto-wrap for roots. Captures commas and numbers (like √3,5 or √327,473)
+    expr = expr.replace(/√([\d\.,πeϕ∞]+)/g, '√($1)');
 
-    // 2. TRANSLATE: Point your custom symbols to our helper functions
+    // 2. TRANSLATE: Connect custom symbols to our helpers
     expr = expr.replace(/√/g, 'customRoot');
     expr = expr.replace(/log/g, 'customLog');
+    expr = expr.replace(/tan/g, 'customTan'); // Use our custom tan interceptor
     
-    // 3. TRANSLATE: Standard constants and functions
+    // 3. TRANSLATE: Everything else
     expr = expr.replace(/x/g, '*'); 
     expr = expr.replace(/π/g, 'Math.PI'); 
     expr = expr.replace(/e/g, 'Math.E'); 
@@ -54,14 +53,16 @@ function calculate() {
     
     expr = expr.replace(/sin/g, 'Math.sin');
     expr = expr.replace(/cos/g, 'Math.cos');
-    expr = expr.replace(/tan/g, 'Math.tan');
     expr = expr.replace(/ln/g, 'Math.log');
     expr = expr.replace(/\^/g, '**'); 
 
     // 4. EVALUATE
-    let result = eval(expr);
+    let rawResult = eval(expr);
+    
+    // 5. FIX: Clean up the result using our floating-point error smasher
+    let result = cleanFloat(rawResult);
 
-    // 5. FIX: If the output is Infinity, format it as a beautiful LaTeX symbol
+    // 6. FIX: Turn internal "Infinity" into gorgeous LaTeX \infty
     let displayResult = result;
     if (result === Infinity) {
       displayResult = '\\infty';
@@ -69,37 +70,61 @@ function calculate() {
       displayResult = '-\\infty';
     }
 
-    // Display the final result using MathJax layout
     displayEl.innerHTML = `\\[ ${displayResult} \\]`;
 
   } catch (err) {
     displayEl.innerHTML = `\\[ \\text{Error: ${err.message}} \\]`;
   }
 
-  // Render LaTeX properly
   if (window.MathJax) {
     window.MathJax.typesetPromise([displayEl]);
   }
 }
 
 // ============================================================================
-// HELPER FUNCTIONS (Teaching JavaScript your custom math rules)
+// HELPER FUNCTIONS (Smart Math & Error Smasher)
 // ============================================================================
 
 // Handles BOTH square roots √(x) and custom roots √(degree, number)
 function customRoot(a, b) {
   if (b === undefined) {
-    return Math.sqrt(a); // If only one number, do normal square root
+    return Math.sqrt(a);
   }
-  return Math.pow(b, 1 / a); // If two numbers, calculate the a-th root of b
+  return Math.pow(b, 1 / a);
 }
 
 // Handles BOTH standard log(x) [base 10] and custom log(base, number)
 function customLog(a, b) {
   if (b === undefined) {
-    return Math.log10(a); // If only one number, default to base 10
+    return Math.log10(a);
   }
-  return Math.log(b) / Math.log(a); // Change of base formula: ln(b) / ln(a)
+  return Math.log(b) / Math.log(a);
+}
+
+// FIX: Prevents tan(π/2) from blowing up into a weird 16-quadrillion number
+function customTan(x) {
+  // If the cosine is basically 0, tangent should be Infinity
+  if (Math.abs(Math.cos(x)) < 1e-12) {
+    return Infinity;
+  }
+  return Math.tan(x);
+}
+
+// FIX: Smashes floating-point fuzz (turns 4.999999999999999 into 5)
+function cleanFloat(num) {
+  if (typeof num !== 'number' || !isFinite(num)) return num;
+  
+  // If a number is practically an integer, snap it to that integer
+  if (Math.abs(num - Math.round(num)) < 1e-12) {
+    return Math.round(num);
+  }
+  
+  // Smooth out trailing decimal fuzz for smaller numbers
+  if (Math.abs(num) < 1e12) {
+    return parseFloat(num.toPrecision(12));
+  }
+  
+  return num;
 }
 
 // ===================================================================
