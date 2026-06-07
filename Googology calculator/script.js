@@ -44,49 +44,48 @@ function calculate() {
       throw new Error("Syntax Error: Invalid use of comma");
     }
 
+    // Implicit multiplication patches
     expr = expr.replace(/(\d+(?:\.\d+)?)([πeϕ∞√\(Γ]|sin|cos|tan|log|ln|gamma)/g, '$1*$2');
     expr = expr.replace(/([πeϕ∞\)])(\d+(?:\.\d+)?|[πeϕ∞√\(Γ]|sin|cos|tan|log|ln|gamma)/g, '$1*$2');
 
+    // Factorial parsing
     expr = expr.replace(/(\d+(?:\.\d+)?|[πeϕ∞]|\((?:[^()]+|\([^()]*\))*\))!/g, 'factorial($1)');
 
+    // Roots and functions
     expr = expr.replace(/√(\d+(?:\.\d+)?|[πeϕ∞])/g, '√($1)');
-
     expr = expr.replace(/√/g, 'root');
     expr = expr.replace(/log/g, 'log');
     expr = expr.replace(/tan/g, 'tan'); 
     expr = expr.replace(/Γ/g, 'gamma');
     
-    // CONSTANTS
+    // Constant swaps
     expr = expr.replace(/x/g, '*'); 
     expr = expr.replace(/π/g, 'Math.PI'); 
     expr = expr.replace(/e/g, 'Math.E'); 
     expr = expr.replace(/∞/g, 'Infinity'); 
     expr = expr.replace(/ϕ/g, 'PHI'); 
 
-    // OTHER
+    // Trigonometry & Logarithms
     expr = expr.replace(/sin/g, 'Math.sin');
     expr = expr.replace(/cos/g, 'Math.cos');
     expr = expr.replace(/ln/g, 'Math.log');
 
-    // OPERATION
-    
+    // Robust Right-to-Left Exponentiation Converter
     while (expr.includes('^')) {
       expr = expr.replace(/(?:\w+(?:\.\w+)*\((?:[^()]+|\([^()]*\))*\)|\((?:[^()]+|\([^()]*\))*\)|\d+(?:\.\d+)?|[πeϕ∞])\^(-?(?:\w+(?:\.\w+)*\((?:[^()]+|\([^()]*\))*\)|\((?:[^()]+|\([^()]*\))*\)|\d+(?:\.\d+)?|[πeϕ∞]))(?![^^]*\^)/, 'exponentiation($1,$2)');
     }
 
-    // EXPONENTIATION FIX
-
+    // Native JS power patches (just in case raw ** is used)
     expr = expr.replace(/\*\*-\s*(\d+(?:\.\d+)?|[πeϕ∞]|\([^)]+\))/g, '**(-$1)');
-
     expr = expr.replace(/(?<![\d\)])-(\d+(?:\.\d+)?|[πeϕ∞]|\([^)]+\))\*\*(\d+(?:\.\d+)?|[πeϕ∞]|\([^)]+\))/g, '-($1**$2)');
 
-    // 7. EVALUATE
+    // Evaluate expression
     let rawResult = eval(expr);
     
-    // 8. FIX: Clean up trailing floating-point fuzz
+    // Clear floating-point inaccuracies
     let result = cleanFloat(rawResult);
 
-    // 9. FIX: Format Infinity values for MathJax LaTeX display
+    // Format output
     let displayResult;
     if (result === Infinity) {
       displayResult = '\\infty';
@@ -95,18 +94,18 @@ function calculate() {
     } else if (isNaN(result)) {
       throw new Error("Invalid Calculation");
     } else {
-      // Pass standard numbers through our renamed LaTeX Scientific Formatter
       displayResult = scientificFormat(result);
     }
 
     displayEl.innerHTML = `\\[ ${displayResult} \\]`;
 
-  } catch (err) {
-    displayEl.innerHTML = `\\[ \\text{Error: ${err.message}} \\]`;
-  }
+    if (window.MathJax) {
+      window.MathJax.typesetPromise([displayEl]);
+    }
 
-  if (window.MathJax) {
-    window.MathJax.typesetPromise([displayEl]);
+  } catch (err) {
+    // FIXED: Print errors as direct HTML text to stop MathJax from breaking on special symbols!
+    displayEl.innerHTML = `<span style="color: #ff4d4d; font-family: system-ui, -apple-system, sans-serif; font-weight: 500;">Error: ${err.message}</span>`;
   }
 }
 
