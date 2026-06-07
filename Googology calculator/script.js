@@ -74,6 +74,13 @@ function calculate() {
     expr = expr.replace(/ln/g, 'Math.log');
     expr = expr.replace(/\^/g, '**'); 
 
+    // >>> PASTE THESE TWO FIXES HERE <<<
+    // 1. Fixes negative exponents (e.g., 2**-3 becomes 2**(-3))
+    expr = expr.replace(/\*\*-\s*(\d+(?:\.\d+)?|[πeϕ∞]|\([^)]+\))/g, '**(-$1)');
+
+    // 2. Fixes unary minus before powers (e.g., -10**10 becomes -(10**10))
+    expr = expr.replace(/(?<![\d\)])-(\d+(?:\.\d+)?|[πeϕ∞]|\([^)]+\))\*\*(\d+(?:\.\d+)?|[πeϕ∞]|\([^)]+\))/g, '-($1**$2)');
+
     // 7. EVALUATE
     let rawResult = eval(expr);
     
