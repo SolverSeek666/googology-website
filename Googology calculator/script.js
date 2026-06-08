@@ -111,6 +111,45 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==========================================
 
   /**
+   * Safe Fractional Tetration Wrapper
+   * Patches break_eternity's native decimal tetration bugs for non-10 bases.
+   */
+  function safeTetrate(base, height) {
+    let hNum = height.toNumber();
+
+    // 1. If it's a clean integer, native tetrate is perfectly stable and ultra-fast
+    if (Math.floor(hNum) === hNum) {
+      return base.tetrate(hNum);
+    }
+
+    // 2. Fallback to native for negative bounds
+    if (hNum < 0) {
+      return base.tetrate(hNum); 
+    }
+
+    // 3. Break the decimal height into integer floor and fractional remainder
+    let floorH = Math.floor(hNum);
+    let frac = hNum - floorH;
+
+    // 4. Evaluate the critical fraction section (b ^^ frac) where 0 <= frac < 1
+    let result;
+    if (base.eq(10)) {
+      // Base 10 native fractional tetration works fine and uses a built-in smooth patch
+      result = base.tetrate(frac);
+    } else {
+      // Linear interpolation fallback for custom bases: 1 + (base - 1) * frac
+      result = new Decimal(1).add(base.sub(1).mul(frac));
+    }
+
+    // 5. Build the rest of the power tower by resolving upward 'floorH' times
+    for (let i = 0; i < floorH; i++) {
+      result = base.pow(result);
+    }
+
+    return result;
+  }
+
+  /**
    * Traverses math.js parsed syntax nodes and resolves them using break_eternity.js
    */
   function evaluateAST(node, scope = {}) {
@@ -126,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
         switch (node.name) {
           case 'pi': return new Decimal(Math.PI);
           case 'e': return new Decimal(Math.E);
-          case 'phi': return new Decimal(PHI);
+          case 'phi': return new Decimal(1.618033988749895);
           case 'Infinity': return new Decimal(Infinity);
           default: throw new Error(`Unknown variable: ${node.name}`);
         }
@@ -143,7 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (node.args.length === 1) {
           if (node.op === '-') return args[0].neg();
           if (node.op === '+') return args[0];
-          if (node.op === '!') return args[0].add(1).gamma(); // Factorial handled via gamma(x+1)
+          if (node.op === '!') return args[0].add(1).gamma(); 
         }
         
         // Binary operations
@@ -174,7 +213,8 @@ document.addEventListener("DOMContentLoaded", () => {
           case 'cos': return funcArgs[0].cos();
           case 'tan': return funcArgs[0].tan();
           case 'tetrate': 
-            return funcArgs[0].tetrate(funcArgs[1] ? funcArgs[1].toNumber() : 1);
+            // FIXED: Now routes through our safe custom fractional handler
+            return safeTetrate(funcArgs[0], funcArgs[1] ? funcArgs[1] : new Decimal(1));
           default: throw new Error(`Unsupported function: ${node.name}`);
         }
 
@@ -182,7 +222,6 @@ document.addEventListener("DOMContentLoaded", () => {
         throw new Error(`Syntax Error`);
     }
   }
-
 
   // ==========================================
   // SECTION 4: LATEX FORMATTING LAYER
