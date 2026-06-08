@@ -239,7 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const laTeX = formatDecimalToLaTeX(result);
 
         // Inject and update MathJax display layout
-        outputDisplay.innerHTML = `\\[ = ${laTeX} \\]`;
+        outputDisplay.innerHTML = `\\[ ${laTeX} \\]`;
 
         if (window.MathJax && window.MathJax.typesetPromise) {
           MathJax.typesetPromise([outputDisplay]);
