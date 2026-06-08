@@ -1,266 +1,256 @@
 // I use gemini to help me lmao
 
+// ===================================================================
+// MAIN STUFF
+// ===================================================================
+
 const PHI = (1 + Math.sqrt(5)) / 2;
 
-// ============================================================================
-// CALCULATION ENGINE
-// ============================================================================
+/**
+ * GOOGOLOGY CALCULATOR CORE ENGINE
+ * Architecture: Math.js (Parser) + Break_Eternity.js (Big Double-Exponential Math)
+ */
 
-document.getElementById('calcInput').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') {
-    calculate(); 
+document.addEventListener("DOMContentLoaded", () => {
+  const calcInput = document.getElementById("calcInput");
+  const outputDisplay = document.getElementById("outputDisplay");
+
+  if (!calcInput || !outputDisplay) return;
+
+  // ==========================================
+  // SECTION 1: GLOBAL UI HOOKS
+  // ==========================================
+  
+  /**
+   * Appends symbols or numbers directly into the input text area from UI buttons
+   */
+  window.appendInput = function(value) {
+    calcInput.value += value;
+    calcInput.focus();
+  };
+
+
+  // ==========================================
+  // SECTION 2: THE PREPROCESSOR ENGINE
+  // ==========================================
+
+  /**
+   * Translates visual keyboard symbols into tokens math.js can safely interpret.
+   */
+  function preprocessExpression(str) {
+    let s = str.trim();
+
+    // Standardize unicode constant symbols
+    s = s.replace(/π/g, 'pi');
+    s = s.replace(/ϕ/g, 'phi');
+    s = s.replace(/∞/g, 'Infinity');
+    s = s.replace(/Γ/g, 'gamma');
+
+    // Standardize square root notations (handles both √5 and raw parenthetical bounds)
+    s = s.replace(/√\(/g, 'sqrt(');
+    s = s.replace(/√(\d+(?:\.\d+)?|[a-zA-Z]+)/g, 'sqrt($1)');
+
+    // Resolve right-associative Knuth arrows (tetration towers)
+    s = convertTetrationTowers(s);
+
+    return s;
   }
+
+  /**
+   * Converts "a^^b^^c" into nested functions "tetrate(a, tetrate(b, c))"
+   */
+  function convertTetrationTowers(s) {
+    while (s.includes('^^')) {
+      let idx = s.lastIndexOf('^^');
+
+      // Boundary scan left (base)
+      let leftStart = idx - 1;
+      let leftPenCount = 0;
+      while (leftStart >= 0) {
+        let char = s[leftStart];
+        if (char === ')') leftPenCount++;
+        else if (char === '(') leftPenCount--;
+
+        if (leftPenCount === 0 && ['+', '-', '*', '/', '^', ','].includes(char)) {
+          leftStart++;
+          break;
+        }
+        if (leftStart === 0) break;
+        leftStart--;
+      }
+      if (leftStart < 0) leftStart = 0;
+
+      // Boundary scan right (exponent)
+      let rightEnd = idx + 2;
+      let rightPenCount = 0;
+      while (rightEnd < s.length) {
+        let char = s[rightEnd];
+        if (char === '(') rightPenCount++;
+        else if (char === ')') rightPenCount--;
+
+        if (rightPenCount === 0 && ['+', '-', '*', '/', '^', ','].includes(char)) {
+          rightEnd--;
+          break;
+        }
+        rightEnd++;
+      }
+      if (rightEnd >= s.length) rightEnd = s.length - 1;
+
+      let base = s.substring(leftStart, idx);
+      let exponent = s.substring(idx + 2, rightEnd + 1);
+
+      let replacement = `tetrate(${base},${exponent})`;
+      s = s.substring(0, leftStart) + replacement + s.substring(rightEnd + 1);
+    }
+    return s;
+  }
+
+
+  // ==========================================
+  // SECTION 3: RECURSIVE AST EVALUATOR
+  // ==========================================
+
+  /**
+   * Traverses math.js parsed syntax nodes and resolves them using break_eternity.js
+   */
+  function evaluateAST(node, scope = {}) {
+    switch (node.type) {
+      
+      // Numbers
+      case 'ConstantNode':
+        return new Decimal(node.value);
+
+      // Constants & Named Symbols
+      case 'SymbolNode':
+        if (scope[node.name] !== undefined) return new Decimal(scope[node.name]);
+        switch (node.name) {
+          case 'pi': return new Decimal(Math.PI);
+          case 'e': return new Decimal(Math.E);
+          case 'phi': return new Decimal(PHI);
+          case 'Infinity': return new Decimal(Infinity);
+          default: throw new Error(`Unknown variable: ${node.name}`);
+        }
+
+      // Syntax formatting blocks
+      case 'ParenthesisNode':
+        return evaluateAST(node.content, scope);
+
+      // Math Operators (+, -, *, /, ^, !)
+      case 'OperatorNode':
+        const args = node.args.map(arg => evaluateAST(arg, scope));
+        
+        // Unary operations (e.g., negative scaling (-5) or factorials (5!))
+        if (node.args.length === 1) {
+          if (node.op === '-') return args[0].neg();
+          if (node.op === '+') return args[0];
+          if (node.op === '!') return Decimal.factorial(args[0]); 
+        }
+        
+        // Binary operations
+        switch (node.op) {
+          case '+': return args[0].add(args[1]);
+          case '-': return args[0].sub(args[1]);
+          case '*': return args[0].mul(args[1]);
+          case '/': return args[0].div(args[1]);
+          case '^': return args[0].pow(args[1]);
+          default: throw new Error(`Unsupported operator: ${node.op}`);
+        }
+
+      // Functional evaluation nodes (log, sqrt, tetrate)
+      case 'FunctionNode':
+        const funcArgs = node.args.map(arg => evaluateAST(arg, scope));
+        switch (node.name) {
+          case 'sqrt':
+            if (funcArgs.length === 1) return funcArgs[0].sqrt();
+            if (funcArgs.length === 2) return funcArgs[0].pow(new Decimal(1).div(funcArgs[1])); 
+            throw new Error("sqrt expects 1 or 2 arguments");
+          case 'log':
+            if (funcArgs.length === 1) return funcArgs[0].log10();
+            if (funcArgs.length === 2) return funcArgs[0].log10().div(funcArgs[1].log10()); 
+            throw new Error("log expects 1 or 2 arguments");
+          case 'ln': return funcArgs[0].ln();
+          case 'gamma': return Decimal.gamma(funcArgs[0]);
+          case 'sin': return funcArgs[0].sin();
+          case 'cos': return funcArgs[0].cos();
+          case 'tan': return funcArgs[0].tan();
+          case 'tetrate': 
+            return funcArgs[0].tetrate(funcArgs[1] ? funcArgs[1].toNumber() : 1);
+          default: throw new Error(`Unsupported function: ${node.name}`);
+        }
+
+      default:
+        throw new Error(`Syntax Error`);
+    }
+  }
+
+
+  // ==========================================
+  // SECTION 4: LATEX FORMATTING LAYER
+  // ==========================================
+
+  /**
+   * Formats astronomical numbers into beautiful vertical LaTeX exponent stacks.
+   */
+  function formatDecimalToLaTeX(d) {
+    if (!d.isFinite()) return '\\infty';
+    if (d.isNaN()) return '\\text{NaN}';
+
+    // Tier 1: Small everyday values
+    if (d.layer === 0 && d.mag < 1e10 && d.mag > 1e-6) {
+      let num = d.toNumber();
+      if (Math.abs(num - Math.round(num)) < 1e-11) num = Math.round(num);
+      return num.toString();
+    }
+
+    // Tier 2: Traditional Scientific Notation (e.g., 3.45 x 10^400)
+    if (d.layer === 1 && d.mag < 1e9) {
+      let exp = Math.floor(d.mag);
+      let mantissa = parseFloat(Math.pow(10, d.mag - exp).toFixed(4));
+      if (mantissa === 10) { mantissa = 1; exp += 1; }
+      if (mantissa === 1) return `10^{${exp}}`;
+      return `${mantissa} \\times 10^{${exp}}`;
+    }
+
+    // Tier 3: Cosmological Power Towers (e.g., 10^10^10^5.4)
+    let tower = "";
+    for (let i = 0; i < d.layer; i++) tower += "10^{";
+    tower += parseFloat(d.mag.toFixed(4)).toString();
+    for (let i = 0; i < d.layer; i++) tower += "}";
+    return tower;
+  }
+
+
+  // ==========================================
+  // SECTION 5: CALCULATION TRIGGER LOOP
+  // ==========================================
+
+  // Listens for 'Enter' key updates inside input bar
+  calcInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      const rawInput = calcInput.value;
+      if (!rawInput.trim()) return;
+
+      try {
+        // Pipeline: Clean -> Parse -> Evaluate -> Format LaTeX
+        const cleanExpression = preprocessExpression(rawInput);
+        const ast = math.parse(cleanExpression);
+        const result = evaluateAST(ast);
+        const laTeX = formatDecimalToLaTeX(result);
+
+        // Inject and update MathJax display layout
+        outputDisplay.innerHTML = `\\[ = ${laTeX} \\]`;
+
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          MathJax.typesetPromise([outputDisplay]);
+        }
+      } catch (err) {
+        // Graceful error layout output
+        outputDisplay.innerHTML = `<span style="color: #ff4d4d; font-family: 'JetBrains Mono', monospace; font-size: 14px;">Error: ${err.message}</span>`;
+      }
+    }
+  });
 });
 
-function appendInput(value) {
-  const inputEl = document.getElementById('calcInput');
-  if (!inputEl) return;
-
-  const startPos = inputEl.selectionStart;
-  const endPos = inputEl.selectionEnd;
-  const text = inputEl.value;
-  
-  inputEl.value = text.substring(0, startPos) + value + text.substring(endPos, text.length);
-  
-  inputEl.focus();
-  inputEl.selectionStart = inputEl.selectionEnd = startPos + value.length;
-}
-
-function calculate() {
-  const inputEl = document.getElementById('calcInput');
-  const displayEl = document.getElementById('outputDisplay');
-  if (!inputEl || !displayEl) return;
-
-  let expr = inputEl.value;
-
-  try {
-    if (!expr.trim()) {
-      throw new Error("Please enter an expression");
-    }
-
-    let commaCheck = expr;
-    commaCheck = commaCheck.replace(/(?:√|log)\([^)]*,[^)]*\)/g, '');
-    if (commaCheck.includes(',')) {
-      throw new Error("Syntax Error: Invalid use of comma");
-    }
-
-    // Implicit multiplication patches
-    expr = expr.replace(/(\d+(?:\.\d+)?)([πeϕ∞√\(Γ]|sin|cos|tan|log|ln|gamma)/g, '$1*$2');
-    expr = expr.replace(/([πeϕ∞\)])(\d+(?:\.\d+)?|[πeϕ∞√\(Γ]|sin|cos|tan|log|ln|gamma)/g, '$1*$2');
-
-    // Factorial parsing
-    expr = expr.replace(/(\d+(?:\.\d+)?|[πeϕ∞]|\((?:[^()]+|\([^()]*\))*\))!/g, 'factorial($1)');
-
-    // Roots and functions
-    expr = expr.replace(/√(\d+(?:\.\d+)?|[πeϕ∞])/g, '√($1)');
-    expr = expr.replace(/√/g, 'root');
-    expr = expr.replace(/log/g, 'log');
-    expr = expr.replace(/tan/g, 'tan'); 
-    expr = expr.replace(/Γ/g, 'gamma');
-    
-    // Constant swaps
-    expr = expr.replace(/x/g, '*'); 
-    expr = expr.replace(/π/g, 'Math.PI'); 
-    expr = expr.replace(/e/g, 'Math.E'); 
-    expr = expr.replace(/∞/g, 'Infinity'); 
-    expr = expr.replace(/ϕ/g, 'PHI'); 
-
-    // Trigonometry & Logarithms
-    expr = expr.replace(/sin/g, 'Math.sin');
-    expr = expr.replace(/cos/g, 'Math.cos');
-    expr = expr.replace(/ln/g, 'Math.log');
-
-    // Robust Right-to-Left Exponentiation Converter
-    const expRegex = /(\w+(?:\.\w+)*\((?:[^()]+|\([^()]*\))*\)|\((?:[^()]+|\([^()]*\))*\)|\d+(?:\.\d+)?|[πeϕ∞])\^(-?(?:\w+(?:\.\w+)*\((?:[^()]+|\([^()]*\))*\)|\((?:[^()]+|\([^()]*\))*\)|\d+(?:\.\d+)?|[πeϕ∞]))(?![^^]*\^)/;
-    
-    // Loop only as long as there are VALID exponent patterns to replace
-    while (expRegex.test(expr)) {
-      expr = expr.replace(expRegex, 'exponentiation($1,$2)');
-    }
-
-    // If a '^' is STILL there, it means it's malformed (like `^ or ^`)
-    if (expr.includes('^')) {
-      throw new Error("Syntax Error: Malformed exponent");
-    }
-
-    // Native JS power patches (just in case raw ** is used)
-    expr = expr.replace(/\*\*-\s*(\d+(?:\.\d+)?|[πeϕ∞]|\([^)]+\))/g, '**(-$1)');
-    expr = expr.replace(/(?<![\d\)])-(\d+(?:\.\d+)?|[πeϕ∞]|\([^)]+\))\*\*(\d+(?:\.\d+)?|[πeϕ∞]|\([^)]+\))/g, '-($1**$2)');
-
-    // Evaluate expression
-    let rawResult = eval(expr);
-    
-    // Clear floating-point inaccuracies
-    let result = cleanFloat(rawResult);
-
-    // Format output
-    let displayResult;
-    if (result === Infinity) {
-      displayResult = '\\infty';
-    } else if (result === -Infinity) {
-      displayResult = '-\\infty';
-    } else if (isNaN(result)) {
-      throw new Error("Invalid Calculation");
-    } else {
-      displayResult = scientificFormat(result);
-    }
-
-    displayEl.innerHTML = `\\[ ${displayResult} \\]`;
-
-    if (window.MathJax) {
-      window.MathJax.typesetPromise([displayEl]);
-    }
-
-  } catch (err) {
-    // FIXED: Print errors as direct HTML text to stop MathJax from breaking on special symbols!
-    displayEl.innerHTML = `<span style="color: #ff4d4d; font-family: system-ui, -apple-system, sans-serif; font-weight: 500;">Error: ${err.message}</span>`;
-  }
-}
-
-// ============================================================================
-// HELPER FUNCTIONS
-// ============================================================================
-
-// Factorial logic mapped directly through the shifted continuous Gamma function
-function factorial(n) {
-  if (n < 0 && Number.isInteger(n)) return NaN; // Factorials of negative integers are undefined
-  return gamma(n + 1);
-}
-
-// The Ultimate Hybrid Gamma Function Γ(z)
-// Combines Lanczos precision for small numbers with Stirling speed for large numbers!
-function gamma(z) {
-  // 1. SAFETY: Reflection Formula to handle negative numbers safely
-  if (z < 0.5) {
-    return Math.PI / (Math.sin(Math.PI * z) * customGamma(1 - z));
-  }
-
-  // 2. THE THRESHOLD: Determine which algorithm to use
-  if (z <= 15) {
-    // -> USE LANCZOS FOR SMALL NUMBERS (Flawless precision)
-    const p = [
-      0.99999999999980993,
-      676.5203681218851,
-      -1259.1392167224028,
-      771.32342877765313,
-      -176.61502916214059,
-      12.507343278686905,
-      -0.13857109526572012,
-      9.9843695780195716e-6,
-      1.5056327351493116e-7
-    ];
-    let z_temp = z - 1;
-    let x = p[0];
-    for (let i = 1; i < p.length; i++) {
-      x += p[i] / (z_temp + i);
-    }
-    let t = z_temp + 7 + 0.5;
-    return Math.sqrt(2 * Math.PI) * Math.pow(t, z_temp + 0.5) * Math.exp(-t) * x;
-    
-  } else {
-    // -> USE STIRLING FOR LARGE NUMBERS (Blazing fast and accurate)
-    return Math.sqrt((2 * Math.PI) / z) * Math.pow(z / Math.E, z);
-  }
-}
-
-// Handles BOTH square roots √(x) and custom roots √(degree, number)
-function root(a, b) {
-  if (b === undefined) {
-    return Math.sqrt(a);
-  }
-  return Math.pow(b, 1 / a);
-}
-
-// Handles BOTH standard log(x) [base 10] and custom log(base, number)
-function log(a, b) {
-  if (b === undefined) {
-    return Math.log10(a);
-  }
-  return Math.log(b) / Math.log(a);
-}
-
-// FIX: Prevents tan(π/2) from blowing up into a weird 16-quadrillion number
-function tan(x) {
-  if (Math.abs(Math.cos(x)) < 1e-12) {
-    return Infinity;
-  }
-  return Math.tan(x);
-}
-
-// FIX: Smashes floating-point fuzz (turns 4.999999999999999 into 5)
-function cleanFloat(num) {
-  if (typeof num !== 'number' || !isFinite(num)) return num;
-  
-  if (Math.abs(num - Math.round(num)) < 1e-12) {
-    return Math.round(num);
-  }
-  
-  if (Math.abs(num) < 1e12) {
-    return parseFloat(num.toPrecision(12));
-  }
-  
-  return num;
-}
-
-// ===================================================================
-// GOOGOLOGY STUFF
-// ===================================================================
-
-function createTower(value, height) {
-  return {
-    value: value,
-    height: height
-  };
-}
-
-function exponentiation(a, b) {
-  const predictedLog10 = b * Math.log10(a);
-  
-  if (predictedLog10 > 300) {
-    return createTower(predictedLog10, 1);
-  }
-  return a**b;
-}
-
-// ===================================================================
-// FORMAT STUFF
-// ===================================================================
-
-// Converts standard numbers to scientific notation AND handles Googology Tower Objects!
-function scientificFormat(num) {
-  // 1. Intercept Googology Tower Objects
-  if (typeof num === 'object' && num !== null && 'value' in num) {
-    // We recursively pass the internal value back through scientificFormat 
-    // just in case the value itself is massive!
-    let formattedValue = scientificFormat(num.value);
-    return `E${formattedValue}\\#${num.height}`;
-  }
-
-  let str = num.toString();
-
-  // If the number is beyond 10^10 or below 10^-6, force scientific notation
-  if (Math.abs(num) >= 1e10 || (Math.abs(num) > 0 && Math.abs(num) <= 1e-6)) {
-    // Keep up to 6 decimal places, but strip useless trailing zeros
-    str = num.toExponential(6).replace(/\.?0+e/, 'e');
-  }
-
-  // Translate the "e" format into MathJax
-  if (str.includes('e')) {
-    let [base, exponent] = str.toLowerCase().split('e');
-    exponent = parseInt(exponent, 10); 
-
-    // Clean up "1 \times 10^b" or "-1 \times 10^b"
-    if (base === '1') {
-      return `10^{${exponent}}`;
-    } else if (base === '-1') {
-      return `-10^{${exponent}}`;
-    }
-
-    return `${base} \\times 10^{${exponent}}`;
-  }
-
-  return str;
-}
 // ===================================================================
 // WEBSITE STUFF ARCHIVE
 // ===================================================================
