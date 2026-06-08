@@ -117,36 +117,51 @@ document.addEventListener("DOMContentLoaded", () => {
   function safeTetrate(base, height) {
     let hNum = height.toNumber();
 
-    // 1. If it's a clean integer, native tetrate is perfectly stable and ultra-fast
+    // 1. If it's a clean integer, use the ultra-fast native engine
     if (Math.floor(hNum) === hNum) {
       return base.tetrate(hNum);
     }
 
-    // 2. Fallback to native for negative bounds
-    if (hNum < 0) {
-      return base.tetrate(hNum); 
+    // 2. Handle extreme heights (Infinity/NaN) safely
+    if (!isFinite(hNum)) {
+      return base.tetrate(hNum);
     }
 
-    // 3. Break the decimal height into integer floor and fractional remainder
+    // Extract the integer floor and the fractional remainder (0 <= frac < 1)
     let floorH = Math.floor(hNum);
-    let frac = hNum - floorH;
+    let frac = hNum - floorH; 
 
-    // 4. Evaluate the critical fraction section (b ^^ frac) where 0 <= frac < 1
-    let result;
-    if (base.eq(10)) {
-      // Base 10 native fractional tetration works fine and uses a built-in smooth patch
-      result = base.tetrate(frac);
-    } else {
-      // Linear interpolation fallback for custom bases: 1 + (base - 1) * frac
-      result = new Decimal(1).add(base.sub(1).mul(frac));
+    // CASE A: Height is greater than -1 (Positive towers and shallow negatives)
+    if (hNum > -1) {
+      // The linear base case on [-1, 0] simplifies perfectly down to just 'frac'
+      let result = new Decimal(frac);
+
+      // Pull up: Apply base.pow() exactly (floorH + 1) times
+      let steps = floorH + 1;
+      for (let i = 0; i < steps; i++) {
+        result = base.pow(result);
+      }
+      return result;
+    } 
+    
+    // CASE B: Height is less than or equal to -1 (Deep negative towers)
+    else {
+      let result = new Decimal(frac);
+
+      // Pull down: Apply log_base() exactly (-floorH - 1) times
+      let steps = -floorH - 1;
+      let logBase = base.log10(); // Cache log10 of base for change-of-base rule
+      
+      for (let i = 0; i < steps; i++) {
+        // Prevent library crashes if log falls into non-positive walls
+        if (result.lte(0)) {
+          return new Decimal(-Infinity); 
+        }
+        // log_base(x) = log10(x) / log10(base)
+        result = result.log10().div(logBase);
+      }
+      return result;
     }
-
-    // 5. Build the rest of the power tower by resolving upward 'floorH' times
-    for (let i = 0; i < floorH; i++) {
-      result = base.pow(result);
-    }
-
-    return result;
   }
 
   /**
