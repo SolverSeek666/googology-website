@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (node.args.length === 1) {
           if (node.op === '-') return args[0].neg();
           if (node.op === '+') return args[0];
-          if (node.op === '!') return Decimal.factorial(args[0]); 
+          if (node.op === '!') return args[0].add(1).gamma(); // Factorial handled via gamma(x+1)
         }
         
         // Binary operations
@@ -169,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (funcArgs.length === 2) return funcArgs[0].log10().div(funcArgs[1].log10()); 
             throw new Error("log expects 1 or 2 arguments");
           case 'ln': return funcArgs[0].ln();
-          case 'gamma': return Decimal.gamma(funcArgs[0]);
+          case 'gamma': return funcArgs[0].gamma();
           case 'sin': return funcArgs[0].sin();
           case 'cos': return funcArgs[0].cos();
           case 'tan': return funcArgs[0].tan();
@@ -192,8 +192,9 @@ document.addEventListener("DOMContentLoaded", () => {
    * Formats astronomical numbers into beautiful vertical LaTeX exponent stacks.
    */
   function formatDecimalToLaTeX(d) {
-    if (!d.isFinite()) return '\\infty';
-    if (d.isNaN()) return '\\text{NaN}';
+    // FIX: Accessing primitive numerical properties for safety checks
+    if (Number.isNaN(d.mag) || Number.isNaN(d.layer)) return '\\text{NaN}';
+    if (!isFinite(d.layer) || !isFinite(d.mag)) return '\\infty';
 
     // Tier 1: Small everyday values
     if (d.layer === 0 && d.mag < 1e10 && d.mag > 1e-6) {
