@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Safe Fractional Tetration Wrapper
-   * Patches break_eternity's native decimal tetration bugs for non-10 bases.
+   * Upgraded to use Universal Smooth Quadratic Approximation for arbitrary bases!
    */
   function safeTetrate(base, height) {
     let hNum = height.toNumber();
@@ -131,37 +131,45 @@ document.addEventListener("DOMContentLoaded", () => {
     let floorH = Math.floor(hNum);
     let frac = hNum - floorH; 
 
-    // CASE A: Height is greater than -1 (Positive towers and shallow negatives)
-    if (hNum > -1) {
-      // The linear base case on [-1, 0] simplifies perfectly down to just 'frac'
-      let result = new Decimal(frac);
+    let bNum = base.toNumber();
+    let result;
 
-      // Pull up: Apply base.pow() exactly (floorH + 1) times
-      let steps = floorH + 1;
-      for (let i = 0; i < steps; i++) {
+    // 3. Compute the smooth base case value on the standard [0, 1) interval
+    if (bNum > 1) {
+      let lnB = Math.log(bNum);
+      
+      // Calculate universal C1 continuity slopes dynamically for this base
+      let B = (2 * (bNum - 1)) / (bNum * lnB + 1);
+      let A = (bNum - 1) - B;
+      
+      // Evaluate our smooth blending polynomial curve: A*f^2 + B*f + 1
+      let polyVal = A * frac * frac + B * frac + 1;
+      result = new Decimal(polyVal);
+    } else {
+      // Fallback configuration if the base is <= 1 (where logarithms/tetration break)
+      result = new Decimal(1 + frac * (bNum - 1));
+    }
+
+    // 4. Climb up or down the power tower from our [0, 1) base coordinate
+    if (floorH >= 0) {
+      // Positive height scaling: execute base.pow() upward
+      for (let i = 0; i < floorH; i++) {
         result = base.pow(result);
       }
-      return result;
-    } 
-    
-    // CASE B: Height is less than or equal to -1 (Deep negative towers)
-    else {
-      let result = new Decimal(frac);
-
-      // Pull down: Apply log_base() exactly (-floorH - 1) times
-      let steps = -floorH - 1;
-      let logBase = base.log10(); // Cache log10 of base for change-of-base rule
+    } else {
+      // Negative height scaling: execute log_base() downward
+      let steps = -floorH;
+      let logBase = base.log10(); // Cached change-of-base rule asset
       
       for (let i = 0; i < steps; i++) {
-        // Prevent library crashes if log falls into non-positive walls
         if (result.lte(0)) {
           return new Decimal(-Infinity); 
         }
-        // log_base(x) = log10(x) / log10(base)
         result = result.log10().div(logBase);
       }
-      return result;
     }
+
+    return result;
   }
 
   /**
@@ -246,7 +254,6 @@ document.addEventListener("DOMContentLoaded", () => {
    * Formats astronomical numbers into beautiful vertical LaTeX exponent stacks.
    */
   function formatDecimalToLaTeX(d) {
-    // FIX: Accessing primitive numerical properties for safety checks
     if (Number.isNaN(d.mag) || Number.isNaN(d.layer)) return '\\text{NaN}';
     if (!isFinite(d.layer) || !isFinite(d.mag)) return '\\infty';
 
