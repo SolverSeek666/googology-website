@@ -1,30 +1,58 @@
+<!DOCTYPE html>
 <html>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
-<meta name="format-detection" content="telephone=no">
 <head>
+  <meta charset="UTF-8">
+  <meta name="format-detection" content="telephone=no">
   <title>BMS Analysis</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <style>
-    body {
-      font-family: "JetBrains Mono", monospace;
-      background-color: #434343;
-      color: #ffffff;
-    }
-    a {
-      color: #b4c8ff;
-      text-decoration: none;
-    }
-  </style>
+  
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
   <p style="font-size: 48px; text-align: center;"><b>Bashicu Matrix Analysis</b></p>
   <p style="font-size: 24px; text-align: center;"><b><i>by Seek</i></b></p>
+  
   <h1>Information</h1>
-  In this page, I'll analyze Bashicu Matrix System with ordinals and OCFs
+  In this page, I'll analyze Bashicu Matrix System with ordinals and OCFs.
+  
   <h1>Credits</h1>
   Dshamlin's <a href="https://sites.google.com/view/dshamlin-bms-analysis/home">Bashicu Matrix Analysis</a> inspired me to make this<br>
+  
   <p style="font-size: 40px; text-align: center;">Part 1: PrSS</p>
   <p style="font-size: 24px; text-align: center;">0 ~ \(\varepsilon_0\)</p>
-  how do I make tables
+
+  Before the analysis, I want to list the OCF I'm using so people won't be confused what OCF I'm using.<br>
+
+  $$C_0(\alpha,\beta)=\{0\}\cup\beta$$
+  $$\qquad\qquad\quad\;\; C_{n+1}(\alpha,\beta)=\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\}$$
+  $$\qquad\qquad\qquad\qquad\qquad\qquad\;\;\; \cup\;\{\psi(\gamma)|\gamma\in C_n(\alpha,\beta)\land\gamma\lt\alpha\}$$
+  $$\qquad\; C(\alpha,\beta)=\bigcup_{n\lt\omega} C_n(\alpha,\beta)$$
+  $$\qquad\qquad\qquad\qquad\qquad\;\,\, \psi(\alpha)=\min\{\beta\lt\Omega|C(\alpha,\beta)\cap\Omega\subseteq\beta\}$$
+  
+  <div class="analysis1">
+    <div class="grid-header">Matrix</div>
+    <div class="grid-header">Ordinal</div>
+    <div class="grid-header">OCF</div>
+  
+    <div class="grid-cell">\( [Empty Matrix] \)</div>
+    <div class="grid-cell">\( 0 \)</div>
+    <div class="grid-cell">\( 0 \)</div>
+  
+    <div class="grid-cell">\(\begin{bmatrix} 0 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( 1 \)</div>
+    <div class="grid-cell">\( \psi(0) \)</div>
+    
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 0 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( 2 \)</div>
+    <div class="grid-cell">\( \psi(0) \cdot 2 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 0 & 0 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( 3 \)</div>
+    <div class="grid-cell">\( \psi(0) \cdot 3 \)</div>
+  </div>
+  
 </body>
 </html>
