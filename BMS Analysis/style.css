@@ -11,7 +11,7 @@ a {
 }
 
 /* --- CSS Grid "Table" --- */
-.analysis1 {
+.analysis {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1px;
