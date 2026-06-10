@@ -66,7 +66,7 @@
     <div class="grid-cell">\( \psi(0) \cdot 6 \)</div>
 
     <div class="grid-cell">\(\begin{bmatrix} 0 & 1 \end{bmatrix}\)</div>
-    <div class="grid-cell">\( \omega [\mathrm{First\;Transfinite\;Ordinal}] \)</div>
+    <div class="grid-cell">\( \omega \;[\mathrm{First\;Transfinite\;Ordinal}] \)</div>
     <div class="grid-cell">\( \psi(1) \)</div>
 
     <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 0 \end{bmatrix}\)</div>
@@ -381,7 +381,7 @@
   <p style="font-size: 40px; text-align: center;">Part 2: Ternary PrSS</p>
   <p style="font-size: 24px; text-align: center;">\(\omega ^ \omega\) ~ \(\omega ^{\omega ^ \omega}\)</p>
 
-  Before the analysis, I want to list the OCF I'm using so people won't be confused what OCF I'm using.<br>
+  Here I used the same OCF right here, and btw we'll be faster after each part.<br>
 
   $$C_0(\alpha,\beta)=\{0\}\cup\beta$$
   $$\qquad\qquad\quad\;\; C_{n+1}(\alpha,\beta)=\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\}$$
@@ -395,8 +395,216 @@
     <div class="grid-header">OCF</div>
     
     <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 \end{bmatrix}\)</div>
-    <div class="grid-cell">\( \omega ^ \omega [\mathrm{Linear\;Array\;Ordinal}] \)</div>
+    <div class="grid-cell">\( \omega ^ \omega \;[\mathrm{Linear\;Array\;Ordinal}] \)</div>
     <div class="grid-cell">\( \psi(\psi(1)) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 0 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ \omega + 1 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1)) + 1 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 0 & 0 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ \omega + 2 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1)) + 2 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 0 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ \omega + \omega \)</div>
+    <div class="grid-cell">\( \psi(\psi(1)) + \psi(1) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 0 & 1 & 0 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ \omega + \omega + 1 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1)) + \psi(1) + 1 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 0 & 1 & 0 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ \omega + \omega \cdot 2 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1)) + \psi(1) \cdot 2 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 0 & 1 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ \omega + \omega ^ 2 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1)) + \psi(2) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 0 & 1 & 1 & 0 & 1 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ \omega + \omega ^ 2 \cdot 2 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1)) + \psi(2) \cdot 2 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 0 & 1 & 1 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ \omega + \omega ^ 3 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1)) + \psi(3) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 0 & 1 & 1 & 1 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ \omega + \omega ^ 4 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1)) + \psi(4) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 0 & 1 & 2 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ \omega \cdot 2 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1)) \cdot 2 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 0 & 1 & 2 & 0 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ \omega \cdot 2 + 1 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1)) \cdot 2 + 1 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 0 & 1 & 2 & 0 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ \omega \cdot 2 + \omega \)</div>
+    <div class="grid-cell">\( \psi(\psi(1)) \cdot 2 + \psi(1) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 0 & 1 & 2 & 0 & 1 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ \omega \cdot 2 + \omega ^ 2 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1)) \cdot 2 + \psi(2) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 0 & 1 & 2 & 0 & 1 & 2 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ \omega \cdot 3 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1)) \cdot 3 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 0 & 1 & 2 & 0 & 1 & 2 & 0 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ \omega \cdot 3 + 1 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1)) \cdot 3 + 1 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 0 & 1 & 2 & 0 & 1 & 2 & 0 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ \omega \cdot 3 + \omega \)</div>
+    <div class="grid-cell">\( \psi(\psi(1)) \cdot 3 + \psi(1) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 0 & 1 & 2 & 0 & 1 & 2 & 0 & 1 & 2 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ \omega \cdot 4 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1)) \cdot 4 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 0 & 1 & 2 & 0 & 1 & 2 & 0 & 1 & 2 & 0 & 1 & 2 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ \omega \cdot 5 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1)) \cdot 5 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega + 1} \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) + 1) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 0 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega + 1} + 1 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) + 1) + 1 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 0 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega + 1} + \omega \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) + 1) + \psi(1) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 0 & 1 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega + 1} + \omega ^ 2 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) + 1) + \psi(2) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 0 & 1 & 2 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega + 1} + \omega ^ \omega \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) + 1) + \psi(\psi(1)) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 0 & 1 & 2 & 0 & 1 & 2 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega + 1} + \omega ^ \omega \cdot 2 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) + 1) + \psi(\psi(1)) \cdot 2 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 0 & 1 & 2 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega + 1} \cdot 2 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) + 1) \cdot 2 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 0 & 1 & 2 & 1 & 0 & 1 & 2 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega + 1} \cdot 3 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) + 1) \cdot 3 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega + 2} \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) + 2) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 1 & 0 & 1 & 2 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega + 2} + \omega ^ {\omega + 1} \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) + 2) + \psi(\psi(1) + 1) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 1 & 0 & 1 & 2 & 1 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega + 2} \cdot 2 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) + 2) \cdot 2 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 1 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega + 3} \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) + 3) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 1 & 1 & 0 & 1 & 2 & 1 & 1 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega + 3} \cdot 2 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) + 3) \cdot 2 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 1 & 1 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega + 4} \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) + 4) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 1 & 1 & 1 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega + 5} \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) + 5) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 2 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega \cdot 2} \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) \cdot 2) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 2 & 0 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega \cdot 2} + 1 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) \cdot 2) + 1 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 2 & 0 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega \cdot 2} + \omega \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) \cdot 2) + \psi(1) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 2 & 0 & 1 & 2 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega \cdot 2} + \omega ^ \omega \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) \cdot 2) + \psi(\psi(1)) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 2 & 0 & 1 & 2 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega \cdot 2} + \omega ^ {\omega + 1} \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) \cdot 2) + \psi(\psi(1) + 1) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 2 & 0 & 1 & 2 & 1 & 2 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega \cdot 2} \cdot 2 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) \cdot 2) \cdot 2 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 2 & 0 & 1 & 2 & 1 & 2 & 0 & 1 & 2 & 1 & 2 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega \cdot 2} \cdot 3 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) \cdot 2) \cdot 3 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 2 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega \cdot 2 + 1} \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) \cdot 2 + 1) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 2 & 1 & 0 & 1 & 2 & 1 & 2 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega \cdot 2 + 1} \cdot 2 \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) \cdot 2 + 1) \cdot 2 \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 2 & 1 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega \cdot 2 + 2} \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) \cdot 2 + 2) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 2 & 1 & 1 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega \cdot 2 + 3} \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) \cdot 2 + 3) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 2 & 1 & 2 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega \cdot 3} \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) \cdot 3) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 2 & 1 & 2 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega \cdot 3 + 1} \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) \cdot 3 + 1) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 2 & 1 & 2 & 1 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega \cdot 3 + 2} \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) \cdot 3 + 2) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 2 & 1 & 2 & 1 & 2 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega \cdot 4} \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) \cdot 4) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 2 & 1 & 2 & 1 & 2 & 1 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega \cdot 4 + 1} \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) \cdot 4 + 1) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 2 & 1 & 2 & 1 & 2 & 1 & 2 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega \cdot 5} \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) \cdot 5) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 1 & 2 & 1 & 2 & 1 & 2 & 1 & 2 & 1 & 2 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega \cdot 6} \)</div>
+    <div class="grid-cell">\( \psi(\psi(1) \cdot 6) \)</div>
+
+    <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 & 2 \end{bmatrix}\)</div>
+    <div class="grid-cell">\( \omega ^ {\omega ^ 2} \)</div>
+    <div class="grid-cell">\( \psi(\psi(2)) \)</div>
   </div>
   <br>
   <br>
