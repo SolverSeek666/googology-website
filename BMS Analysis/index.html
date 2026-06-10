@@ -37,7 +37,7 @@
     <div class="grid-header">Ordinal</div>
     <div class="grid-header">OCF</div>
   
-    <div class="grid-cell">\( [\mathrm{Empty\;Matrix}] \)</div>
+    <div class="grid-cell">\(\begin{bmatrix} \mathrm{Empty\;Matrix} \end{bmatrix}\)</div>
     <div class="grid-cell">\( 0 \)</div>
     <div class="grid-cell">\( 0 \)</div>
   
@@ -66,7 +66,7 @@
     <div class="grid-cell">\( \psi(0) \cdot 6 \)</div>
 
     <div class="grid-cell">\(\begin{bmatrix} 0 & 1 \end{bmatrix}\)</div>
-    <div class="grid-cell">\( \omega \)</div>
+    <div class="grid-cell">\( \omega [\mathrm{First\;Transfinite\;Ordinal}] \)</div>
     <div class="grid-cell">\( \psi(1) \)</div>
 
     <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 0 \end{bmatrix}\)</div>
@@ -374,11 +374,28 @@
     <div class="grid-cell">\( \psi(9) \)</div>
 
     <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \end{bmatrix}\)</div>
-    <div class="grid-cell">\( \omega ^ 10 \)</div>
+    <div class="grid-cell">\( \omega ^{10} \)</div>
     <div class="grid-cell">\( \psi(10) \)</div>
+  </div>
 
+  <p style="font-size: 40px; text-align: center;">Part 2: Ternary PrSS</p>
+  <p style="font-size: 24px; text-align: center;">\(\omega ^ \omega\) ~ \(\omega ^{\omega ^ \omega}\)</p>
+
+  Before the analysis, I want to list the OCF I'm using so people won't be confused what OCF I'm using.<br>
+
+  $$C_0(\alpha,\beta)=\{0\}\cup\beta$$
+  $$\qquad\qquad\quad\;\; C_{n+1}(\alpha,\beta)=\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\}$$
+  $$\qquad\qquad\qquad\qquad\qquad\qquad\;\;\; \cup\;\{\psi(\gamma)|\gamma\in C_n(\alpha,\beta)\land\gamma\lt\alpha\}$$
+  $$\qquad\; C(\alpha,\beta)=\bigcup_{n\lt\omega} C_n(\alpha,\beta)$$
+  $$\qquad\qquad\qquad\qquad\qquad\;\,\, \psi(\alpha)=\min\{\beta\lt\Omega|C(\alpha,\beta)\cap\Omega\subseteq\beta\}$$
+  
+  <div class="analysis">
+    <div class="grid-header">Matrix</div>
+    <div class="grid-header">Ordinal</div>
+    <div class="grid-header">OCF</div>
+    
     <div class="grid-cell">\(\begin{bmatrix} 0 & 1 & 2 \end{bmatrix}\)</div>
-    <div class="grid-cell">\( \omega ^ \omega \)</div>
+    <div class="grid-cell">\( \omega ^ \omega [\mathrm{Linear\;Array\;Ordinal}] \)</div>
     <div class="grid-cell">\( \psi(\psi(1)) \)</div>
   </div>
   <br>
