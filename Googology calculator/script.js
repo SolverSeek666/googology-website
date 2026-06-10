@@ -249,35 +249,60 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==========================================
   // SECTION 4: LATEX FORMATTING LAYER
   // ==========================================
+  
+  // Formats astronomical numbers into beautiful vertical LaTeX exponent stacks
+  // based on tier thresholds (Normal -> a*10^b -> 10^(a*10^b) -> 10^10^(a*10^b)...)
 
-  /**
-   * Formats astronomical numbers into beautiful vertical LaTeX exponent stacks.
-   */
   function formatDecimalToLaTeX(d) {
     if (Number.isNaN(d.mag) || Number.isNaN(d.layer)) return '\\text{NaN}';
     if (!isFinite(d.layer) || !isFinite(d.mag)) return '\\infty';
-
-    // Tier 1: Small everyday values
-    if (d.layer === 0 && d.mag < 1e10 && d.mag > 1e-6) {
+  
+    let layer = d.layer;
+    let mag = d.mag;
+  
+    // Safe normalization pass if layer 0 overflowed
+    if (layer === 0 && mag >= 1e10) {
+      mag = Math.log10(mag);
+      layer = 1;
+    }
+  
+    // Tier 1: Small everyday values below 10^10 displayed normally
+    if (layer === 0) {
       let num = d.toNumber();
       if (Math.abs(num - Math.round(num)) < 1e-11) num = Math.round(num);
       return num.toString();
     }
-
-    // Tier 2: Traditional Scientific Notation (e.g., 3.45 x 10^400)
-    if (d.layer === 1 && d.mag < 1e9) {
-      let exp = Math.floor(d.mag);
-      let mantissa = parseFloat(Math.pow(10, d.mag - exp).toFixed(4));
-      if (mantissa === 10) { mantissa = 1; exp += 1; }
-      if (mantissa === 1) return `10^{${exp}}`;
-      return `${mantissa} \\times 10^{${exp}}`;
+    if (layer === 1 && mag < 10) {
+      let num = Math.pow(10, mag);
+      if (Math.abs(num - Math.round(num)) < 1e-11) num = Math.round(num);
+      return num.toString();
     }
-
-    // Tier 3: Cosmological Power Towers (e.g., 10^10^10^5.4)
+  
+    // Tiers 2+: Parse the core scientific notation (a * 10^b) from the top exponent
+    let exp = Math.floor(mag);
+    let mantissa = parseFloat(Math.pow(10, mag - exp).toFixed(4));
+    if (mantissa === 10) { 
+      mantissa = 1; 
+      exp += 1; 
+    }
+  
+    let innerLaTeX;
+    if (mantissa === 1) {
+      innerLaTeX = `10^{${exp}}`;
+    } else {
+      innerLaTeX = `${mantissa} \\times 10^{${exp}}`;
+    }
+  
+    // Dynamically wrap inside nested 10^{...} blocks based on remaining tower layers
     let tower = "";
-    for (let i = 0; i < d.layer; i++) tower += "10^{";
-    tower += parseFloat(d.mag.toFixed(4)).toString();
-    for (let i = 0; i < d.layer; i++) tower += "}";
+    for (let i = 0; i < layer - 1; i++) {
+      tower += "10^{";
+    }
+    tower += innerLaTeX;
+    for (let i = 0; i < layer - 1; i++) {
+      tower += "}";
+    }
+  
     return tower;
   }
 
