@@ -260,14 +260,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let layer = d.layer;
     let mag = d.mag;
   
-    // Safe normalization pass if layer 0 overflowed
-    if (layer === 0 && mag >= 1e10) {
-      mag = Math.log10(mag);
-      layer = 1;
-    }
-  
-    // Tier 1: Small everyday values below 10^10 displayed normally
-    if (layer === 0) {
+    // Tier 1: Small values below 10^10 displayed normally
+    if (layer === 0 && mag < 1e10) {
       let num = d.toNumber();
       if (Math.abs(num - Math.round(num)) < 1e-11) num = Math.round(num);
       return num.toString();
@@ -278,31 +272,45 @@ document.addEventListener("DOMContentLoaded", () => {
       return num.toString();
     }
   
-    // Tiers 2+: Parse the core scientific notation (a * 10^b) from the top exponent
-    let exp = Math.floor(mag);
-    let mantissa = parseFloat(Math.pow(10, mag - exp).toFixed(4));
-    if (mantissa === 10) { 
-      mantissa = 1; 
-      exp += 1; 
-    }
+    // Uniform Tower Unroller: Determine the core scientific notation (a * 10^b)
+    let outerLayers = 0;
+    let exponent = 0;
+    let mantissa = 1;
   
-    let innerLaTeX;
-    if (mantissa === 1) {
-      innerLaTeX = `10^{${exp}}`;
+    if (mag >= 1e10) {
+      // Top exponent is huge (e.g. 1e15) -> It becomes its own scientific layer
+      outerLayers = layer;
+      exponent = Math.floor(Math.log10(mag));
+      mantissa = mag / Math.pow(10, exponent);
     } else {
-      innerLaTeX = `${mantissa} \\times 10^{${exp}}`;
+      // Top exponent is small (e.g. 15 or 16) -> The layer beneath it is the scientific layer
+      outerLayers = layer - 1;
+      exponent = Math.floor(mag);
+      mantissa = Math.pow(10, mag - exponent);
     }
   
-    // Dynamically wrap inside nested 10^{...} blocks based on remaining tower layers
+    // Format the core scientific notation block cleanly
+    let innerLaTeX;
+    let formattedMantissa = parseFloat(mantissa.toFixed(4));
+    
+    if (formattedMantissa === 10) {
+      innerLaTeX = `10^{${exponent + 1}}`;
+    } else if (formattedMantissa === 1) {
+      innerLaTeX = `10^{${exponent}}`;
+    } else {
+      innerLaTeX = `${formattedMantissa} \\times 10^{${exponent}}`;
+    }
+  
+    // Wrap the core inside the dynamically calculated number of outer 10^ prefixes
     let tower = "";
-    for (let i = 0; i < layer - 1; i++) {
+    for (let i = 0; i < outerLayers; i++) {
       tower += "10^{";
     }
     tower += innerLaTeX;
-    for (let i = 0; i < layer - 1; i++) {
+    for (let i = 0; i < outerLayers; i++) {
       tower += "}";
     }
-  
+    
     return tower;
   }
 
