@@ -26,9 +26,13 @@ a {
   color: #ffb4b4;
   padding: 12px;
   font-weight: bold;
+  display: flex;
+  align-items: center;
 }
 
 .grid-cell {
   background-color: #3a3a3a;
   padding: 12px;
+  display: flex;
+  align-items: center;
 }
