@@ -19,7 +19,6 @@ a {
 .game-header {
   text-align: center;
   padding: 10px 0;
-  cursor: pointer; /* Makes it obvious you can click it to test */
 }
 
 .divider {
@@ -29,35 +28,21 @@ a {
   margin-bottom: 25px;
 }
 
-/* Side-by-side alignment for the layout split */
-/* Stacks the panels vertically */
+/* Stacks elements vertically down the center */
 .game-body {
   display: flex;
-  flex-direction: column; /* This does the magic! */
-  align-items: center;    /* Centers the button and the box on the screen */
-  gap: 30px;              /* Adds clean spacing between the blocks */
-}
-
-.left-panel, .right-panel {
-  width: 100%;
-  display: flex;
-  justify-content: center; /* Ensures the items inside stay perfectly centered */
-}
-
-/* Adjusting the placeholder box so it lines up nicely with the button */
-.placeholder-box {
-  border: 2px dashed #666;
-  border-radius: 6px;
-  width: 100%;
-  max-width: 280px; /* Matches the exact width of your upgrade button */
-  height: 120px;
-  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  color: #aaa;
+  gap: 30px;
 }
 
-/* --- The Custom Upgrade Button Structure --- */
+.panel {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* --- Upgrade Button Design --- */
 .upgrade-btn {
   display: flex;
   flex-direction: column;
@@ -78,7 +63,6 @@ a {
   border-color: #aaa;
 }
 
-/* User's color requested for Header */
 .btn-header {
   background-color: #222222;
   padding: 8px;
@@ -86,7 +70,6 @@ a {
   font-size: 0.95rem;
 }
 
-/* User's color requested for Info/Description */
 .btn-description {
   background-color: #3a3a3a;
   padding: 12px;
@@ -95,23 +78,25 @@ a {
   border-bottom: 1px solid #444;
 }
 
-/* Bottom sector for the cost display */
 .btn-cost {
   background-color: #2b2b2b;
   padding: 6px;
   font-size: 0.8rem;
-  color: #ffbb99; /* Subtle color shift for numbers */
+  color: #ffffff;
 }
 
-/* Placeholder box styling for the right side */
+/* Placeholder Box matching the layout */
 .placeholder-box {
   border: 2px dashed #666;
   border-radius: 6px;
-  height: 200px;
+  width: 100%;
+  max-width: 280px;
+  height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #aaa;
+  font-size: 0.85rem;
 }
 
 /* I want the button's header be #222222 */
