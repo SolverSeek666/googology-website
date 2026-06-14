@@ -18,7 +18,19 @@ a {
 
 .game-header {
   text-align: center;
-  padding: 10px 0;
+  padding: 10px 0 0 0; /* Adjusted padding to fit the new text */
+}
+
+.game-header h1 {
+  margin-bottom: 5px; /* Brings the nps text closer to the main number */
+}
+
+/* Styling for the new numbers per second display */
+.rate-text {
+  color: #aaaaaa;
+  font-size: 0.95rem;
+  margin-top: 0;
+  margin-bottom: 15px;
 }
 
 .divider {
@@ -41,24 +53,23 @@ a {
   justify-content: center;
 }
 
-/* --- All Black Button with White Outlines --- */
 .upgrade-btn {
   display: flex;
   flex-direction: column;
   width: 100%;
   max-width: 380px;
-  border: 2px solid #ffffff; /* Crisp white outline */
+  border: 2px solid #ffffff;
   border-radius: 4px;
   overflow: hidden;
   cursor: pointer;
   font-family: inherit;
-  background-color: #000000; /* All Black */
-  color: #ffffff;            /* White Text */
+  background-color: #000000;
+  color: #ffffff;
   padding: 0;
 }
 
 .upgrade-btn:hover {
-  opacity: 0.85; /* Subtle flash effect when hovering */
+  opacity: 0.85;
 }
 
 .upgrade-btn:disabled {
@@ -73,20 +84,20 @@ a {
   font-weight: bold;
   font-size: 0.95rem;
   text-align: center;
-  border-bottom: 1px solid #ffffff; /* White separating outline */
+  border-bottom: 1px solid #ffffff;
 }
 
 .btn-main-content {
   background-color: #000000;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid #ffffff; /* White separating outline */
+  border-bottom: 1px solid #ffffff;
   text-align: left;
 }
 
 .btn-left-info {
   padding: 12px;
-  border-right: 1px solid #ffffff; /* White separating outline */
+  border-right: 1px solid #ffffff;
   min-width: 80px;
   font-size: 0.75rem;
   display: flex;
@@ -96,11 +107,11 @@ a {
 }
 
 .btn-tier {
-  color: #ffffff; /* White Text */
+  color: #ffffff;
 }
 
 .btn-buy-count {
-  color: #ffffff; /* White Text */
+  color: #ffffff;
 }
 
 .btn-description {
@@ -108,20 +119,19 @@ a {
   font-size: 0.8rem;
   flex: 1;
   line-height: 1.4;
-  color: #ffffff; /* White Text */
+  color: #ffffff;
 }
 
 .btn-cost {
   background-color: #000000;
   padding: 8px;
   font-size: 0.8rem;
-  color: #ffffff; /* White Text */
+  color: #ffffff;
   text-align: center;
 }
 
-/* Placeholder Frame */
 .placeholder-box {
-  border: 2px dashed #ffffff; /* Swapped to white outline to match */
+  border: 2px dashed #ffffff;
   border-radius: 6px;
   width: 100%;
   max-width: 380px;
