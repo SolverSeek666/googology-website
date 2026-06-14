@@ -30,7 +30,32 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  idk main page lol
+  <div class="game-container">
+    <header class="game-header">
+      <h1>Numbers: <span id="number-count">0</span></h1>
+      <p style="font-size: 0.8rem; color: #888;">(Click this header to manually generate numbers for testing!)</p>
+    </header>
+    
+    <hr class="divider">
+    
+    <main class="game-body">
+      
+      <div class="left-panel">
+        <button id="upgrade-btn-1" class="upgrade-btn">
+          <div class="btn-header">More Digits</div>
+          <div class="btn-description">Increase manual click gain by +1</div>
+          <div class="btn-cost">Cost: <span id="upgrade-cost-1">10</span></div>
+        </button>
+      </div>
+      
+      <div class="right-panel">
+        <div class="placeholder-box">
+          <p>More stuff i guess</p>
+        </div>
+      </div>
+      
+    </main>
+  </div>
   
   <script src="script.js"></script>
 </body>
