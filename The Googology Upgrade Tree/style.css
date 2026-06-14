@@ -1,0 +1,14 @@
+body {
+  font-family: "JetBrains Mono", monospace;
+  background-color: #434343;
+  color: #ffffff;
+  padding: 20px;
+}
+
+a {
+  color: #b4c8ff;
+  text-decoration: none;
+}
+
+/* I want the button's header be #222222 */
+/* I want the button's info be #3a3a3a */
