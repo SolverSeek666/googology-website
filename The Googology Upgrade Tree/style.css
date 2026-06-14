@@ -18,16 +18,16 @@ a {
 
 .game-header {
   text-align: center;
-  padding: 10px 0 0 0; /* Adjusted padding to fit the new text */
+  padding: 10px 0 0 0;
 }
 
 .game-header h1 {
-  margin-bottom: 5px; /* Brings the nps text closer to the main number */
+  margin-bottom: 5px;
 }
 
-/* Styling for the new numbers per second display */
+/* FIX: Made this bright white so it pops right off the screen background */
 .rate-text {
-  color: #aaaaaa;
+  color: #ffffff;
   font-size: 0.95rem;
   margin-top: 0;
   margin-bottom: 15px;
