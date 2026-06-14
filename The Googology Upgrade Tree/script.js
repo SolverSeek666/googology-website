@@ -2,17 +2,16 @@ let game = {
     numbers: new Decimal(0),
     upgrade1Cost: new Decimal(0),
     upgrade1Count: 0,
-    upgrade1Max: 1, // Changed maximum cap to 1
-    productionPerUpgrade: new Decimal(0.01), // Set to 0.01 to match your [base: 0.01/s] text
+    upgrade1Max: 1, 
+    productionPerUpgrade: new Decimal(0.01), // Fixed back to 0.01!
     
-    // Your new future-proofing variables!
     add: new Decimal(1),
     mult: new Decimal(1),
     exp: new Decimal(1)
 };
 
 const numberCountEl = document.getElementById("number-count");
-const rateDisplayEl = document.getElementById("rate-display"); // New element target
+const rateDisplayEl = document.getElementById("rate-display");
 const upgradeBtn1 = document.getElementById("upgrade-btn-1");
 const upgradeCount1El = document.getElementById("upgrade-count-1");
 const upgradeCost1El = document.getElementById("upgrade-cost-1");
@@ -29,14 +28,12 @@ function updateDisplay() {
     numberCountEl.innerText = formatDisplay(game.numbers);
     upgradeCount1El.innerText = game.upgrade1Count;
 
-    // Calculate current NPS (Numbers Per Second)
     let currentNps = new Decimal(game.upgrade1Count).mul(game.productionPerUpgrade);
     
-    // Update the visual rate display using your exact requested format
-    rateDisplayEl.innerText = `+${formatDisplay(currentNps)}/s [+${game.add}|×${game.mult}|^${game.exp}]`;
+    rateDisplayEl.innerText = `+${formatDisplay(currentNps)}/s [+${game.add.toString()}|×${game.mult.toString()}|^${game.exp.toString()}]`;
 
     if (game.upgrade1Count >= game.upgrade1Max) {
-        upgradeCostContainer1.innerText = "Upgrade Maxed"; // Changed to Uppercase
+        upgradeCostContainer1.innerText = "Upgrade Maxed"; 
         upgradeBtn1.disabled = true;
     } else {
         upgradeCost1El.innerText = game.upgrade1Cost.toString();
@@ -49,15 +46,6 @@ upgradeBtn1.addEventListener("click", () => {
     if (game.numbers.gte(game.upgrade1Cost)) {
         game.numbers = game.numbers.sub(game.upgrade1Cost);
         game.upgrade1Count += 1;
-        
-        // This won't trigger anymore since max is 1, but it's safe to leave for future upgrades
-        if (game.upgrade1Count < game.upgrade1Max) {
-            if (game.upgrade1Cost.eq(0)) {
-                game.upgrade1Cost = new Decimal(0.05);
-            } else {
-                game.upgrade1Cost = game.upgrade1Cost.mul(3.5);
-            }
-        }
         
         updateDisplay();
     }
