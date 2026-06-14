@@ -13,15 +13,15 @@
     window.MathJax = {
       tex: {
         macros: {
-          itra: ["\\color{##ddaaaa}{#1}", 1], // \itra{text}
-          itrb: ["\\color{##ffbb99}{#1}", 1], // \itrb{text}
-          itrc: ["\\color{##ffffaa}{#1}", 1], // \itrc{text}
-          itrd: ["\\color{##bbffaa}{#1}", 1], // \itrd{text}
-          itre: ["\\color{##bbccff}{#1}", 1], // \itre{text}
-          itrf: ["\\color{##ccbbdd}{#1}", 1], // \itrf{text}
-          itrg: ["\\color{##ddaacc}{#1}", 1], // \itrg{text}
-          itrh: ["\\color{##ddbbcc}{#1}", 1], // \itrh{text}
-          itri: ["\\color{##ddcccc}{#1}", 1] // \itri{text}
+          itra: ["\\color{##ddaaaa}{#1}", 1],
+          itrb: ["\\color{##ffbb99}{#1}", 1],
+          itrc: ["\\color{##ffffaa}{#1}", 1],
+          itrd: ["\\color{##bbffaa}{#1}", 1],
+          itre: ["\\color{##bbccff}{#1}", 1],
+          itrf: ["\\color{##ccbbdd}{#1}", 1],
+          itrg: ["\\color{##ddaacc}{#1}", 1],
+          itrh: ["\\color{##ddbbcc}{#1}", 1],
+          itri: ["\\color{##ddcccc}{#1}", 1]
         }
       }
     };
@@ -30,27 +30,27 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
   <div class="game-container">
     <header class="game-header">
-      <h1>Numbers: <span id="number-count">0</span></h1>
-      <p style="font-size: 0.8rem; color: #888;">(Click this header to manually generate numbers for testing!)</p>
+      <h1>Numbers: <span id="number-count">0.000</span></h1>
     </header>
     
     <hr class="divider">
     
     <main class="game-body">
       
-      <div class="left-panel">
+      <div class="panel">
         <button id="upgrade-btn-1" class="upgrade-btn">
-          <div class="btn-header">More Digits</div>
-          <div class="btn-description">Increase manual click gain by +1</div>
-          <div class="btn-cost">Cost: <span id="upgrade-cost-1">10</span></div>
+          <div class="btn-header">Quantum Spark</div>
+          <div class="btn-description">Generates +0.001 numbers per second passively.</div>
+          <div class="btn-cost">Cost: <span id="upgrade-cost-1">0</span></div>
         </button>
       </div>
       
-      <div class="right-panel">
+      <div class="panel">
         <div class="placeholder-box">
-          <p>More stuff i guess</p>
+          <p>More stuff i guess (Locked until later)</p>
         </div>
       </div>
       
