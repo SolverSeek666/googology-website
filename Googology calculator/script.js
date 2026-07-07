@@ -9,5 +9,5 @@ appendInput = function(stuff) {
 calcInput.onkeydown = function(e) {
 	// console.log(e.key);
 	if (e.key != "Enter") return;
-	document.getElementById("calcOutput").innerHTML = eval(calcInput.value);
+	document.getElementById("calcOutput").innerHTML = Number(eval(calcInput.value).toFixed(10));
 }
