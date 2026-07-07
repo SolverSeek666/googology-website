@@ -6,4 +6,8 @@ appendInput = function(stuff) {
     calcInput.value += stuff;
 }
 
-calcOutput = eval(calcInput);
+calcInput.onkeydown = function(e) {
+	// console.log(e.key);
+	if (e.key != "Enter") return;
+	document.getElementById("calcOutput").innerHTML = calcStuff(calcInput.value);
+}
