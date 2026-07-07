@@ -22,5 +22,5 @@ calcInput.onkeydown = function(e) {
 	transform = transform.replaceAll(/tan\(([\w.]+)\)/g, 'math.tan($1)');
 	transform = transform.replaceAll(/([\w.]+)!/g, 'math.factorial($1)');
 	transform = transform.replaceAll(/Γ\(([\w.]+)\)/g, 'math.gamma($1)');
-	document.getElementById("calcOutput").innerHTML = Number(math.evaluate("transform").toFixed(10));
+	document.getElementById("calcOutput").innerHTML = Number(math.evaluate(transform).toFixed(10));
 }
