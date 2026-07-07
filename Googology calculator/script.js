@@ -6,4 +6,4 @@ appendInput = function(stuff) {
     calcInput.value += stuff;
 }
 
-calcInput = calcOutput
+calcOutput = calcInput
