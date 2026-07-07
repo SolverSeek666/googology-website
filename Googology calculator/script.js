@@ -14,5 +14,10 @@ calcInput.onkeydown = function(e) {
 	transform = transform.replaceAll("√", "nthRoot");
     transform = transform.replaceAll("ln", "log");
 	transform = transform.replaceAll("Γ", "gamma");
-	document.getElementById("calcOutput").innerHTML = Number(math.evaluate(transform).toFixed(10));
+	numFormat = Number(math.evaluate(transform).toFixed(10));
+	if (numFormat >= 1e+10) {
+    	numFormat = numFormat.toExponential();
+		numFormat = numFormat.replaceAll("e+", "×10^");
+  	}
+	document.getElementById("calcOutput").innerHTML = numFormat;
 }
