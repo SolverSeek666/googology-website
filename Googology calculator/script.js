@@ -6,4 +6,4 @@ appendInput = function(stuff) {
     calcInput.value += stuff;
 }
 
-calcOutput = calcInput
+calcOutput = console.log(eval(calcInput));
