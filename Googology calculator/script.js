@@ -14,10 +14,14 @@ calcInput.onkeydown = function(e) {
 	transform = transform.replaceAll("√", "nthRoot");
     transform = transform.replaceAll("ln", "log");
 	transform = transform.replaceAll("Γ", "gamma");
-	numFormat = Number(math.evaluate(transform).toFixed(10));
-	if (numFormat >= 1e+10) {
-    	numFormat = numFormat.toExponential(6);
-		numFormat = numFormat.replaceAll("e+", "×10^");
+	numSmall = Number(math.evaluate(transform).toFixed(10));
+	if (numSmall < 1e+10) {
+    	document.getElementById("calcOutput").innerHTML = numSmall;
   	}
-	document.getElementById("calcOutput").innerHTML = numFormat;
+	if (numSmall >= 1e+10 && numSmall < 1e+300) {
+    	numSmall = numSmall.toExponential(6);
+		mul = Number(numSmall.slice(0,numSmall.indexOf("e")));
+		pow = Number(numSmall.slice(numSmall.indexOf("e")+2));
+		document.getElementById("calcOutput").innerHTML = `${mul}×10^${pow}`;
+  	}
 }
