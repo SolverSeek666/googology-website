@@ -16,7 +16,7 @@ calcInput.onkeydown = function(e) {
 	transform = transform.replaceAll("Γ", "gamma");
 	numFormat = Number(math.evaluate(transform).toFixed(10));
 	if (numFormat >= 1e+10) {
-    	numFormat = numFormat.toExponential();
+    	numFormat = numFormat.toExponential(6);
 		numFormat = numFormat.replaceAll("e+", "×10^");
   	}
 	document.getElementById("calcOutput").innerHTML = numFormat;
