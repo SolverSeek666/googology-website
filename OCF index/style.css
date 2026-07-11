@@ -11,12 +11,12 @@ a {
 }
 
 .tab {
-      display: flex;
-      border-bottom: 2px solid #ccc;
-    }
+  display: flex;
+  background: #333;
+}
 
 .tab-btn {
-  background: #f1f1f1;
+  background: #222222;
   border: none;
   outline: none;
   padding: 10px 20px;
@@ -26,24 +26,22 @@ a {
 }
 
 .tab-btn:hover {
-  background: #ddd;
+  background: #222222;
 }
 
 .tab-btn.active {
-  background: #fff;
-  border: 2px solid #ccc;
-  border-bottom: 2px solid transparent;
+  background: #222222;
+  border: none;
   margin-bottom: -2px;
-  font-weight: bold;
 }
 
 .tab-pan {
   display: none;
   padding: 20px;
-  border: 1px solid #ccc;
+  border: none;
   border-top: none;
 }
 
 .tab-pan.active {
-  display: block;
+  display: none;
 }
