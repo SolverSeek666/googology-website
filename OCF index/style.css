@@ -1,0 +1,37 @@
+.tab {
+      display: flex;
+      border-bottom: 2px solid #ccc;
+    }
+
+.tab-btn {
+  background: #f1f1f1;
+  border: none;
+  outline: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.2s;
+}
+
+.tab-btn:hover {
+  background: #ddd;
+}
+
+.tab-btn.active {
+  background: #fff;
+  border: 2px solid #ccc;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  font-weight: bold;
+}
+
+.tab-pan {
+  display: none;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+
+.tab-pan.active {
+  display: block;
+}
