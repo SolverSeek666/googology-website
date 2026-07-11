@@ -1,3 +1,15 @@
+body {
+  font-family: "JetBrains Mono", monospace;
+  background-color: #434343;
+  color: #ffffff;
+  padding: 20px;
+}
+
+a {
+  color: #b4c8ff;
+  text-decoration: none;
+}
+
 .tab {
       display: flex;
       border-bottom: 2px solid #ccc;
