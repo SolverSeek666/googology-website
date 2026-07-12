@@ -12,6 +12,7 @@ a {
 
 .btntab {
   font-family: "JetBrains Mono", monospace;
+  cursor: pointer;
   width: 100%;
   max-width: 120px;
   min-height: 30px;
