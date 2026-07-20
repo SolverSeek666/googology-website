@@ -348,7 +348,7 @@
   &nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.1: if Lv(#) > Lv(separator) and a > 0, then<br>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. Decrease the first number of A by 1.<br>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. Iterate the separator in "n" with iterator times.<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. Change the iterated separator into separators that satisfies Lv(new separator) = Lv(old separator),<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. Change the iterated separator into separators that satisfies "Lv(separator), = Lv(#)".<br>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4. Replace the iterator to base.<br>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5. The process ends.<br>
   &nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.2: otherwise, focus on A in the separator and repeat after C2.<br>
@@ -398,15 +398,24 @@
   &nbsp;&nbsp;&nbsp;&nbsp;2. Add "@0" in front of the separator.<br>
   &nbsp;&nbsp;&nbsp;&nbsp;3. The process ends.<br>
   &nbsp;&nbsp;&nbsp;C2.1.1.2: if n = 0, set @ is the form [n<sub>1</sub>#A<sub>1</sub>] and do the process below.<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.1: n<sub>1</sub> > 0, do the process below.<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.1.1: if Lv(#) > Lv(separator) and a > 0, then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.1: A<sub>1</sub> > 0, do the process below.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.1.1: n<sub>1</sub> > 0, do the process below.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.1.1.1: if Lv(#) > Lv(separator) and a > 0, then<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. Decrease the first number of A by 1.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. Iterate the separator in "n" with iterator times.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. Change the iterated separator into separators that satisfies "Lv(separator), = Lv(#)".<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4. Replace the iterator to base.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5. The process ends.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.1.1.2: otherwise, focus on A in the separator and repeat after C2.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.1.2: n<sub>1</sub> = 0, focus on A in the separator and repeat after C2.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.2: A<sub>1</sub> = 0, do the process below.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.2.1: if Lv(#) > Lv(separator) and a > 0, then<br>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. Decrease the first number of A by 1.<br>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. Iterate the separator in "n" with iterator times.<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. Change the iterated separator into separators that satisfies Lv(new separator) = Lv(old separator),<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. Change the iterated separator into separators that satisfies "Lv(separator), = Lv(#)".<br>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4. Replace the iterator to base.<br>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5. The process ends.<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.1.2: otherwise, focus on A in the separator and repeat after C2.<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.2: n<sub>1</sub> = 0, focus on A in the separator and repeat after C2.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C2.1.1.2.2.2: otherwise, focus on A in the separator and repeat after C2.<br>
   &nbsp;&nbsp;C2.1.2: if A = 0, do the process below.<br>
   &nbsp;&nbsp;&nbsp;C2.1.2.1: if n > 1, then<br>
   &nbsp;&nbsp;&nbsp;&nbsp;1. Decrease n by 1.<br>
