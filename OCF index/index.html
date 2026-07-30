@@ -34,11 +34,13 @@
   <br>
   <br>
   <span class="tab" style="display: none;">
-    $$C_0(\alpha,\beta)=\{0\}\cup\beta$$
-    $$\qquad\qquad\quad\;\; C_{n+1}(\alpha,\beta)=\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\}$$
-    $$\qquad\qquad\qquad\qquad\qquad\qquad\;\;\; \cup\;\{\psi(\gamma)|\gamma\in C_n(\alpha,\beta)\land\gamma\lt\alpha\}$$
-    $$\qquad\; C(\alpha,\beta)=\bigcup_{n\lt\omega} C_n(\alpha,\beta)$$
-    $$\qquad\qquad\qquad\qquad\qquad\;\,\, \psi(\alpha)=\min\{\beta\lt\Omega|C(\alpha,\beta)\cap\Omega\subseteq\beta\}$$
+    $$\begin{align}
+    C_0(\alpha,\beta)&=\{0\}\cup\beta \\
+    C_{n+1}(\alpha,\beta)&=\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
+    &\mspace{1mu}\cup\mspace{1mu}\{\psi(\gamma)|\gamma\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
+    C(\alpha,\beta)&=\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
+    \psi(\alpha)&=\min\{\beta\lt\Omega|C(\alpha,\beta)\cap\Omega\subseteq\beta\}
+    \end{align}$$
   </span>
   <span class="tab" style="display: none;">
     $$\quad\, C_0(\alpha,\beta)=\{0,\Omega\}\cup\beta$$
