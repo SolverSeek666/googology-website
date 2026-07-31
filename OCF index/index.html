@@ -220,6 +220,7 @@
   <span class="tab" style="display: none;">
     $$\begin{align}
     \mathbb{U} & =\{\Omega_\gamma|\gamma\in\mathrm{Ord}\land\Omega_\gamma\in\mathrm{Reg}\} \\
+    \mathbb{K} & =\{K_\gamma|\gamma\in\mathrm{Ord}\land K_\gamma\in\mathrm{Reg}\} \\
     C_0(\alpha,\beta) & =\{0\}\cup\beta \\
     C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
     & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
@@ -231,7 +232,8 @@
     A_\pi(\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathbb{U} \\
     & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha) A(\xi)\;\mathrm{is\;stationary\;in}\;\beta\} \\
     \psi_\pi(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\}\cup\{\pi\}) \\
-    \chi_\pi^\xi(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in A_\pi(\xi)\}\cup\{\pi\})
+    \chi_\pi^\xi(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in A_{\mathrm{next\;weakly\;compact\;after}\;\pi}(\xi)\}\cup\{\pi\})
+    \mathrm{for}\;\pi\in\mathbb{K} ,\;\chi_\pi^\xi(\alpha) & =\min(\{\beta\in A_pi(\xi)|C(\alpha,\beta)\cap\pi\subseteq\beta\}\cup\{\pi\})
     \end{align}$$
   </span>
   <script src="tab.js"></script>
