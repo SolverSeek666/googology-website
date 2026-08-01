@@ -33,6 +33,8 @@
   <button class="btntab">&lt; \(M(1@\omega;0)\)</button>
   <button class="btntab">&lt; \(K_2\)</button>
   <button class="btntab">&lt; \(K\)fp</button>
+  <button class="btntab">&lt; \(K(1;\cdot)\)fp</button>
+  <button class="btntab">&lt; \(K[2]\)fp</button>
   <br>
   <br>
   <br>
@@ -207,7 +209,6 @@
     C_0(\alpha,\beta) & =\{0,K\}\cup\beta \\
     C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
     & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-    & \mspace{2mu}\cup\mspace{1mu}\{M(\xi;\gamma)|\gamma,\xi\in C_n(\alpha,\beta)\} \\
     & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
     & \mspace{2mu}\cup\mspace{1mu}\{\chi_\pi^\xi(\gamma)|\gamma,\xi,\pi\in C_n(\alpha,\beta)\land\gamma,\xi\lt\alpha\} \\
     C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
@@ -220,11 +221,9 @@
   <span class="tab" style="display: none;">
     $$\begin{align}
     \mathbb{U} & =\{\Omega_\gamma|\gamma\in\mathrm{Ord}\land\Omega_\gamma\in\mathrm{Reg}\} \\
-    \mathbb{K} & =\{K_\gamma|\gamma\in\mathrm{Ord}\land K_\gamma\in\mathrm{Reg}\} \\
     C_0(\alpha,\beta) & =\{0\}\cup\beta \\
     C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
     & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-    & \mspace{2mu}\cup\mspace{1mu}\{M(\xi;\gamma)|\gamma,\xi\in C_n(\alpha,\beta)\} \\
     & \mspace{2mu}\cup\mspace{1mu}\{K_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
     & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
     & \mspace{2mu}\cup\mspace{1mu}\{\chi_\pi^\xi(\gamma)|\gamma,\xi,\pi\in C_n(\alpha,\beta)\land\gamma,\xi\lt\alpha\} \\
@@ -232,8 +231,27 @@
     A_\pi(\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathbb{U} \\
     & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha) A_\pi(\xi)\;\mathrm{is\;stationary\;in}\;\beta\} \\
     \psi_\pi(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\}\cup\{\pi\}) \\
-    \chi_\pi^\xi(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in A_{\mathrm{next\;weakly\;compact\;after}\;\pi}(\xi)\}\cup\{\pi\}) \\
-    \mathrm{for}\;\pi\in\mathbb{K} ,\;\chi_\pi^\xi(\alpha) & =\min(\{\beta\in A_pi(\xi)|C(\alpha,\beta)\cap\pi\subseteq\beta\}\cup\{\pi\})
+    \chi_\pi^\xi(\alpha) & =\min(\{\beta\in A_\pi(\xi)|C(\alpha,\beta)\cap\pi\subseteq\beta\}\cup\{\pi\})
+    \end{align}$$
+  </span>
+  <span class="tab" style="display: none;">
+    $$\begin{align}
+    \mathbb{U} & =\{\Omega_\gamma|\gamma\in\mathrm{Ord}\land\Omega_\gamma\in\mathrm{Reg}\} \\
+    C_0(\alpha,\beta) & =\{0\}\cup\beta \\
+    C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{K_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{K[2]_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\delta(\gamma)|\gamma,\xi,\pi\in C_n(\alpha,\beta)\land\gamma,\delta\lt\alpha\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^{\delta,\xi}(\gamma)|\gamma,\delta\xi,\pi\in C_n(\alpha,\beta)\land\gamma,\delta,\xi\lt\alpha\} \\
+    C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
+    B_\pi(\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathbb{U} \\
+    & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha)\beta\;\mathrm{is}\;\Pi_1^1-\mathrm{indescribable\;with}\;\Pi_0^1-\mathrm{indescribablity\;over}\; B_\pi(\xi)\} \\
+    A_\pi^\gamma(\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in B_\pi(\gamma) \\
+    & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha)\beta\;\mathrm{is}\;\Pi_0^1-\mathrm{indescribable\;with}\;\Pi_0^1-\mathrm{indescribablity\;over}\; A_\pi^\gamma(\xi)\} \\
+    \psi_\pi^\gamma(\alpha) & =\min(\{\beta\in A_\pi(\gamma)|C(\alpha,\beta)\cap\pi\subseteq\beta\}\cup\{\pi\})
+    \psi_\pi^{\gamma,\delta}(\alpha) & =\min(\{\beta\in A_\pi^\gamma(\delta)|C(\alpha,\beta)\cap\pi\subseteq\beta\}\cup\{\pi\})
     \end{align}$$
   </span>
   <script src="tab.js"></script>
