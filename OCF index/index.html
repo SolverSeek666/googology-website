@@ -35,6 +35,7 @@
   <button class="btntab">&lt; \(K\)fp</button>
   <button class="btntab">&lt; \(K(1;\cdot)\)fp</button>
   <button class="btntab">&lt; \(K[2]\)fp</button>
+  <button class="btntab">&lt; \(K[\omega^{-}]\)</button>
   <br>
   <br>
   <br>
@@ -248,10 +249,10 @@
     C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
     A_\pi(\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathbb{U} \\
     & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha) A_\pi(\xi)\;\mathrm{is\;stationary\;in}\;\beta\} \\
-    A_\pi^1(\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathbb{K} \\
-    & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha) A_\pi^1(\xi)\;\mathrm{is\;stationary\;in}\;\beta\} \\
+    A_\pi(1,\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathbb{K} \\
+    & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha) A_\pi(1,\xi)\;\mathrm{is\;stationary\;in}\;\beta\} \\
     \psi_\pi^\xi(\alpha) & =\min(\{\beta\in A_\pi(\xi)|C(\alpha,\beta)\cap\pi\subseteq\beta\}\cup\{\pi\}) \\
-    \psi_\pi^{1,\xi}(\alpha) & =\min(\{\beta\in A_\pi^1(\xi)|C(\alpha,\beta)\cap\pi\subseteq\beta\}\cup\{\pi\})
+    \psi_\pi^{1,\xi}(\alpha) & =\min(\{\beta\in A_\pi(1,\xi)|C(\alpha,\beta)\cap\pi\subseteq\beta\}\cup\{\pi\})
     \end{align}$$
   </span>
   <span class="tab" style="display: none;">
@@ -264,13 +265,33 @@
     & \mspace{2mu}\cup\mspace{1mu}\{K[2]_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
     & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
     & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\delta(\gamma)|\gamma,\xi,\pi\in C_n(\alpha,\beta)\land\gamma,\delta\lt\alpha\} \\
-    & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^{\delta,\xi}(\gamma)|\gamma,\delta\xi,\pi\in C_n(\alpha,\beta)\land\gamma,\delta,\xi\lt\alpha\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^{\delta,\xi}(\gamma)|\gamma,\delta,\xi,\pi\in C_n(\alpha,\beta)\land\gamma,\delta,\xi\lt\alpha\} \\
     C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
-    B_\pi(\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathbb{U} \\
-    & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha)\beta\;\mathrm{is}\;\Pi_1^1-\mathrm{indescribable\;with}\;\Pi_0^1-\mathrm{indescribablity\;over}\; B_\pi(\xi)\} \\
-    A_\pi^\gamma(\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in B_\pi(\gamma) \\
-    & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha)\beta\;\mathrm{is}\;\Pi_0^1-\mathrm{indescribable\;with}\;\Pi_0^1-\mathrm{indescribablity\;over}\; A_\pi^\gamma(\xi)\} \\
-    \psi_\pi^{\gamma,\delta}(\alpha) & =\min(\{\beta\in A_\pi^\gamma(\delta)|C(\alpha,\beta)\cap\pi\subseteq\beta\}\cup\{\pi\})
+    B(0) & = Ord \\
+    B(\alpha+1) & = \Pi_1^1-\mathrm{indescribable\;with}\;\Pi_0^1-\mathrm{indescribablity\;over}\; B(\alpha) \\
+    A_\pi(\gamma,\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in B_\pi(\gamma) \\
+    & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha) A_\pi(\gamma,\xi)\;\mathrm{is\;stationary\;in}\;\beta\} \\
+    \psi_\pi^{\gamma,\delta}(\alpha) & =\min(\{\beta\in A_\pi(\gamma,\delta)|C(\alpha,\beta)\cap\pi\subseteq\beta\}\cup\{\pi\})
+    \end{align}$$
+  </span>
+  <span class="tab" style="display: none;">
+    $$\begin{align}
+    \mathbb{U} & =\{\Omega_\gamma|\gamma\in\mathrm{Ord}\land\Omega_\gamma\in\mathrm{Reg}\} \\
+    C_0(\alpha,\beta) & =\{0\}\cup\beta \\
+    C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{K_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{K[\delta]_\gamma|\gamma,\delta\in C_n(\alpha,\beta)\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\delta(\gamma)|\gamma,\xi,\delta\in C_n(\alpha,\beta)\land\gamma,\delta\lt\alpha\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^{\delta_0,\delta_1,\cdot\cdot\cdot}(\gamma)|\gamma,\delta_0,\delta_1,\cdot\cdot\cdot,\pi\in C_n(\alpha,\beta)\land\gamma,\delta_0,\delta_1,\cdot\cdot\cdot\lt\alpha\} \\
+    C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
+    B(0,0) & = Ord \\
+    B(\gamma,\alpha+1) & = \Pi_1^1-\gamma-\mathrm{indescribable\;with}\;\Pi_0^1-\mathrm{indescribablity\;over}\; B(\gamma,\alpha) \\
+    A_\pi(\alpha_n,\cdot\cdot\cdot,\alpha_{k+1},\alpha_k,0,\cdot\cdot\cdot\{\times k\}\cdot\cdot\cdot,0) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in B_\pi(k,\alpha_{k+1}) \\
+    & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha) \\
+    A_\pi(\alpha_n,\cdot\cdot\cdot,\alpha_{k+1},\alpha_k,0,\cdot\cdot\cdot\{\times k\}\cdot\cdot\cdot,0)\;\mathrm{is\;stationary\;in}\;\beta\} \\
+    \psi_\pi^{\gamma_n,\cdot\cdot\cdot,\gamma_1,\gamma_0}(\alpha) & =\min(\{\beta\in A_\pi(\gamma_n,\cdot\cdot\cdot,\gamma_1,\gamma_0)|C(\alpha,\beta)\cap\pi\subseteq\beta\}\cup\{\pi\})
     \end{align}$$
   </span>
   <script src="tab.js"></script>
