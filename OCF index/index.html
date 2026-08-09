@@ -36,6 +36,7 @@
   <button class="btntab">&lt; \(K(1;\cdot)\)fp</button>
   <button class="btntab">&lt; \(K[2]\)fp</button>
   <button class="btntab">&lt; \(K[\omega^{-}]\)</button>
+  <button class="btntab">&lt; \(K [Set]\)</button>
   <br>
   <br>
   <br>
@@ -301,6 +302,23 @@
     & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha) \\
     & A_\pi(\alpha_n,\cdot\cdot\cdot ,\alpha_{k+1},\alpha_k,0,\cdot\cdot\cdot\{\times k\}\cdot\cdot\cdot ,0)\;\mathrm{is\;stationary\;in}\;\beta\} \\
     \psi_\pi^{\gamma_n,\cdot\cdot\cdot ,\gamma_1,\gamma_0}(\alpha) & =\min(\{\beta\in A_\pi(\gamma_n,\cdot\cdot\cdot ,\gamma_1,\gamma_0)|C(\alpha,\beta)\cap\pi\subseteq\beta\}\cup\{\pi\})
+    \end{align}$$
+  </span>
+  <span class="tab" style="display: none;">
+    $$\begin{align}
+    \mathbb{U} & =\{\Omega_\gamma|\gamma\in\mathrm{Ord}\land\Omega_\gamma\in\mathrm{Reg}\} \\
+    C_0(\alpha,\beta) & =\{0\}\cup\beta \\
+    C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{I_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{K_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^{[\mathbb{A}]}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
+    C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
+    \Psi_\pi(\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathbb{U} \\
+    & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha) \Psi_\pi(\xi)\;\mathrm{is\;stationary\;in}\;\beta\} \\
+    \psi_\pi(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\}\cup\{\pi\}) \\
+    \psi_\pi^{[\mathbb{A}]}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathbb{A}\}\cup\{\pi\})
     \end{align}$$
   </span>
   <script src="tab.js"></script>
