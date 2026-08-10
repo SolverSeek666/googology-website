@@ -55,14 +55,26 @@
   Let \(\Lambda\le\mathbb{I}_N\) be a strongly critical number.<br>
   \(\varphi_b(\xi)\) denotes the binary Veblen function on \((\mathbb{I}_N)^{\dagger 0}=\omega_{\mathbb{I}_N+1}\) with \(\varphi_0(\xi)=\omega^\xi\), and \(\tilde{\varphi}_b(\xi;\Lambda):=\varphi_b(\Lambda\cdot\xi)\).<br>
   <br>
+  Let \(b,\xi\lt (\mathbb{I}_N)^{\dagger 0}\).<br>
+  \(\theta_b(\xi)[\tilde{\theta}_b(\xi;\Lambda)]\) denotes a \(b\)-th iterate of \(\varphi_0(\xi)=\omega^\xi\) [of \(\tilde{\varphi}_0(\xi;\Lambda)=\Lambda^\xi\)], resp.<br>
+  Specifically ordinals \(\theta_b(\xi),\tilde{\theta}_b(\xi;\Lambda)\lt (\mathbb{I}_N)^{\dagger 0}\) are defined by recursion on \(b\) as follows.<br>
+  $$\begin{align}
+  \theta_0(\xi) = \tilde{\theta}_0(\xi;\Lambda) & = \xi \\
+  \theta_{\omega^b}(\xi) & = \varphi_b(\xi) \\
+  \tilde{\theta}_{\omega^b}(\xi;\Lambda) & = \tilde{\varphi}_b(\xi;\Lambda) \\
+  \theta_{c\dotplus\omega^b}(\xi) & = \theta_c(\theta_{\omega^b}(\xi)) \\
+  \tilde{\theta}_{c\dotplus\omega^b}(\xi;\Lambda) & = \tilde{\theta}_c(\tilde{\theta}_{\omega^b}(\xi;\Lambda);\Lambda)
+  \end{align}$$
+  <br>
+  A finite set \(SC(a)\) of strongly critical numbers is defined recursively as follows.<br>
+  $$\begin{align}
+  SC(0) & = \emptyset \\
+  SC(a) & = \bigcup_{i\le m} SC(a_i)\;\mathrm{for}\; a = \omega^{a_m}\dotplus\dotsb\dotplus\omega^{a_0} \\
+  SC(a) & = SC(b)\cup SC(c)\;\mathrm{for}\; a = \varphi_b(c)\;\mathrm{if}\; a \;\mathrm{is\;not\;strongly\;critical} \\
+  SC(a) & = \{a\}\;\mathrm{if}\; a \;\mathrm{is\;strongly\;critical}
+  \end{align}$$
+  <br>
   /WIP/<br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
   <br>
   <br>
   <br>
@@ -76,8 +88,7 @@
   <br>
   <br>
   <br>
-  $$\begin{align}
-  placeholder\;for\;future\;uses
-  \end{align}$$
+  <br>
+  <br>
 </body>
 </html>
