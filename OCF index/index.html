@@ -39,6 +39,7 @@
   <button class="btntab">&lt; \(K\)fp [Set]</button>
   <button class="btntab">&lt; \(K(\cdot;0)\)fp [Set]</button>
   <button class="btntab">&lt; \(K[\cdot]\)fp [Set]</button>
+  <button class="btntab">&lt; \(\mathcal{K}\)fp</button>
   <br>
   <br>
   <br>
@@ -357,6 +358,27 @@
     \pi & = \min(\mathrm{conf}(\gamma,\pi)-\Pi_0^1-\mathrm{indescr}\;\mathrm{that\;is\;also}\;\Pi_1^1-\gamma+1-\mathrm{indescr}) \\
     \Psi_\pi^\gamma(\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathrm{conf}(\gamma,\pi) \\
     & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha) \beta\;\mathrm{is}\;\Psi_\pi(\xi)-\Pi_0^1-\mathrm{indescr}\;\mathrm{that\;is\;also}\;\Pi_1^1-\gamma-\mathrm{indescr}\} \\
+    \psi_\pi(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\}\cup\{\pi\}) \\
+    \psi_\pi^{[\mathbb{A}]}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathbb{A}\}\cup\{\pi\})
+    \end{align}$$
+  </span>
+  <span class="tab" style="display: none;">
+    $$\begin{align}
+    \mathbb{U} & =\{\Omega_\gamma|\gamma\in\mathrm{Ord}\land\Omega_\gamma\in\mathrm{Reg}\} \\
+    C_0(\alpha,\beta) & =\{0\}\cup\beta \\
+    C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{I_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{K_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{\mathcal{K}_\gamma|\gamma,\delta\in C_n(\alpha,\beta)\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
+    & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^{[\mathbb{A}]}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
+    C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
+    \pi & = \min(\mathrm{conf}(\mathbb{A},\pi)-\Pi_0^1-\mathrm{indescr}\;\mathrm{that\;is\;also}\;\mathbb{A}-\Pi_1^1-\mathrm{indescr}) \\
+    \Psi_\pi^{[1;\mathbb{U}]}(\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathbb{U} \\
+    & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha) \beta\;\mathrm{is}\;\Psi_\pi(\xi)-\Pi_1^1-\mathrm{indescr}\} \\
+    \Psi_\pi^{[\mathbb{A}]}(\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathrm{conf}(\mathbb{A},\pi) \\
+    & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha) \beta\;\mathrm{is}\;\Psi_\pi(\xi)-\Pi_0^1-\mathrm{indescr}\;\mathrm{that\;is\;also}\;\mathbb{A}\} \\
     \psi_\pi(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\}\cup\{\pi\}) \\
     \psi_\pi^{[\mathbb{A}]}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathbb{A}\}\cup\{\pi\})
     \end{align}$$
