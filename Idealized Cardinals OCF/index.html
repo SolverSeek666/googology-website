@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="format-detection" content="telephone=no">
+  <title>OCF conversion index</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/14.0.1/math.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/break_eternity.js"></script>
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <p style="font-size: 48px; text-align: center;"><b>OCF conversion index</b></p>
+  <h1>Information</h1>
+  these OCFs are from <a href="https://solverseek666.github.io/googology-website/OCF%20index/">OCF index</a>
+  <h1>Credits</h1>
+  Hyp_cos for all 4 parts of <a href="https://googology.fandom.com/wiki/User:Hyp_cos/OCF_vs_Array_Notation">OCF vs Array Notation</a>
+  <h1>Note</h1>
+  \(N = M(1;0)\) for convenience.<br>
+  \(\pi_\alpha^\beta[n] = n\mathrm{th}\;\Pi_\alpha^\beta\) for convenience.<br>
+  \(\pi_\alpha^\beta = \pi_\alpha^\beta[1]\) for convenience.<br>
+  \(\mathcal{K} = \pi_2^1\) for convenience.<br>
+  \(P_\alpha^\beta = \kappa\;\mathrm{if}\;\kappa\rightarrow (\alpha)_2^\beta\) for convenience.<br>
+  <p style="font-size: 40px; text-align: center;">Section 1: inaccessible</p>
+  $$\begin{align}
+  \begin{bmatrix} 0 \end{bmatrix} & = 1 \\
+  \begin{bmatrix} 0 & 1 \end{bmatrix} & = \omega \\
+  \begin{bmatrix} 0 & 1 \\ 0 & 1 \end{bmatrix} & = \psi(\Omega) \\
+  \begin{bmatrix} 0 & 1 \\ 0 & 1 \\ 0 & 1 \end{bmatrix} & = \psi(\Omega_\omega) \\
+  \begin{bmatrix} 0 & 1 & 2 \\ 0 & 1 & 1 \\ 0 & 1 & 1 \end{bmatrix} & = \psi(\Omega_{\omega^2}) \\
+  \begin{bmatrix} 0 & 1 & 2 & 3 \\ 0 & 1 & 1 & 1 \\ 0 & 1 & 1 & 1 \end{bmatrix} & = \psi(I_\omega) \\
+  \begin{bmatrix} 0 & 1 & 2 & 3 & 4 \\ 0 & 1 & 1 & 1 & 1 \\ 0 & 1 & 1 & 1 & 1 \end{bmatrix} & = \psi(K_\omega) \\
+  \begin{bmatrix} 0 & 1 & 2 & 3 & 4 & 5 \\ 0 & 1 & 1 & 1 & 1 & 1 \\ 0 & 1 & 1 & 1 & 1 & 1 \end{bmatrix} & = \psi(\mathcal{K}_\omega) \\
+  \begin{bmatrix} 0 & 1 & 2 & 3 & 4 & 5 & 6 \\ 0 & 1 & 1 & 1 & 1 & 1 & 1 \\ 0 & 1 & 1 & 1 & 1 & 1 & 1 \end{bmatrix} & = \psi(\pi_3^1[\omega]) \\
+  \begin{bmatrix} 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\ 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\ 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \end{bmatrix} & = \psi(\pi_4^1[\omega]) \\
+  \begin{bmatrix} 0 & 1 & 2 \\ 0 & 1 & 2 \\ 0 & 1 & 0 \end{bmatrix} & = \psi(\psi_{\pi_0^2}(\omega)) \\
+  \begin{bmatrix} 0 & 1 & 2 & 2 & 3 & 2 \\ 0 & 1 & 2 & 1 & 1 & 0 \\ 0 & 1 & 0 & 1 & 0 & 0 \end{bmatrix} & = \psi(\pi_0^2) \\
+  \begin{bmatrix} 0 & 1 & 2 & 2 & 3 \\ 0 & 1 & 2 & 1 & 1 \\ 0 & 1 & 0 & 1 & 1 \end{bmatrix} & = \psi(\pi_0^2[\omega]) \\
+  \begin{bmatrix} 0 & 1 & 2 & 2 & 3 & 2 & 3 & 2 \\ 0 & 1 & 2 & 1 & 2 & 1 & 1 & 0 \\ 0 & 1 & 0 & 1 & 0 & 1 & 0 & 0 \end{bmatrix} & = \psi(\pi_0^2-\pi_0^1-\pi_0^2) \\
+  \begin{bmatrix} 0 & 1 & 2 & 2 & 2 & 3 & 2 \\ 0 & 1 & 2 & 2 & 1 & 1 & 0 \\ 0 & 1 & 0 & 0 & 1 & 0 & 0 \end{bmatrix} & = \psi(\pi_0^2-\pi_0^2) \\
+  \begin{bmatrix} 0 & 1 & 2 & 3 & 2 \\ 0 & 1 & 2 & 1 & 0 \\ 0 & 1 & 0 & 0 & 0 \end{bmatrix} & = \psi(\pi_1^2) \\
+  \begin{bmatrix} 0 & 1 & 2 & 3 & 4 & 2 & 3 & 2 \\ 0 & 1 & 2 & 1 & 2 & 1 & 1 & 0 \\ 0 & 1 & 0 & 1 & 0 & 1 & 0 & 0 \end{bmatrix} & = \psi(\pi_0^3) \\
+  \begin{bmatrix} 0 & 1 & 2 & 3 \\ 0 & 1 & 2 & 2 \\ 0 & 1 & 0 & 0 \end{bmatrix} & = \psi(T\pi) \\
+  \begin{bmatrix} 0 & 1 & 2 & 3 & 4 & 2 \\ 0 & 1 & 2 & 2 & 1 & 0 \\ 0 & 1 & 0 & 0 & 0 & 0 \end{bmatrix} & = \psi(P_1^3) \\
+  \end{align}$$
+</body>
+</html>
