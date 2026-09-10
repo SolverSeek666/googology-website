@@ -22,9 +22,57 @@
   <h1>Note</h1>
   idk.<br>
   Work in progress.<br>
-  <p style="font-size: 40px; text-align: center;">Section 1: OCF using uncountable ordinals</p>
-  I'll note nth uncountable ordinal as \(\Omega_\alpha\)
-  idk
+  <p style="font-size: 40px; text-align: center;">Section 1: OCF using uncountable cardinals</p>
+  I'll note nth uncountable cardinal as \(\Omega_\alpha\)<br>
+  $$\begin{align}
+  C_0(\alpha,\beta) & =\{0\}\cup\beta \\
+  C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
+  C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
+  \psi_\pi(\alpha) & =\min\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\}
+  \end{align}$$
+  <p style="font-size: 40px; text-align: center;">Section 1: OCF using inaccessible cardinals</p>
+  I'll note nth inaccessible cardinal as \(I_\alpha\)<br>
+  $$\begin{align}
+  C_0(\alpha,\beta) & =\{0\}\cup\beta \\
+  C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{I_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
+  C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
+  \psi_\pi(\alpha) & =\min\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\}
+  \end{align}$$
+  <p style="font-size: 40px; text-align: center;">Section 1: OCF using Mahlo cardinals</p>
+  I'll note nth Mahlo cardinal as \(M_\alpha\)<br>
+  $$\begin{align}
+  C_0(\alpha,\beta) & =\{0\}\cup\beta \\
+  C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{I_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{M_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\chi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
+  C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
+  \psi_\pi(\alpha) & =\min\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\}
+  \chi_\pi(\alpha) & =\min\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathrm{Uc}\}
+  \end{align}$$
+  <p style="font-size: 40px; text-align: center;">Section 1: OCF using weakly compact cardinals</p>
+  I'll note nth weakly compact cardinal as \(K_\alpha\)<br>
+  $$\begin{align}
+  C_0(\alpha,\beta) & =\{0\}\cup\beta \\
+  C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{K_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\chi_\pi^\xi(\gamma)|\gamma,\xi,\pi\in C_n(\alpha,\beta)\land\gamma,\xi\lt\alpha\} \\
+  C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
+  A_\pi(\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathrm{Uc} \\
+  & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha)\beta\text{ is }\Pi_0^1-\text{indescr onto }A_\pi(\xi)\} \\
+  \psi_\pi(\alpha) & =\min\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\}
+  \chi_\pi^\xi(\alpha) & =\min(\{\beta\in A_\pi(\xi)|C(\alpha,\beta)\cap\pi\subseteq\beta\}\cup\{\pi\})
+  \end{align}$$
+  e
   <br>
   <br>
   <br>
