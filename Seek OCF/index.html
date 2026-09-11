@@ -25,52 +25,59 @@
   <p style="font-size: 40px; text-align: center;">Section 1: OCF using uncountable cardinals</p>
   I'll note nth uncountable cardinal as \(\Omega_\alpha\)<br>
   $$\begin{align}
+  \text{A reflection instance } \mathbb{X} & \text{ is in the form } (\pi)
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
-  \psi_\pi(\alpha) & =\min\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\}
+  \psi_\mathbb{X}(\alpha) & =\min\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\}
   \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Section 1: OCF using inaccessible cardinals</p>
+  <p style="font-size: 40px; text-align: center;">Section 2: OCF using inaccessible cardinals</p>
   I'll note nth inaccessible cardinal as \(I_\alpha\)<br>
   $$\begin{align}
+  \text{A reflection instance } \mathbb{X} & \text{ is in the form } (\pi)
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{I_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
-  \psi_\pi(\alpha) & =\min\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\}
+  \psi_\mathbb{X}(\alpha) & =\min\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\}
   \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Section 1: OCF using Mahlo cardinals</p>
+  <p style="font-size: 40px; text-align: center;">Section 3: OCF using Mahlo cardinals</p>
   I'll note nth Mahlo cardinal as \(M_\alpha\)<br>
   $$\begin{align}
+  \text{A reflection instance } \mathbb{X} & \text{ is in the form } (\pi) \text{, or } (\pi;\epsilon;\epsilon;0)
+  \kappa\models (\pi) :\Leftrightarrow\kappa\in\mathrm{Ord}
+  \kappa\models (\pi;\epsilon;\epsilon;0) :\Leftrightarrow\kappa\in\mathrm{Uc},\mathrm{Reg}
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{I_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{M_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\chi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
-  \psi_\pi(\alpha) & =\min\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\} \\
-  \chi_\pi(\alpha) & =\min\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathrm{Uc}\}
+  \psi_\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\models\mathbb{X}\}\cup\{\pi\})
   \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Section 1: OCF using weakly compact cardinals</p>
+  <p style="font-size: 40px; text-align: center;">Section 4: OCF using weakly compact cardinals</p>
   I'll note nth weakly compact cardinal as \(K_\alpha\)<br>
   $$\begin{align}
+  \text{A reflection instance } \mathbb{X} & \text{ is in the form } (\pi) \text{, or } (\pi;\mathsf{P}_0;\mathbb{Z};\delta)
+  \text{An inner reflection instance } \mathbb{Z} & \text{ is in the form } (\pi) \text{, or } (\mathsf{P}_0;\mathbb{Y};\delta)
+  \pi(\mathsf{P}_0;\mathbb{Y};\delta) = (\pi;\mathsf{P}_0;\mathbb{Y};\delta)
+  \kappa\models (\pi) :\Leftrightarrow\kappa\in\mathrm{Ord}
+  \kappa\models (\pi;\epsilon;0) :\Leftrightarrow\kappa\in\mathrm{Uc},\mathrm{Reg}
+  \kappa\models (\pi;\mathsf{P}_0;\mathbb{Z};\delta) :\Leftrightarrow\kappa\in A_\pi(\delta)-\iota,\iota\models\pi\mathbb{Z}
+  A_\pi(\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathrm{Uc} \\
+  & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha)\beta\text{ is }\Pi_0^1-\text{indescr onto } A_\pi(\xi)\} \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{K_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\chi_\pi^\xi(\gamma)|\gamma,\xi,\pi\in C_n(\alpha,\beta)\land\gamma,\xi\lt\alpha\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
-  A_\pi(\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathrm{Uc} \\
-  & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha)\beta\text{ is }\Pi_0^1-\text{indescr onto }A_\pi(\xi)\} \\
-  \psi_\pi(\alpha) & =\min\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\} \\
-  \chi_\pi^\xi(\alpha) & =\min(\{\beta\in A_\pi(\xi)|C(\alpha,\beta)\cap\pi\subseteq\beta\}\cup\{\pi\})
+  \psi_\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\models\mathbb{X}\}\cup\{\pi\})
   \end{align}$$
   e
   <br>
