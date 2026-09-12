@@ -68,14 +68,17 @@
   $$\begin{align}
   \text{A reflection instance } & \mathbb{X} \text{ is in the form } (\pi) \text{, or } (\pi;\mathsf{P}_0;\mathbb{Z};\delta) \\
   \text{An inner reflection instance } & \mathbb{Z} \text{ is in the form } (\pi) \text{, or } (\mathsf{P}_0;\mathbb{Y};\delta) \\
-  \pi(\mathsf{P}_0;\mathbb{Y};\delta) & = (\pi;\mathsf{P}_0;\mathbb{Y};\delta) \\
+  (\epsilon;\epsilon;0) & = \mathrm{Uc} \\
+  (\mathsf{P}_0;\mathbb{Y};\delta) & = A(\delta)\text{ onto }\mathbb{Y} \\
   i(\mathbb{X}) & = \pi \\
   o(\mathbb{X}) & = \delta \\
   \kappa\models (\pi) & :\Leftrightarrow\kappa\in\mathrm{Ord} \\
   \kappa\models (\pi;\epsilon;\epsilon;0) & :\Leftrightarrow\kappa\in\mathrm{Uc},\mathrm{Reg} \\
-  \kappa\models (\pi;\mathsf{P}_0;\mathbb{Z};\delta) & :\Leftrightarrow\kappa\in A_\pi(\delta)\text{ onto }\iota,\iota\models\pi\mathbb{Z} \\
+  \kappa\models (\pi;\mathsf{P}_0;\mathbb{Z};\delta) & :\Leftrightarrow\kappa\in A_\pi(\delta)\text{ onto }\mathbb{Z} \\
   A_\pi(\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathrm{Uc} \\
   & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha)\beta\text{ is }\Pi_0^1-\text{indescr onto } A_\pi(\xi)\} \\
+  A(\alpha) & =\{\beta|C(\alpha,\beta)\subseteq\beta\land\beta\in\mathrm{Uc} \\
+  & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha)\beta\text{ is }\Pi_0^1-\text{indescr onto } A(\xi)\} \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
@@ -89,18 +92,24 @@
   $$\begin{align}
   \text{A reflection instance } & \mathbb{X} \text{ is in the form } (\pi) \text{, or } (\pi;\mathsf{P}_m;\mathbb{Z};\delta) \\
   \text{An inner reflection instance } & \mathbb{Z} \text{ is in the form } (\pi) \text{, or } (\mathsf{P}_m;\mathbb{Y};\delta) \\
-  \pi(\mathsf{P}_m;\mathbb{Y};\delta) & = (\pi;\mathsf{P}_m;\mathbb{Y};\delta) \\
+  (\epsilon;\epsilon;0) & = \mathrm{Uc} \\
+  (\mathsf{P}_0;\mathbb{Y};\delta) & = A(\delta)\text{ onto }\mathbb{Y} \\
+  (\mathsf{P}_1;\mathbb{Y};\delta) & = B(\delta)\text{ onto }\mathbb{Y} \\
   m & \lt \omega \\
   i(\mathbb{X}) & = \pi \\
   o(\mathbb{X}) & = \delta \\
   \kappa\models (\pi) & :\Leftrightarrow\kappa\in\mathrm{Ord} \\
   \kappa\models (\pi;\epsilon;\epsilon;0) & :\Leftrightarrow\kappa\in\mathrm{Uc},\mathrm{Reg} \\
-  \kappa\models (\pi;\mathsf{P}_0;\mathbb{Z};\delta) & :\Leftrightarrow\kappa\in A_\pi(\delta)\text{ onto }\iota,\iota\models\pi\mathbb{Z} \\
-  \kappa\models (\pi;\mathsf{P}_1;\mathbb{Z};\delta) & :\Leftrightarrow\kappa\in B_\pi(\delta)\text{ onto }\iota,\iota\models\pi\mathbb{Z} \\
+  \kappa\models (\pi;\mathsf{P}_0;\mathbb{Z};\delta) & :\Leftrightarrow\kappa\in A_\pi(\delta)\text{ onto }\mathbb{Z} \\
+  \kappa\models (\pi;\mathsf{P}_1;\mathbb{Z};\delta) & :\Leftrightarrow\kappa\in B_\pi(\delta)\text{ onto }\mathbb{Z} \\
   A_\pi(\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathrm{Uc} \\
   & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha)\beta\text{ is }\Pi_0^1-\text{indescr onto } A_\pi(\xi)\} \\
   B_\pi(\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathrm{Uc} \\
   & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha)\beta\text{ is }\Pi_1^1-\text{indescr onto } B_\pi(\xi)\} \\
+  A(\alpha) & =\{\beta|C(\alpha,\beta)\subseteq\beta\land\beta\in\mathrm{Uc} \\
+  & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha)\beta\text{ is }\Pi_0^1-\text{indescr onto } A(\xi)\} \\
+  B(\alpha) & =\{\beta|C(\alpha,\beta)\subseteq\beta\land\beta\in\mathrm{Uc} \\
+  & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha)\beta\text{ is }\Pi_1^1-\text{indescr onto } B(\xi)\} \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
@@ -114,15 +123,18 @@
   $$\begin{align}
   \text{A reflection instance } & \mathbb{X} \text{ is in the form } (\pi) \text{, or } (\pi;\mathsf{P}_m;\mathbb{Z};\delta) \\
   \text{An inner reflection instance } & \mathbb{Z} \text{ is in the form } (\pi) \text{, or } (\mathsf{P}_m;\mathbb{Y};\delta) \\
-  \pi(\mathsf{P}_m;\mathbb{Y};\delta) & = (\pi;\mathsf{P}_m;\mathbb{Y};\delta) \\
+  (\epsilon;\epsilon;0) & = \mathrm{Uc} \\
+  (\mathsf{P}_m;\mathbb{Y};\delta) & = A^m(\delta)\text{ onto }\mathbb{Y} \\
   m & \lt \omega \\
   i(\mathbb{X}) & = \pi \\
   o(\mathbb{X}) & = \delta \\
   \kappa\models (\pi) & :\Leftrightarrow\kappa\in\mathrm{Ord} \\
   \kappa\models (\pi;\epsilon;\epsilon;0) & :\Leftrightarrow\kappa\in\mathrm{Uc},\mathrm{Reg} \\
-  \kappa\models (\pi;\mathsf{P}_m;\mathbb{Z};\delta) & :\Leftrightarrow\kappa\in A_\pi^m(\delta)\text{ onto }\iota,\iota\models\pi\mathbb{Z} \\
+  \kappa\models (\pi;\mathsf{P}_m;\mathbb{Z};\delta) & :\Leftrightarrow\kappa\in A_\pi^m(\delta)\text{ onto }\mathbb{Z} \\
   A_\pi^m(\alpha) & =\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in\mathrm{Uc} \\
-  & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha)\beta\text{ is }\Pi_m^1-\text{indescr onto } A_\pi(\xi)\} \\
+  & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha)\beta\text{ is }\Pi_m^1-\text{indescr onto } A_\pi^m(\xi)\} \\
+  A^m(\alpha) & =\{\beta|C(\alpha,\beta)\subseteq\beta\land\beta\in\mathrm{Uc} \\
+  & \land(\forall\xi\in C(\alpha,\beta)\cap\alpha)\beta\text{ is }\Pi_m^1-\text{indescr onto } A^m(\xi)\} \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
