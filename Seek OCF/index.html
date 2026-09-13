@@ -23,7 +23,7 @@
   idk.<br>
   Work in progress.<br>
   <p style="font-size: 40px; text-align: center;">Collapsing uncountable cardinals</p>
-  <p style="font-size: 24px; text-align: center;">I'll note nth uncountable cardinal as \(\Omega_\alpha\)</p>
+  <p style="font-size: 24px; text-align: center;">I'll note nth uncountable cardinal as \(\Omega_n\)</p>
   $$\begin{align}
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
@@ -33,7 +33,7 @@
   \psi_\pi(\alpha) & =\min\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\}
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing inaccessible cardinals</p>
-  <p style="font-size: 24px; text-align: center;">I'll note nth inaccessible cardinal as \(I_\alpha\)</p>
+  <p style="font-size: 24px; text-align: center;">I'll note nth inaccessible cardinal as \(I_n\)</p>
   $$\begin{align}
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
@@ -44,7 +44,7 @@
   \psi_\pi(\alpha) & =\min\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\}
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing Mahlo cardinals</p>
-  <p style="font-size: 24px; text-align: center;">I'll note nth Mahlo cardinal as \(M_\alpha\)</p>
+  <p style="font-size: 24px; text-align: center;">I'll note nth Mahlo cardinal as \(M_n\)</p>
   $$\begin{align}
   \text{A reflection instance } & \mathbb{X} \text{ is in the form } \epsilon \text{, or } (\mathsf{P}_0;\epsilon;0) \\
   \kappa\models \epsilon & :\Leftrightarrow\kappa\in\mathrm{Ord} \\
@@ -59,7 +59,7 @@
   \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\models\mathbb{X}\}\cup\{\pi\})
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing weakly compact cardinals</p>
-  <p style="font-size: 24px; text-align: center;">I'll note nth weakly compact cardinal as \(K_\alpha\)</p>
+  <p style="font-size: 24px; text-align: center;">I'll note nth weakly compact cardinal as \(K_n\)</p>
   $$\begin{align}
   \text{A reflection instance } & \mathbb{X} \text{ is in the form } \epsilon \text{, or } (\mathsf{P}_0;\epsilon;\delta) \\
   \kappa\models \epsilon & :\Leftrightarrow\kappa\in\mathrm{Ord} \\
@@ -75,7 +75,7 @@
   \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\models\mathbb{X}\}\cup\{\pi\})
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing \(\Pi_2^1\)-indescr cardinals</p>
-  <p style="font-size: 24px; text-align: center;">I'll note nth \(\Pi_2^1\)-indescr cardinal as \(\mathcal{K}_\alpha\)</p>
+  <p style="font-size: 24px; text-align: center;">I'll note nth \(\Pi_2^1\)-indescr cardinal as \(\mathcal{K}_n\)</p>
   $$\begin{align}
   \text{A reflection instance } & \mathbb{X} \text{ is in the form } \epsilon \text{, or } (\mathsf{P}_m;\mathbb{Z};\delta) \\
   m & \lt \omega \\
@@ -95,7 +95,7 @@
   \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\models\mathbb{X}\}\cup\{\pi\})
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing \(\Pi_0^2\)-indescr cardinals</p>
-  <p style="font-size: 24px; text-align: center;">I'll note nth \(\Pi_0^2\)-indescr cardinal as \(\Xi_\alpha\)</p>
+  <p style="font-size: 24px; text-align: center;">I'll note nth \(\Pi_0^2\)-indescr cardinal as \(\Xi_n\)</p>
   $$\begin{align}
   \text{A reflection instance } & \mathbb{X} \text{ is in the form } \epsilon \text{, or } (\mathsf{P}_m;\mathbb{Z};\delta) \\
   m & \lt \omega \\
@@ -115,15 +115,16 @@
   <p style="font-size: 40px; text-align: center;">Collapsing \(\alpha\)-shrewd cardinals</p>
   <p style="font-size: 24px; text-align: center;">I'll note nth \(\alpha\)-shrewd cardinal as \(S_n^\alpha\)</p>
   $$\begin{align}
-  \text{A reflection instance } & \mathbb{X} \text{ is in the form } \epsilon \text{, or } (\mathsf{P}_m;\mathbb{Z};\delta) \\
+  \text{A reflection instance } & \mathbb{X} \text{ is in the form } \epsilon \text{, or } (P;\mathbb{Z};\delta) \\
+  \text{A level expression } & P \text{ is in the form } \mathsf{P}_m \text{, or } \mu-\mathsf{P}_m \\
   m & \lt \omega \\
   \kappa\models \epsilon & :\Leftrightarrow\kappa\in\mathrm{Ord} \\
   \kappa\models \mathbb{X} & :\Leftrightarrow\kappa\in A\mathbb{X} \\
-  A(\mathsf{P}_m^0;\epsilon;\alpha) & =\{\beta|\beta\in\mathrm{Uc} \\
-  & \land\forall\xi\in\alpha(\beta\text{ is }\Pi_m-\text{indescr onto } A(0;\mathsf{P}_m^0;\epsilon;\xi))\} \\
-  A(\mathsf{P}_m^n;\epsilon;\alpha) & =\{\beta|\beta\in\mathrm{Uc} \\
-  & \land\forall\xi\in\alpha(\beta\text{ is }n-\text{shrewd}-\Pi_m-\text{indescr onto } A(0;\mathsf{P}_m^n;\epsilon;\xi))\} \\
-  A(\mathsf{P}_m^n;\mathbb{Z};\alpha) & = A(\mathsf{P}_m^n;\epsilon;\alpha)\cap A\mathbb{Z} \\
+  A(\mathsf{P}_m;\epsilon;\alpha) & =\{\beta|\beta\in\mathrm{Uc} \\
+  & \land\forall\xi\in\alpha(\beta\text{ is }\Pi_m-\text{indescr onto } A(0;\mathsf{P}_m;\epsilon;\xi))\} \\
+  A(\mu-\mathsf{P}_m;\epsilon;\alpha) & =\{\beta|\beta\in\mathrm{Uc} \\
+  & \land\forall\xi\in\alpha(\beta\text{ is }\mu-\text{shrewd}-\Pi_m-\text{indescr onto } A(0;\mu-\mathsf{P}_m;\epsilon;\xi))\} \\
+  A(P;\mathbb{Z};\alpha) & = A(P;\epsilon;\alpha)\cap A\mathbb{Z} \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
