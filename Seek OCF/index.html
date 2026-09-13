@@ -22,7 +22,7 @@
   <h1>Note</h1>
   idk.<br>
   Work in progress.<br>
-  <p style="font-size: 40px; text-align: center;">Section 1: OCF using uncountable cardinals</p>
+  <p style="font-size: 40px; text-align: center;">Collapsing uncountable cardinals</p>
   <p style="font-size: 24px; text-align: center;">I'll note nth uncountable cardinal as \(\Omega_\alpha\)</p>
   $$\begin{align}
   \text{A reflection instance } & \mathbb{X} \text{ is in the form } (\pi) \\
@@ -34,7 +34,7 @@
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   \psi_\mathbb{X}(\alpha) & =\min\{\beta\lt i(\mathbb{X})|C(\alpha,\beta)\cap i(\mathbb{X})\subseteq\beta\}
   \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Section 2: OCF using inaccessible cardinals</p>
+  <p style="font-size: 40px; text-align: center;">Collapsing inaccessible cardinals</p>
   <p style="font-size: 24px; text-align: center;">I'll note nth inaccessible cardinal as \(I_\alpha\)</p>
   $$\begin{align}
   \text{A reflection instance } & \mathbb{X} \text{ is in the form } (\pi) \\
@@ -47,13 +47,13 @@
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   \psi_\mathbb{X}(\alpha) & =\min\{\beta\lt i(\mathbb{X})|C(\alpha,\beta)\cap i(\mathbb{X})\subseteq\beta\}
   \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Section 3: OCF using Mahlo cardinals</p>
+  <p style="font-size: 40px; text-align: center;">Collapsing Mahlo cardinals</p>
   <p style="font-size: 24px; text-align: center;">I'll note nth Mahlo cardinal as \(M_\alpha\)</p>
   $$\begin{align}
   \text{A reflection instance } & \mathbb{X} \text{ is in the form } (\pi) \text{, or } (\pi;\epsilon;\epsilon;0) \\
   i(\mathbb{X}) & = \pi \\
-  \kappa\models (\pi) & :\Leftrightarrow\kappa\in\mathrm{Ord} \\
-  \kappa\models (\pi;\epsilon;\epsilon;0) & :\Leftrightarrow\kappa\in\mathrm{Uc},\mathrm{Reg} \\
+  \kappa\models (\pi;\epsilon;\epsilon;0) & :\Leftrightarrow\kappa\in\mathrm{Ord} \\
+  \kappa\models (\pi;\mathsf{P}_0;\epsilon;0) & :\Leftrightarrow\kappa\in\Pi_0^1-\text{indescr} \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
@@ -63,15 +63,14 @@
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   \psi_\mathbb{X}(\alpha) & =\min(\{\beta\lt i(\mathbb{X})|C(\alpha,\beta)\cap i(\mathbb{X})\subseteq\beta\land\beta\models\mathbb{X}\}\cup\{i(\mathbb{X})\})
   \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Section 4: OCF using weakly compact cardinals</p>
+  <p style="font-size: 40px; text-align: center;">Collapsing weakly compact cardinals</p>
   <p style="font-size: 24px; text-align: center;">I'll note nth weakly compact cardinal as \(K_\alpha\)</p>
   $$\begin{align}
   \text{A reflection instance } & \mathbb{X} \text{ is in the form } (\pi) \text{, or } (\pi;\mathsf{P}_0;\mathbb{Z};\delta) \\
   \text{An inner reflection instance } & \mathbb{Z} \text{ is in the form } (\pi) \text{, or } (\mathsf{P}_0;\mathbb{Y};\delta) \\
   i(\mathbb{X}) & = \pi \\
   o(\mathbb{X}) & = \delta \\
-  \kappa\models (\pi) & :\Leftrightarrow\kappa\in\mathrm{Ord} \\
-  \kappa\models (\pi;\epsilon;\epsilon;0) & :\Leftrightarrow\kappa\in\mathrm{Uc},\mathrm{Reg} \\
+  \kappa\models (\pi;\epsilon;\epsilon;0) & :\Leftrightarrow\kappa\in\mathrm{Ord} \\
   \kappa\models (\pi;\mathsf{P}_0;\mathbb{Z};\delta) & :\Leftrightarrow\kappa\in A_\pi(\delta)\text{ onto } N \text{, in which } N\models\mathbb{Z} \\
   N\models (\epsilon;\epsilon;0) & :\Leftrightarrow N = \{\gamma|\gamma\in\mathrm{Uc},\mathrm{Reg}\} \\
   N\models (\mathsf{P}_0;\mathbb{Y};\delta) & :\Leftrightarrow N = A(\delta)\text{ onto } M \text{, in which } M\models\mathbb{Z} \\
@@ -87,7 +86,7 @@
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   \psi_\mathbb{X}(\alpha) & =\min(\{\beta\lt i(\mathbb{X})|C(\alpha,\beta)\cap i(\mathbb{X})\subseteq\beta\land\beta\models\mathbb{X}\}\cup\{i(\mathbb{X})\})
   \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Section 5: OCF using \(\Pi_2^1\)-indescr cardinals</p>
+  <p style="font-size: 40px; text-align: center;">Collapsing \(\Pi_2^1\)-indescr cardinals</p>
   <p style="font-size: 24px; text-align: center;">I'll note nth \(\Pi_2^1\)-indescr cardinal as \(\mathcal{K}_\alpha\)</p>
   $$\begin{align}
   \text{A reflection instance } & \mathbb{X} \text{ is in the form } (\pi) \text{, or } (\pi;\mathsf{P}_m;\mathbb{Z};\delta) \\
@@ -95,8 +94,7 @@
   m & \lt \omega \\
   i(\mathbb{X}) & = \pi \\
   o(\mathbb{X}) & = \delta \\
-  \kappa\models (\pi) & :\Leftrightarrow\kappa\in\mathrm{Ord} \\
-  \kappa\models (\pi;\epsilon;\epsilon;0) & :\Leftrightarrow\kappa\in\mathrm{Uc},\mathrm{Reg} \\
+  \kappa\models (\pi;\epsilon;\epsilon;0) & :\Leftrightarrow\kappa\in\mathrm{Ord} \\
   \kappa\models (\pi;\mathsf{P}_0;\mathbb{Z};\delta) & :\Leftrightarrow\kappa\in A_\pi(\delta)\text{ onto } N \text{, in which } N\models\mathbb{Z} \\
   \kappa\models (\pi;\mathsf{P}_1;\mathbb{Z};\delta) & :\Leftrightarrow\kappa\in B_\pi(\delta)\text{ onto } N \text{, in which } N\models\mathbb{Z} \\
   N\models (\epsilon;\epsilon;0) & :\Leftrightarrow N = \{\gamma|\gamma\in\mathrm{Uc},\mathrm{Reg}\} \\
@@ -118,7 +116,7 @@
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   \psi_\mathbb{X}(\alpha) & =\min(\{\beta\lt i(\mathbb{X})|C(\alpha,\beta)\cap i(\mathbb{X})\subseteq\beta\land\beta\models\mathbb{X}\}\cup\{i(\mathbb{X})\})
   \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Section 6: OCF using \(\Pi_0^2\)-indescr cardinals</p>
+  <p style="font-size: 40px; text-align: center;">Collapsing \(\Pi_0^2\)-indescr cardinals</p>
   <p style="font-size: 24px; text-align: center;">I'll note nth \(\Pi_0^2\)-indescr cardinal as \(\Xi_\alpha\)</p>
   $$\begin{align}
   \text{A reflection instance } & \mathbb{X} \text{ is in the form } (\pi) \text{, or } (\pi;\mathsf{P}_m;\mathbb{Z};\delta) \\
@@ -126,8 +124,7 @@
   m & \lt \omega \\
   i(\mathbb{X}) & = \pi \\
   o(\mathbb{X}) & = \delta \\
-  \kappa\models (\pi) & :\Leftrightarrow\kappa\in\mathrm{Ord} \\
-  \kappa\models (\pi;\epsilon;\epsilon;0) & :\Leftrightarrow\kappa\in\mathrm{Uc},\mathrm{Reg} \\
+  \kappa\models (\pi;\epsilon;\epsilon;0) & :\Leftrightarrow\kappa\in\mathrm{Ord} \\
   \kappa\models (\pi;\mathsf{P}_m;\mathbb{Z};\delta) & :\Leftrightarrow\kappa\in A_\pi^m(\delta)\text{ onto } N \text{, in which } N\models\mathbb{Z} \\
   N\models (\epsilon;\epsilon;0) & :\Leftrightarrow N = \{\gamma|\gamma\in\mathrm{Uc},\mathrm{Reg}\} \\
   N\models (\mathsf{P}_m;\mathbb{Y};\delta) & :\Leftrightarrow N = A^m(\delta)\text{ onto } M \text{, in which } M\models\mathbb{Z} \\
