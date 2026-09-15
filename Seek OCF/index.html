@@ -23,116 +23,66 @@
   idk.<br>
   Work in progress.<br>
   <p style="font-size: 40px; text-align: center;">Collapsing uncountable cardinals</p>
-  <p style="font-size: 24px; text-align: center;">I'll note nth uncountable cardinal as \(\Omega_n\)</p>
   $$\begin{align}
+  \text{Let } & \Omega_\alpha \text{ be } \alpha\text{th uncountable.} \\
+  C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
-  C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   \psi_\pi(\alpha) & =\min\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\}
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing inaccessible cardinals</p>
-  <p style="font-size: 24px; text-align: center;">I'll note nth inaccessible cardinal as \(I_n\)</p>
   $$\begin{align}
+  \text{Let } & I_\alpha \text{ be } \alpha\text{th inaccessible.} \\
+  C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{I_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
-  C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   \psi_\pi(\alpha) & =\min\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\}
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing Mahlo cardinals</p>
-  <p style="font-size: 24px; text-align: center;">I'll note nth Mahlo cardinal as \(M_n\)</p>
   $$\begin{align}
-  \text{A reflection instance } & \mathbb{X} \text{ is in the form } \epsilon \text{, or } (\mathsf{P}_0;\epsilon;0) \\
-  \kappa\models \epsilon & :\Leftrightarrow\kappa\in\mathrm{Ord} \\
-  \kappa\models (\mathsf{P}_0;\epsilon;0) & :\Leftrightarrow\kappa\in\Pi_0^1-\text{indescr} \\
+  \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } M_\alpha \text{ be } \alpha\text{th Mahlo.} \\
+  \varnothing & \in\mathrm{RI} \\
+  (0) & \in\mathrm{RI} \\
+  C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{I_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{M_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
-  C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
-  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\models\mathbb{X}\}\cup\{\pi\})
+  A\varnothing = \{\gamma|\gamma\in\mathrm{Ord}\}
+  A(0) = \{\gamma|\gamma\text{ is }\Pi_0^1\text{ indescr}\}
+  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in A\mathbb{X}\}\cup\{\pi\})
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing weakly compact cardinals</p>
-  <p style="font-size: 24px; text-align: center;">I'll note nth weakly compact cardinal as \(K_n\)</p>
   $$\begin{align}
-  \text{A reflection instance } & \mathbb{X} \text{ is in the form } \epsilon \text{, or } (\mathsf{P}_0;\epsilon;\delta) \\
-  \kappa\models \epsilon & :\Leftrightarrow\kappa\in\mathrm{Ord} \\
-  \kappa\models \mathbb{X} & :\Leftrightarrow\kappa\in A\mathbb{X} \\
-  A(\mathsf{P}_0;\epsilon;\alpha) & =\{\beta|\beta\in\mathrm{Uc} \\
-  & \land\forall\xi\in\alpha(\beta\text{ is }\Pi_0^1-\text{indescr onto } A(\mathsf{P}_0;\epsilon;\xi))\} \\
+  \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } K_\alpha \text{ be } \alpha\text{th weakly compact.} \\
+  \varnothing & \in\mathrm{RI} \\
+  \forall\alpha\in\mathrm{Ord}((\alpha) & \in\mathrm{RI}) \\
+  C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{K_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
-  C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
-  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\models\mathbb{X}\}\cup\{\pi\})
+  A\varnothing = \{\gamma|\gamma\in\mathrm{Ord}\}
+  A(\alpha) = \{\gamma|\forall\xi\in\alpha(\gamma\text{ is }\Pi_0^1\text{ indescr onto } A(\xi))\}
+  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in A\mathbb{X}\}\cup\{\pi\} \\
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing \(\Pi_2^1\)-indescr cardinals</p>
   <p style="font-size: 24px; text-align: center;">I'll note nth \(\Pi_2^1\)-indescr cardinal as \(\mathcal{K}_n\)</p>
-  $$\begin{align}
-  \text{A reflection instance } & \mathbb{X} \text{ is in the form } \epsilon \text{, or } (\mathsf{P}_m;\mathbb{Z};\delta) \\
-  m & \lt \omega \\
-  \kappa\models \epsilon & :\Leftrightarrow\kappa\in\mathrm{Ord} \\
-  \kappa\models \mathbb{X} & :\Leftrightarrow\kappa\in A\mathbb{X} \\
-  A(\mathsf{P}_0;\epsilon;\alpha) & =\{\beta|\beta\in\mathrm{Uc} \\
-  & \land\forall\xi\in\alpha(\beta\text{ is }\Pi_0^1-\text{indescr onto } A(\mathsf{P}_0;\epsilon;\xi))\} \\
-  A(\mathsf{P}_1;\epsilon;\alpha) & =\{\beta|\beta\in\mathrm{Uc} \\
-  & \land\forall\xi\in\alpha(\beta\text{ is }\Pi_1^1-\text{indescr onto } A(\mathsf{P}_1;\epsilon;\xi))\} \\
-  A(\mathsf{P}_m;\mathbb{Z};\alpha) & = A(\mathsf{P}_m;\epsilon;\alpha)\cap A\mathbb{Z} \\
-  C_0(\alpha,\beta) & =\{0\}\cup\beta \\
-  C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\mathcal{K}_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
-  C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
-  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\models\mathbb{X}\}\cup\{\pi\})
-  \end{align}$$
+  wip
   <p style="font-size: 40px; text-align: center;">Collapsing \(\Pi_0^2\)-indescr cardinals</p>
   <p style="font-size: 24px; text-align: center;">I'll note nth \(\Pi_0^2\)-indescr cardinal as \(\Xi_n\)</p>
-  $$\begin{align}
-  \text{A reflection instance } & \mathbb{X} \text{ is in the form } \epsilon \text{, or } (\mathsf{P}_m;\mathbb{Z};\delta) \\
-  m & \lt \omega \\
-  \kappa\models \epsilon & :\Leftrightarrow\kappa\in\mathrm{Ord} \\
-  \kappa\models \mathbb{X} & :\Leftrightarrow\kappa\in A\mathbb{X} \\
-  A(\mathsf{P}_m;\epsilon;\alpha) & =\{\beta|\beta\in\mathrm{Uc} \\
-  & \land\forall\xi\in\alpha(\beta\text{ is }\Pi_m^1-\text{indescr onto } A(\mathsf{P}_m;\epsilon;\xi))\} \\
-  A(\mathsf{P}_m;\mathbb{Z};\alpha) & = A(\mathsf{P}_m;\epsilon;\alpha)\cap A\mathbb{Z} \\
-  C_0(\alpha,\beta) & =\{0\}\cup\beta \\
-  C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\Xi_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
-  C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
-  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\models\mathbb{X}\}\cup\{\pi\})
-  \end{align}$$
+  wip
   <p style="font-size: 40px; text-align: center;">Collapsing \(\alpha\)-shrewd cardinals</p>
   <p style="font-size: 24px; text-align: center;">I'll note nth \(\alpha\)-shrewd cardinal as \(S_n^\alpha\)</p>
-  $$\begin{align}
-  \text{A reflection instance } & \mathbb{X} \text{ is in the form } \epsilon \text{, or } (P;\mathbb{Z};\delta) \\
-  \text{A level expression } & P \text{ is in the form } \mathsf{P}_m \text{, or } \mu-\mathsf{P}_m \\
-  m & \lt \omega \\
-  \kappa\models \epsilon & :\Leftrightarrow\kappa\in\mathrm{Ord} \\
-  \kappa\models \mathbb{X} & :\Leftrightarrow\kappa\in A\mathbb{X} \\
-  A(\mathsf{P}_m;\epsilon;\alpha) & =\{\beta|\beta\in\mathrm{Uc} \\
-  & \land\forall\xi\in\alpha(\beta\text{ is }\Pi_m-\text{indescr onto } A(0;\mathsf{P}_m;\epsilon;\xi))\} \\
-  A(\mu-\mathsf{P}_m;\epsilon;\alpha) & =\{\beta|\beta\in\mathrm{Uc} \\
-  & \land\forall\xi\in\alpha(\beta\text{ is }\mu-\text{shrewd}-\Pi_m-\text{indescr onto } A(0;\mu-\mathsf{P}_m;\epsilon;\xi))\} \\
-  A(P;\mathbb{Z};\alpha) & = A(P;\epsilon;\alpha)\cap A\mathbb{Z} \\
-  C_0(\alpha,\beta) & =\{0\}\cup\beta \\
-  C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{S_\gamma^\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
-  C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
-  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\models\mathbb{X}\}\cup\{\pi\})
-  \end{align}$$
+  wip
   <p style="font-size: 40px; text-align: center;">E</p>
   <br>
   <br>
