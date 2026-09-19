@@ -55,9 +55,9 @@
   & \mspace{2mu}\cup\mspace{1mu}\{I_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{M_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
-  A\varnothing & = \{\gamma|\gamma\in\mathrm{Ord}\} \\
-  A(0) & = \{\gamma|\gamma\text{ is }\Pi_0^1\text{ indescr}\} \\
-  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in A\mathbb{X}\}\cup\{\pi\})
+  A_\pi \varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
+  A_\pi(0) & = \{\gamma\in\pi|\gamma\text{ is }\Pi_0^1\text{ indescr}\} \\
+  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in A_\pi \mathbb{X}\}\cup\{\pi\})
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing weakly compact cardinals</p>
   $$\begin{align}
@@ -70,9 +70,9 @@
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{K_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
-  A\varnothing & = \{\gamma|\gamma\in\mathrm{Ord}\} \\
-  A(\alpha) & = \{\gamma|\forall\xi\in\alpha(\gamma\text{ is }\Pi_0^1\text{ indescr onto } A(\xi))\} \\
-  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in A\mathbb{X}\}\cup\{\pi\}
+  A_\pi \varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
+  A_\pi(\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\Pi_0^1\text{ indescr onto } A_\pi(\xi))\} \\
+  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in A_\pi \mathbb{X}\}\cup\{\pi\}
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing \(\Pi_2^1\)-indescr cardinals</p>
   $$\begin{align}
@@ -87,13 +87,13 @@
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\mathcal{K}_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
-  A\varnothing & = \{\gamma|\gamma\in\mathrm{Ord}\} \\
-  A((m);\varnothing;\varnothing;\alpha) & = \{\gamma|\forall\xi\in\alpha(\gamma\text{ is }\Pi_m^1\text{-indescr onto } A(N;\varnothing;\varnothing;\xi))\} \\
-  A(\rho;\mathbb{X};\varnothing;\alpha) & = \{\gamma|\gamma\text{ is }A\mathbb{X}\text{ onto }A(\rho;\varnothing;\varnothing;\alpha)\} \\
-  A(\rho;\mathbb{X};\mathbb{Y};\alpha) & = A\mathbb{Y}\cap A(\rho;\mathbb{X};\varnothing;\alpha) \\
+  A_\pi \varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
+  A_\pi((m);\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\Pi_m^1\text{-indescr onto } A_\pi(N;\varnothing;\varnothing;\xi))\} \\
+  A_\pi(\rho;\mathbb{X};\varnothing;\alpha) & = \{\gamma\in\pi|\gamma\text{ is }A_\pi \mathbb{X}\text{ onto }A_\pi(\rho;\varnothing;\varnothing;\alpha)\} \\
+  A_\pi(\rho;\mathbb{X};\mathbb{Y};\alpha) & = A_\pi \mathbb{Y}\cap A_\pi(\rho;\mathbb{X};\varnothing;\alpha) \\
   \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in A\mathbb{X}\}\cup\{\pi\}
   \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Collapsing \(\Pi_0^2\)-indescr cardinals</p>
+  <p style="font-size: 40px; text-align: center;">Collapsing \(\Pi_0^2\)-indescr cardinals /BROKEN/</p>
   $$\begin{align}
   \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } \Xi_\alpha \text{ be } \alpha\text{th }\Pi_0^2\text{-indescribable.} \\
   \text{Let } \rho & = (m) \text{ in which } m\in \omega \\
@@ -112,7 +112,7 @@
   A(\rho;\mathbb{X};\mathbb{Y};\alpha) & = A\mathbb{Y}\cap A(\rho;\mathbb{X};\varnothing;\alpha) \\
   \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in A\mathbb{X}\}\cup\{\pi\}
   \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Collapsing \(\alpha\)-shrewd cardinals</p>
+  <p style="font-size: 40px; text-align: center;">Collapsing \(\alpha\)-shrewd cardinals /BROKEN/</p>
   $$\begin{align}
   \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } \Sigma_\alpha^\tau \text{ be }\alpha\text{th }\tau\text{-shrewd.} \\
   \text{Let } \rho & = (\sigma,m) \text{ in which } \sigma\in\mathrm{Ord},m\in \omega \\
