@@ -77,10 +77,8 @@
   <p style="font-size: 40px; text-align: center;">Collapsing \(\Pi_2^1\)-indescr cardinals</p>
   $$\begin{align}
   \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } \mathcal{K}_\alpha \text{ be } \alpha\text{th }\Pi_2^1\text{-indescribable.} \\
-  \text{Let } \rho & = (m) \text{ in which } m\in 2 \\
-  \\
   \varnothing & \in\mathrm{RI} \\
-  \forall\mathbb{X},\mathbb{Y}\in\mathrm{RI},\alpha\in\mathrm{Ord}((\rho;\mathbb{X};\mathbb{Y};\alpha) & \in\mathrm{RI}) \\
+  \forall\mathbb{X},\mathbb{Y}\in\mathrm{RI}\land\alpha\in\mathrm{Ord}\land m\in 2((m;\mathbb{X};\mathbb{Y};\alpha) & \in\mathrm{RI}) \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
@@ -88,18 +86,16 @@
   & \mspace{2mu}\cup\mspace{1mu}\{\mathcal{K}_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
   A_\pi \varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  A_\pi((m);\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\Pi_m^1\text{-indescr onto } A_\pi((m);\varnothing;\varnothing;\xi))\} \\
-  A_\pi(\rho;\mathbb{X};\varnothing;\alpha) & = \{\gamma\in\pi|\gamma\text{ is }A_\pi \mathbb{X}\text{ onto }A_\pi(\rho;\varnothing;\varnothing;\alpha)\} \\
-  A_\pi(\rho;\mathbb{X};\mathbb{Y};\alpha) & = A_\pi \mathbb{Y}\cap A_\pi(\rho;\mathbb{X};\varnothing;\alpha) \\
+  A_\pi(m;\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\Pi_m^1\text{-indescr onto } A_\pi(m;\varnothing;\varnothing;\xi))\} \\
+  A_\pi(m;\mathbb{X};\varnothing;\alpha) & = \{\gamma\in\pi|\gamma\text{ is }A_\pi \mathbb{X}\text{ onto }A_\pi(m;\varnothing;\varnothing;\alpha)\} \\
+  A_\pi(m;\mathbb{X};\mathbb{Y};\alpha) & = A_\pi \mathbb{Y}\cap A_\pi(m;\mathbb{X};\varnothing;\alpha) \\
   \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in A_\pi \mathbb{X}\}\cup\{\pi\})
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing \(\Pi_0^2\)-indescr cardinals</p>
   $$\begin{align}
   \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } \Xi_\alpha \text{ be } \alpha\text{th }\Pi_0^2\text{-indescribable.} \\
-  \text{Let } \rho & = (m) \text{ in which } m\in \omega \\
-  \\
   \varnothing & \in\mathrm{RI} \\
-  \forall\mathbb{X},\mathbb{Y}\in\mathrm{RI},\alpha\in\mathrm{Ord}((\rho;\mathbb{X};\mathbb{Y};\alpha) & \in\mathrm{RI}) \\
+  \forall\mathbb{X},\mathbb{Y}\in\mathrm{RI}\land\alpha\in\mathrm{Ord}\land m\in\omega((m;\mathbb{X};\mathbb{Y};\alpha) & \in\mathrm{RI}) \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
@@ -107,20 +103,16 @@
   & \mspace{2mu}\cup\mspace{1mu}\{\Xi_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
   A_\pi \varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  A_\pi((m);\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\Pi_m^1\text{-indescr onto } A_\pi((m);\varnothing;\varnothing;\xi))\} \\
-  A_\pi(\rho;\mathbb{X};\varnothing;\alpha) & = \{\gamma\in\pi|\gamma\text{ is }A_\pi \mathbb{X}\text{ onto }A_\pi(\rho;\varnothing;\varnothing;\alpha)\} \\
-  A_\pi(\rho;\mathbb{X};\mathbb{Y};\alpha) & = A_\pi \mathbb{Y}\cap A_\pi(\rho;\mathbb{X};\varnothing;\alpha) \\
+  A_\pi(m;\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\Pi_m^1\text{-indescr onto } A_\pi(m;\varnothing;\varnothing;\xi))\} \\
+  A_\pi(m;\mathbb{X};\varnothing;\alpha) & = \{\gamma\in\pi|\gamma\text{ is }A_\pi \mathbb{X}\text{ onto }A_\pi(m;\varnothing;\varnothing;\alpha)\} \\
+  A_\pi(m;\mathbb{X};\mathbb{Y};\alpha) & = A_\pi \mathbb{Y}\cap A_\pi(m;\mathbb{X};\varnothing;\alpha) \\
   \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in A_\pi\mathbb{X}\}\cup\{\pi\})
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing \(\alpha\)-shrewd cardinals</p>
   $$\begin{align}
   \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } \Sigma_\alpha^\tau \text{ be }\alpha\text{th }\tau\text{-shrewd.} \\
-  \text{Let } \rho & = (\sigma,m) \text{ in which } \sigma\in\mathrm{Ord},m\in \omega \\
-  \text{If } m & = 0\text{, then } \rho = \sigma \\
-  \text{If } \sigma & = 0\text{, then } \rho = (m) \\
-  \\
   \varnothing & \in\mathrm{RI} \\
-  \forall\mathbb{X},\mathbb{Y}\in\mathrm{RI},\alpha\in\mathrm{Ord}((\rho;\mathbb{X};\mathbb{Y};\alpha) & \in\mathrm{RI}) \\
+  \forall\mathbb{X},\mathbb{Y}\in\mathrm{RI}\land\alpha,f\in\mathrm{Ord}\land m\in\omega((f;m;\mathbb{X};\mathbb{Y};\alpha) & \in\mathrm{RI}) \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
@@ -128,11 +120,11 @@
   & \mspace{2mu}\cup\mspace{1mu}\{\Sigma^\tau_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
   A_\pi \varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  A_\pi((m);\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\Pi_n^1\text{-indescribable onto } A_\pi((m);\varnothing;\varnothing;\xi))\} \\
-  A_\pi((\sigma,m);\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\sigma\text{-}\Pi_n^1\text{-shrewd onto } A_\pi((\sigma,m);\varnothing;\varnothing;\xi))\} \\
-  A_\pi(\sigma;\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\sigma\text{-shrewd onto } A_\pi(\sigma;\varnothing;\varnothing;\xi))\} \\
-  A_\pi(\rho;\mathbb{X};\varnothing;\alpha) & = \{\gamma\in\pi|\gamma\text{ is }A_\pi \mathbb{X}\text{ onto }A_\pi(\rho;\varnothing;\varnothing;\alpha)\} \\
-  A_\pi(\rho;\mathbb{X};\mathbb{Y};\alpha) & = A_\pi \mathbb{Y}\cap A_\pi(\rho;\mathbb{X};\varnothing;\alpha) \\
+  A_\pi(0;m;\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\Pi_n^1\text{-indescribable onto } A_\pi(0;m;\varnothing;\varnothing;\xi))\} \\
+  A_\pi(f;m;\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\sigma\text{-}\Pi_n^1\text{-shrewd onto } A_\pi(f;m;\varnothing;\varnothing;\xi))\} \\
+  A_\pi(f;0;\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\sigma\text{-shrewd onto } A_\pi(f;0;\varnothing;\varnothing;\xi))\} \\
+  A_\pi(f;m;\mathbb{X};\varnothing;\alpha) & = \{\gamma\in\pi|\gamma\text{ is }A_\pi \mathbb{X}\text{ onto }A_\pi(f;m;\varnothing;\varnothing;\alpha)\} \\
+  A_\pi(f;m;\mathbb{X};\mathbb{Y};\alpha) & = A_\pi \mathbb{Y}\cap A_\pi(f;m;\mathbb{X};\varnothing;\alpha) \\
   \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in A_\pi \mathbb{X}\}\cup\{\pi\})
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">E</p>
