@@ -17,74 +17,29 @@
   <p style="font-size: 48px; text-align: center;"><b>Arai OCF</b></p>
   <h1>Information</h1>
   Arai OCF is Hieroglyphics.<br>
-  here I just simplify the words, not learning lol.<br>
-  if I missed anything, tell me in discord.
   <h1>Credits</h1>
   Arai making <a href="https://arxiv.org/pdf/2311.12459">this freaking paper</a> that no one understands.<br>
+  ZhiqiuCao for <a href="https://github.com/ZhiqiuCao/Googology">the definition that is easier to read</a> (in the paper)<br>
   <h1>Note</h1>
-  everything is copied from <a href="https://arxiv.org/pdf/2311.12459">this freaking paper</a> made by Arai.<br>
-  I'll only include definitions.<br>
+  This website is my notes for <a href="https://arxiv.org/pdf/2311.12459">this freaking paper</a><br>
+  Arai OCF here is \(Z_2\).<br>
+  I'll note \(ON\) as \(\mathrm{Ord}\)<br>
   Work in progress.<br>
-  <p style="font-size: 40px; text-align: center;">Section 1: Introduction</p>
-  Throughout in this paper, \(N\) denotes a fixed positive integer.<br>
-  <p style="font-size: 40px; text-align: center;">Section 3: Ordinals for \(\Pi_N\)-Collection</p>
-  In this section up to subsection 3.2, we work in a set theory \(\mathsf{ZFC}(\{St_i\}_i)\), where each \(St_i (0\lt i\le N)\) is a unary predicate symbol.<br>
-  <br>
-  Let \(St_0\) denote the set of uncountable cardinal below \(\mathbb{I}_N\)<br>
-  \(\Omega\) and \(\mathbb{I}_N\) are strongly critical numbers with \(\Omega\lt\mathbb{I}_N\), i.e., non-zero ordinals closed under the binary Veblen function \(\varphi\alpha\beta=\varphi_\alpha(\beta)\).<br>
-  We assume that \(St_{i+1}\subset St_i\;\mathrm{for}\;i\lt N\), each \(St_i\) is an unbounded class of ordinals below \(\mathbb{I}_N\) such that the least element of \(St_i\) is larger than \(\Omega\), \(\Omega\lt\min(\bigcup_{0\lt i\le N} St_i)\).<br>
-  The predicate \(St_i\) is identified with the class \(\{\alpha\in ON:\alpha\in St_i\}\).<br>
-  \(\alpha^{\dagger i}\) denotes the least ordinal \(\gt\alpha\) in the class \(St_i\) when \(\alpha\lt\mathbb{I}_N\).<br>
-  \(\alpha^{\dagger i}:=\mathbb{I}_N\) if \(\alpha\ge\mathbb{I}_N\).<br>
-  Put \(\alpha^{\dagger}:=\alpha^{\dagger 1}\).<br>
-  Let \(SSt_i:=\{\alpha^{\dagger i}:\alpha\in ON\}\) and \(LSt_i=St_i\;\backslash\;SSt_i\)<br>
-  <br>
-  \(\Gamma_a\) denotes the \(a\)-th strongly critical number.<br>
-  For ordinals \(\alpha\), \(\varepsilon(\alpha)\) denotes the least epsilon number above \(\alpha\), and \(\Gamma(\alpha)\) the least strongly critical number above \(\alpha\)<br>
-  For ordinals \(\alpha,\beta\), and \(\gamma\), \(\gamma=\alpha-\beta\) designates that \(\alpha=\beta+\gamma\).<br>
-  \(\alpha\dotplus\beta\) denotes the sum \(\alpha+\beta\) when \(\alpha+\beta\) equals to the commutative (natural) sum \(\alpha\#\beta\), i.e., when either \(\alpha=0\) or \(\alpha=\alpha_0+\omega^{\alpha_1}\) with \(\omega^{\alpha_1+1}\gt\beta\).<br>
-  <br>
-  \(u,v,w,x,y,z,\dots\) range over sets in the universe, \(a,b,c,\alpha,\beta,\gamma,\delta,\dots\) range over ordinals \(\lt\varepsilon(\mathbb{I}_N)\), and \(\xi,\zeta,\eta,\dots\) range over ordinals less than \(\Gamma(\mathbb{I}_N)\), and ordinals \(\le\mathbb{I}_N\) are denoted by \(\pi,\kappa,\rho,\sigma,\tau,\lambda,\dots\).<br>
-  <br>
-  Let \(\mathbb{S}\in St_i\) with \(i\gt 0\).<br>
-  A 'Mahlo degree' \(m(\pi)\) of ordinals \(pi\lt\mathbb{S}\) with higher reflections is defined to be a finite function \(f:\mathbb{I}_N\rightarrow\Gamma(\mathbb{I}_N)\).<br>
-  Let \(\Lambda\le\mathbb{I}_N\) be a strongly critical number.<br>
-  To denote ordinals \(\lt\Gamma(\mathbb{I}_N)\), it is convenient for us to introduce an ordinal function \(\tilde{\theta}_1(\xi;\Lambda)=\Lambda^\xi\) with the base \(\Lambda\).<br>
-  <br>
-  <p style="font-size: 24px;">Definition 3.1</p>
-  Let \(\Lambda\le\mathbb{I}_N\) be a strongly critical number.<br>
-  \(\varphi_b(\xi)\) denotes the binary Veblen function on \((\mathbb{I}_N)^{\dagger 0}=\omega_{\mathbb{I}_N+1}\) with \(\varphi_0(\xi)=\omega^\xi\), and \(\tilde{\varphi}_b(\xi;\Lambda):=\varphi_b(\Lambda\cdot\xi)\).<br>
-  <br>
-  Let \(b,\xi\lt (\mathbb{I}_N)^{\dagger 0}\).<br>
-  \(\theta_b(\xi)[\tilde{\theta}_b(\xi;\Lambda)]\) denotes a \(b\)-th iterate of \(\varphi_0(\xi)=\omega^\xi\) [of \(\tilde{\varphi}_0(\xi;\Lambda)=\Lambda^\xi\)], resp.<br>
-  Specifically ordinals \(\theta_b(\xi),\tilde{\theta}_b(\xi;\Lambda)\lt (\mathbb{I}_N)^{\dagger 0}\) are defined by recursion on \(b\) as follows.<br>
-  $$\begin{align}
-  \theta_0(\xi) = \tilde{\theta}_0(\xi;\Lambda) & = \xi \\
-  \theta_{\omega^b}(\xi) & = \varphi_b(\xi) \\
-  \tilde{\theta}_{\omega^b}(\xi;\Lambda) & = \tilde{\varphi}_b(\xi;\Lambda) \\
-  \theta_{c\dotplus\omega^b}(\xi) & = \theta_c(\theta_{\omega^b}(\xi)) \\
-  \tilde{\theta}_{c\dotplus\omega^b}(\xi;\Lambda) & = \tilde{\theta}_c(\tilde{\theta}_{\omega^b}(\xi;\Lambda);\Lambda)
-  \end{align}$$
-  <br>
-  <p style="font-size: 24px; text-align: center;">Section 3.1: Skolem hulls and Mahlo classes</p>
-  <br>
-  In this subsection, Skolem hulls \(C_\alpha(\beta)\), collapsing functions \(\psi\) and Mahlo classes \(Mh_{i,c}^a(\xi)\) are introduced.\(\psi\)-functions are introduced in Buchholz.<br>
-  <p style="font-size: 24px;">Definition 3.7</p>
-  Let \(A\subset\mathbb{I}_N\) be a set, and \(\alpha\le\mathbb{I}_N\) a limit ordinal.<br>
-  $$\alpha\in M(A) :\Leftrightarrow A\cap\alpha\;\mathrm{is\;stationary\;in}\;\alpha\Leftrightarrow\mathrm{every\;club\;subset\;of}\;\alpha\;\mathrm{meets}\; A$$
-  <br>
-  In the following Definition 3.8, \(\varphi\alpha\beta=\varphi_\alpha(\beta)\) denotes the binary Veblen function on \((\mathbb{I}_N)^{\dagger 0}\).<br>
-  For \(a\lt\varepsilon(\mathbb{I}_N)\), \(\beta,c\lt\mathbb{I}_N\), and \(\xi\lt\Gamma(\mathbb{I}_N)\), define simultaneously classes \(C_a(\beta)\subset\Gamma(\mathbb{I}_N)\), \(Mh_{i,c}^a(\xi)\subset (\mathbb{I}_N+1) (i\gt 0)\), and ordinals \(\psi_{\mathbb{I}_N}(\alpha)\le\mathbb{I}_N\) and \(\psi_\kappa^f(a)\le\kappa\) by recursion on ordinals \(a\) as follows.<br>
-  $$\begin{align}
-  1.\; & (\mathrm{Inductive\;definition\;of}\; C_a(\beta)) \\
-  & (\mathrm{a})\; \{0,\Omega,\mathbb{I}_N\}\cup\beta\subset C_a(\beta),\;\mathrm{where}\;\Omega\in SSt_0. \\
-  & (\mathrm{b})\; \mathrm{If}\; x,y\in C_a(\beta),\;\mathrm{then}\; x+y\in C_a(\beta)\;\mathrm{and}\; \varphi xy\in C_a(\beta). \\
-  & (\mathrm{c})\; \mathrm{Let}\; \alpha=\psi_\pi(b)\;\mathrm{with}\;\pi\in C_a(\beta)\cap SSt_0 \cap\mathbb{I}_N,\; b\in C_a(\beta)\cap a\;\mathrm{such\;that}\;\{\pi,b\}\subset C_b(\alpha).\;\mathrm{Then}\;\alpha\in C_a(\beta) \\
-  & (\mathrm{d})\; \mathrm{/WIP/} \\
-  & (\mathrm{e})\; \mathrm{/WIP/} \\
-  & (\mathrm{f})\; \mathrm{/WIP/} \\
-  2.\; & \mathrm{/WIP/} \\
-  \end{align}$$
+  <p style="font-size: 40px;">Section 1: First part of the definition</p>
+  In what follows, \(\Omega\) denotes the least recursively regular ordinal \(\omega_1^{CK}\),<br>
+  and \(\psi_\Omega\) is a collapsing function such that \(\psi_\Omega(\alpha)\lt\Omega\).<br>
+  \(\mathbb{I}_N\) is an ordinal term denoting an ordinal such that \(L_{\mathbb{I}_N} = \mathbb{KP}\omega+\Pi_N\text{-Collection}+(V = L)\).<br>
+  We work in a set theory \(\mathrm{ZFC}\) (\(\{St_i\}_i\)), where each \(St_i\) (\(0\lt i\lte N\)) is a unary predicate symbol.<br>
+  Let \(St_0\) denote the set of uncountable cardinal less than \(\mathbb{I}_N\).<br>
+  \(\Omega\) and \(\mathbb{I}_N\) are strongly critical numbers with \(\Omega\lt\mathbb{I}_N\),<br>
+  i.e., non-zero ordinals closed under the binary Veblen function \(\varphi\alpha\beta = \varphi_\alpha(\beta)\).<br>
+  We assume \(St_{i+1}\subset St_i\) for \(i\lt N\),<br>
+  each \(St_i\) is an unbounded class of ordinals less than \(\mathbb{I}_N\) whose minimal element is greater than \(\Omega\)<br>
+  i.e., \(\Omega\lt\mathrm{min}\left(\cup_{0\lt i\lte N} St_i\right)\).<br>
+  The predicate \(St_i\) is identified with the calss \(\{\alpha\in\mathrm{Ord}|\alpha\in St_i\}\).<br>
+  For \(\alpha\lt\mathbb{I}_N\), \(\alpha^{\dagger i}\) denotes the least ordinal in the class \(St_i\) greater than \alpha.<br>
+  If \(\alpha\gte\mathbb{I}_N\), let \(\alpha^{\dagger i} := \mathbb{I}_N\).<br>
+  Let \(\alpha^{\dagger} = \alpha^{\dagger 1}\). Let \(SSt_i := \{\alpha^{\dagger i}|\alpha\in\mathrm{Ord}\}\) and \(LSt_i = St_i\backslash SSt_i\.<br>
   <br>
   <br>
   <br>
@@ -92,21 +47,7 @@
   <br>
   <br>
   <br>
-  <br>
-  <br>
-  <br>
-  bro<br>
-  <br>
-  Seek's understanding of Arai OCF:<br>
-  \(St_0=\{\alpha\lt\mathbb{I}_N:\alpha\in\mathrm{Uncountable}\}\)<br>
-  \(\alpha^{\dagger 0}=\omega_{\alpha+1}\;\mathrm{for}\;\alpha\lt\mathbb{I}_N\)<br>
-  \(\alpha^{\dagger i}=\mathbb{I}_N\;\mathrm{for}\;\alpha\ge\mathbb{I}_N\)<br>
-  \((\mathbb{I}_N)^{\dagger 0}=\omega_{\mathbb{I}_N+1}\)???<br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
+  /WIP/<br>
+  E<br>
 </body>
 </html>
