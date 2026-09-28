@@ -68,24 +68,42 @@
   & \alpha\prec_1\beta\prec_2\gamma\land\alpha\prec_1\beta'\prec_1\beta'+1_{(\beta'\gt\gamma)} \\
   & \alpha\prec_1\beta\prec_2\gamma\land\alpha\prec_1\beta'\prec_2\gamma'_{(\beta'\gt\gamma)} \\
   & \alpha\prec_1\beta\prec_2\gamma\land\alpha\prec_1\beta'\prec_2\gamma'_{(\beta'\gt\gamma)}\land\alpha\prec_1\beta''\prec_2\gamma''_{(\beta''\gt\gamma')} \\
-  & \alpha\prec_1\beta\prec_2\gamma\land\Pi_0-[\alpha\prec_1\beta^n\prec_2\gamma^n_{(\beta'\gt\gamma)}] \\
-  & \alpha\prec_1\beta\prec_2\gamma\land\Pi_3-[\alpha\prec_1\beta^n\prec_2\gamma^n_{(\beta'\gt\gamma)}] \\
-  & \alpha\prec_1\beta\prec_2\gamma\land\alpha\prec_1\alpha+1-[\alpha\prec_1\beta^n\prec_2\gamma^n_{(\beta'\gt\gamma)}] \\
-  & \alpha\prec_1\beta\prec_2\gamma\land\alpha\prec_1\alpha(1)+1-[\alpha\prec_1\beta^n\prec_2\gamma^n_{(\beta'\gt\gamma)}] \\
-  & \alpha\prec_1\beta\prec_2\gamma\land\alpha_1\prec_1\alpha(1)+1-[\alpha\prec_1\beta^n\prec_2\gamma^n_{(\beta'\gt\gamma)}] \\
-  & \alpha\prec_1\beta\prec_2\gamma\land\alpha_1\prec_1\beta-[\alpha\prec_1\beta^n\prec_2\gamma^n_{(\beta'\gt\gamma)}] \\
-  & \alpha\prec_1\beta\prec_2\gamma\land\alpha_1\prec_1\gamma-[\alpha\prec_1\beta^n\prec_2\gamma^n_{(\beta'\gt\gamma)}] \\
-  & \alpha\prec_1\beta\prec_2\gamma\land\alpha_1\prec_1\gamma\text{ onto }\alpha_1\prec_1\alpha(2)-[\alpha\prec_1\beta^n\prec_2\gamma^n_{(\beta'\gt\gamma)}] \\
-  & \alpha\prec_1\beta\prec_2\gamma\land\alpha_1\prec_1\gamma\text{ onto }\alpha_1\prec_1\beta-[\alpha\prec_1\beta^n\prec_2\gamma^n_{(\beta'\gt\gamma)}] \\
-  & \alpha\prec_1\beta\prec_2\gamma\land\alpha_1\prec_1\gamma\text{ onto }\alpha_1\prec_1\gamma-[\alpha\prec_1\beta^n\prec_2\gamma^n_{(\beta'\gt\gamma)}] \\
-  & \alpha\prec_1\beta\prec_2\gamma\land\alpha_1\prec_1\gamma-\Pi_2-[\alpha\prec_1\beta^n\prec_2\gamma^n_{(\beta'\gt\gamma)}] \\
-  & \alpha\prec_1\beta\prec_2\gamma\land\alpha_1\prec_1\gamma+1-[\alpha\prec_1\beta^n\prec_2\gamma^n_{(\beta'\gt\gamma)}] \\
-  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_1\prec_1\beta'\prec_1\gamma'_{(\beta'\gt\gamma)})-[\alpha\prec_1\beta^n\prec_2\gamma^n_{(\beta'\gt\gamma)}] \\
-  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_1\prec_1\beta'\prec_1\gamma'_{(\beta'\gt\gamma)}\land\alpha_1\prec_1\beta''\prec_1\gamma''_{(\beta''\gt\gamma')})-[\alpha\prec_1\beta^n\prec_2\gamma^n_{(\beta'\gt\gamma)}] \\
-  & \alpha\prec_1\beta\prec_2\gamma\land\alpha_2\prec_1\gamma-[\alpha\prec_1\beta^n\prec_2\gamma^n_{(\beta'\gt\gamma)}] \\
-  & \alpha\prec_1\beta\prec_2\gamma\land\alpha_3\prec_1\gamma-[\alpha\prec_1\beta^n\prec_2\gamma^n_{(\beta'\gt\gamma)}] \\
-  & \alpha\prec_1\beta\prec_2\gamma\land\alpha_\omega\prec_1\gamma-[\alpha\prec_1\beta^n\prec_2\gamma^n_{(\beta'\gt\gamma)}] \\
-  & \alpha\prec_1\beta'\prec_1\beta\prec_2\gamma\land\alpha\prec_1\beta'\prec_2\gamma' \\
+  & \alpha\prec_1\beta\prec_2\gamma\land\Pi_0-[\alpha\prec_1\beta^{n+1}\prec_2\gamma^{n+1}_{(\beta^{n+1}\gt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land\Pi_3-[\alpha\prec_1\beta^{n+1}\prec_2\gamma^{n+1}_{(\beta^{n+1}\gt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha\prec_1\alpha+1)-[\alpha\prec_1\beta^{n+1}\prec_2\gamma^{n+1}_{(\beta^{n+1}\gt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha\prec_1\alpha(1)+1)-[\alpha\prec_1\beta^{n+1}\prec_2\gamma^{n+1}_{(\beta^{n+1}\gt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_1\prec_1\alpha(2)+1)-[\alpha\prec_1\beta^{n+1}\prec_2\gamma^{n+1}_{(\beta^{n+1}\gt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_1\prec_1\beta)-[\alpha\prec_1\beta^{n+1}\prec_2\gamma^{n+1}_{(\beta^{n+1}\gt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_1\prec_1\gamma)-[\alpha\prec_1\beta^{n+1}\prec_2\gamma^{n+1}_{(\beta^{n+1}\gt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_1\prec_1\gamma\text{ onto }\alpha_1\prec_1\alpha(2))-[\alpha\prec_1\beta^{n+1}\prec_2\gamma^{n+1}_{(\beta^{n+1}\gt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_1\prec_1\gamma\text{ onto }\alpha_1\prec_1\beta)-[\alpha\prec_1\beta^{n+1}\prec_2\gamma^{n+1}_{(\beta^{n+1}\gt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_1\prec_1\gamma\text{ onto }\alpha_1\prec_1\gamma)-[\alpha\prec_1\beta^{n+1}\prec_2\gamma^{n+1}_{(\beta^{n+1}\gt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_1\prec_1\gamma-\Pi_2)-[\alpha\prec_1\beta^{n+1}\prec_2\gamma^{n+1}_{(\beta^{n+1}\gt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_1\prec_1\gamma+1)-[\alpha\prec_1\beta^{n+1}\prec_2\gamma^{n+1}_{(\beta^{n+1}\gt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_1\prec_1\beta'\prec_1\gamma'_{(\beta'\gt\gamma)})-[\alpha\prec_1\beta^{n+1}\prec_2\gamma^{n+1}_{(\beta^{n+1}\gt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_1\prec_1\beta'\prec_1\gamma'_{(\beta'\gt\gamma)}\land\alpha_1\prec_1\beta''\prec_1\gamma''_{(\beta''\gt\gamma')})-[\alpha\prec_1\beta^{n+1}\prec_2\gamma^{n+1}_{(\beta^{n+1}\gt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_2\prec_1\gamma)-[\alpha\prec_1\beta^{n+1}\prec_2\gamma^{n+1}_{(\beta^{n+1}\gt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_3\prec_1\gamma)-[\alpha\prec_1\beta^{n+1}\prec_2\gamma^{n+1}_{(\beta^{n+1}\gt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_\omega\prec_1\gamma)-[\alpha\prec_1\beta^{n+1}\prec_2\gamma^{n+1}_{(\beta^{n+1}\gt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land\beta\prec_1\eta\prec_2\gamma'_{(\gamma'\lt\gamma)} \\
+  & \alpha\prec_1\beta\prec_2\gamma\land\Pi_0-[\beta^n\prec_1\eta^n\prec_2\gamma^{n+1}_{(\gamma^{n+1}\lt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha\prec_1\alpha+1)-[\beta^n\prec_1\eta^n\prec_2\gamma^{n+1}_{(\gamma^{n+1}\lt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha\prec_1\alpha(1)+1)-[\beta^n\prec_1\eta^n\prec_2\gamma^{n+1}_{(\gamma^{n+1}\lt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_1\prec_1\alpha(2)+1)-[\beta^n\prec_1\eta^n\prec_2\gamma^{n+1}_{(\gamma^{n+1}\lt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_1\prec_1\beta)-[\beta^n\prec_1\eta^n\prec_2\gamma^{n+1}_{(\gamma^{n+1}\lt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_1\prec_1\gamma)-[\beta^n\prec_1\eta^n\prec_2\gamma^{n+1}_{(\gamma^{n+1}\lt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_2\prec_1\gamma)-[\beta^n\prec_1\eta^n\prec_2\gamma^{n+1}_{(\gamma^{n+1}\lt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\alpha_\omega\prec_1\gamma)-[\beta^n\prec_1\eta^n\prec_2\gamma^{n+1}_{(\gamma^{n+1}\lt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\eta\prec_1\gamma)-[\beta^n\prec_1\eta^n\prec_2\gamma^{n+1}_{(\gamma^{n+1}\lt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\eta'\prec_1\gamma)-[\beta^n\prec_1\eta^n\prec_2\gamma^{n+1}_{(\gamma^{n+1}\lt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\eta^\omega\prec_1\gamma)-[\beta^n\prec_1\eta^n\prec_2\gamma^{n+1}_{(\gamma^{n+1}\lt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\eta^{\eta}\prec_1\gamma)-[\beta^n\prec_1\eta^n\prec_2\gamma^{n+1}_{(\gamma^{n+1}\lt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\Pi_3-[\eta^n]\prec_1\gamma)-[\beta^n\prec_1\eta^n\prec_2\gamma^{n+1}_{(\gamma^{n+1}\lt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land(\beta\prec_1\gamma)-[\beta^n\prec_1\eta^n\prec_2\gamma^{n+1}_{(\gamma^{n+1}\lt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2\gamma\land\beta\prec_1\gamma+1 \\
+  & \alpha\prec_1\beta\prec_2\gamma\land\beta\prec_1\beta'\prec_1\gamma'_{(\beta'\gt\gamma)} \\
+  & \alpha\prec_1\beta\prec_2\gamma\land\Pi_0-[\beta^n\prec_1\beta^{n+1}\prec_1\gamma^{n+1}_{(\beta^{n+1}\gt\gamma^n)}] \\
+  & \alpha\prec_1\beta\prec_2(\gamma,\delta) \\
   \end{align}$$
   /WIP/
   <p style="font-size: 40px;">E</p>
