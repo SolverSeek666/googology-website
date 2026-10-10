@@ -21,26 +21,33 @@
   Arai making <a href="https://arxiv.org/pdf/2311.12459">this freaking paper</a> that no one understands.<br>
   ZhiqiuCao for <a href="https://github.com/ZhiqiuCao/Googology">the definition that is easier to read</a> (in the paper)<br>
   <h1>Note</h1>
-  This website is my notes for <a href="https://arxiv.org/pdf/2311.12459">this freaking paper</a><br>
+  This website is my notes and understanding of <a href="https://arxiv.org/pdf/2311.12459">this freaking paper</a><br>
   Arai OCF here is \(Z_2\).<br>
   I'll note \(ON\) as \(\mathrm{Ord}\)<br>
   Work in progress.<br>
-  <p style="font-size: 40px;">Section 1: First part of the definition</p>
-  In what follows, \(\Omega\) denotes the least recursively regular ordinal \(\omega_1^{CK}\),<br>
-  and \(\psi_\Omega\) is a collapsing function such that \(\psi_\Omega(\alpha)\lt\Omega\).<br>
-  \(\mathbb{I}_N\) is an ordinal term denoting an ordinal such that \(L_{\mathbb{I}_N} = \mathbb{KP}\omega+\Pi_N\text{-Collection}+(V = L)\).<br>
-  We work in a set theory \(\mathrm{ZFC}\) (\(\{St_i\}_i\)), where each \(St_i\) (\(0\lt i\lte N\)) is a unary predicate symbol.<br>
-  Let \(St_0\) denote the set of uncountable cardinal less than \(\mathbb{I}_N\).<br>
-  \(\Omega\) and \(\mathbb{I}_N\) are strongly critical numbers with \(\Omega\lt\mathbb{I}_N\),<br>
-  i.e., non-zero ordinals closed under the binary Veblen function \(\varphi\alpha\beta = \varphi_\alpha(\beta)\).<br>
-  We assume \(St_{i+1}\subset St_i\) for \(i\lt N\),<br>
-  each \(St_i\) is an unbounded class of ordinals less than \(\mathbb{I}_N\) whose minimal element is greater than \(\Omega\)<br>
-  i.e., \(\Omega\lt\mathrm{min}\left(\cup_{0\lt i\lte N} St_i\right)\).<br>
-  The predicate \(St_i\) is identified with the calss \(\{\alpha\in\mathrm{Ord}|\alpha\in St_i\}\).<br>
-  For \(\alpha\lt\mathbb{I}_N\), \(\alpha^{\dagger i}\) denotes the least ordinal in the class \(St_i\) greater than \alpha.<br>
-  If \(\alpha\gte\mathbb{I}_N\), let \(\alpha^{\dagger i} := \mathbb{I}_N\).<br>
-  Let \(\alpha^{\dagger} = \alpha^{\dagger 1}\). Let \(SSt_i := \{\alpha^{\dagger i}|\alpha\in\mathrm{Ord}\}\) and \(LSt_i = St_i\backslash SSt_i\.<br>
+  <p style="font-size: 40px;">Section 1: The Beginnning</p>
+  \(\Omega\) denotes the least recursively regular ordinal \(\omega_1^{CK}\)<br>
+  \(\psi_\Omega\) is a collapsing function such that \(\psi_\Omega(\alpha) \lt \Omega\)<br>
+  \(\mathbb{I}_N\) is an ordinal term denoting an ordinal such that \(L_{\mathbb{I}_N} = \mathrm{KP}\omega+\Pi_N\text{-Collection}+(V=L)\)<br>
+  Each \(St_i \; (0 \lt i \le N)\) is a unary predicate symbol<br>
+  Let \(St_0\) denote the set of uncountable cardinals less than \(\mathbb{I}_N\), which is just<br>
+  $$St_0 = \{\gamma|\gamma\in\mathrm{Card}\land\gamma\lt\mathbb{I}_N\}$$<br>
+  \(\Omega\) and \(\mathbb{I}_N\) are strongly critical numbers with \(\Omega \lt \mathbb{I}_N\), in which strongly critical numbers are just gammas<br>
+  We assume \(St_{i+1} \subset St_i\) for \(i \lt N\), and \(\Omega \lt \min\left( \bigcup_{0\lt i\le N} St_i \right)\)<br>
+  For \(\alpha\lt\mathbb{I}_N\), \(\alpha^{\dagger i} := \min\{\gamma|\gamma\in St_i\land\gamma\gt\alpha\}\)<br>
+  For \(\alpha\ge\mathbb{I}_N\), \(\alpha^{\dagger i} := \mathbb{I}_N\)<br>
+  Let \(\alpha^\dagger := \alpha^{\dagger 1}\)<br>
+  \(\varepsilon(\alpha)\) denotes the least epsilon number greater than \(\alpha\)<br>
+  \(\Gamma(\alpha)\) denotes the least gamma number greater than \(\alpha\)<br>
+  \(\gamma = \alpha-\beta\) means \(\alpha = \beta+\gamma\) (tbh this is unnecessary sometimes)<br>
+  \(\alpha\dotplus\beta\) denotes the sum \(\alpha+\beta\) when \(\alpha+\beta\) equals the commutative (natural) sum<br>
   <br>
+  Let \(\mathbb{S}\in St_i\) with \(i\gt 0\)<br>
+  The "Mahlo degree" \(m(\pi)\) of an ordinal \(\pi\lt\mathbb{S}\) is definted as a finite function \(f:\mathbb{I}_N\to\Gamma(\mathbb{I}_N)\)<br>
+  <br>
+  Let \(A\subset\mathbb{I}_N\) be a set and \(\alpha\le\mathbb{I}_N\) a limit ordinal<br>
+  \(\alpha\in M(A) :\Leftrightarrow A\cap\alpha\text{ is stationary in }\alpha\)<br>
+  <p style="font-size: 40px;">Section 2: The Class \(C_a(\beta)\), \(Mh_{i,c}^a(\xi)\) and the \(Z_2\) OCF</p>
   <br>
   <br>
   <br>
