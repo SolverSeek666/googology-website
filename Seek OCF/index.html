@@ -21,77 +21,97 @@
   idk
   <h1>Note</h1>
   idk.<br>
+  all ocf is /WIP/ because I messed up and I'm lazy to fix now lol<br>
   Work in progress.<br>
   <p style="font-size: 40px; text-align: center;">Collapsing uncountable cardinals</p>
   $$\begin{align}
-  \text{Let } & \Omega_\alpha \text{ be } \alpha\text{th uncountable.} \\
+  \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } \Omega_\alpha \text{ be } \alpha\text{th uncountable.} \\
+  \varnothing & \in\mathrm{RI} \\
+  (\pi) & \in\mathrm{RI} \\
+  i(\mathbb{X}) & =\pi \\
+  C(\beta) & =\{\alpha|\alpha\in C(\alpha,\beta)\} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
-  \psi_\pi(\alpha) & =\min\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\}
+  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\mathbb{X}^\gamma|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\land\Psi_\mathbb{X}^\gamma\text{ is well-defined}\} \\
+  \mathfrak{M}_\mathbb{X}^\alpha & =\{\kappa\lt\pi|C(\alpha,\kappa)\cap\pi=\kappa\land\alpha,\mathbb{X}\in C(\kappa)\} \\
+  \Psi_\mathbb{X}^\alpha & =\min(\mathfrak{M}_\mathbb{X}^\alpha)
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing inaccessible cardinals</p>
   $$\begin{align}
-  \text{Let } & I_\alpha \text{ be } \alpha\text{th inaccessible.} \\
+  \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } I_\alpha \text{ be } \alpha\text{th inaccessible.} \\
+  \varnothing & \in\mathrm{RI} \\
+  (\pi) & \in\mathrm{RI} \\
+  i(\mathbb{X}) & =\pi \\
+  C(\beta) & =\{\alpha|\alpha\in C(\alpha,\beta)\} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{I_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
-  \psi_\pi(\alpha) & =\min\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\}
+  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\mathbb{X}^\gamma|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\land\Psi_\mathbb{X}^\gamma\text{ is well-defined}\} \\
+  \mathfrak{M}_\mathbb{X}^\alpha & =\{\kappa\lt\pi|C(\alpha,\kappa)\cap\pi=\kappa\land\alpha,\mathbb{X}\in C(\kappa)\} \\
+  \Psi_\mathbb{X}^\alpha & =\min(\mathfrak{M}_\mathbb{X}^\alpha)
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing Mahlo cardinals</p>
   $$\begin{align}
   \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } M_\alpha \text{ be } \alpha\text{th Mahlo.} \\
   \varnothing & \in\mathrm{RI} \\
-  (0) & \in\mathrm{RI} \\
+  (\pi;M_\mathbb{M}^{\lt\alpha};\delta) & \in\mathrm{RI} \\
+  i(\mathbb{X})=i(\mathbb{F}) & =\pi \\
+  o(\mathbb{X})=o(\mathbb{F}) & =\delta \\
+  \kappa\models M_\mathbb{M}^{\lt o(\mathbb{M})} & :\Leftrightarrow\kappa\text{ is }\Pi_0^1\text{-indesc.} \\
+  \kappa\models M_\mathbb{M}^{\lt\alpha} & :\Leftrightarrow\forall\gamma\in[o(\mathbb{M}),\alpha)\land\gamma\in C(\kappa)(\kappa\text{ is }\mathfrak{M}_{\mathbb{M}}^\gamma\text{-}\Pi_0^1\text{-indesc.}) \\
+  C(\beta) & =\{\alpha|\alpha\in C(\alpha,\beta)\} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{I_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{M_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
-  A_\pi \varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  A_\pi(0) & = \{\gamma\in\pi|\gamma\text{ is }\Pi_0^1\text{ indescr}\} \\
-  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in A_\pi \mathbb{X}\}\cup\{\pi\})
+  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\mathbb{X}^\gamma|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\land\Psi_\mathbb{X}^\gamma\text{ is well-defined}\} \\
+  \mathfrak{M}_\mathbb{X}^\alpha & =\{\kappa\lt\pi|C(\alpha,\kappa)\cap\pi=\kappa\land\alpha,\mathbb{X}\in C(\kappa)\land\kappa\models M_\mathbb{M}^{\lt\alpha}\} \\
+  \Psi_\mathbb{X}^\alpha & =\min(\mathfrak{M}_\mathbb{X}^\alpha)
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing weakly compact cardinals</p>
   $$\begin{align}
   \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } K_\alpha \text{ be } \alpha\text{th weakly compact.} \\
   \varnothing & \in\mathrm{RI} \\
-  \forall\alpha\in\mathrm{Ord}((\alpha) & \in\mathrm{RI}) \\
-  R(\alpha) & = \alpha \\
+  (\pi;M_\mathbb{M}^{\lt\alpha};\delta) & \in\mathrm{RI} \\
+  i(\mathbb{X})=i(\mathbb{F}) & =\pi \\
+  o(\mathbb{X})=o(\mathbb{F}) & =\delta \\
+  \kappa\models M_\mathbb{M}^{\lt o(\mathbb{M})} & :\Leftrightarrow\kappa\text{ is }\Pi_0^1\text{-indesc.} \\
+  \kappa\models M_\mathbb{M}^{\lt\alpha} & :\Leftrightarrow\forall\gamma\in[o(\mathbb{M}),\alpha)\land\gamma\in C(\kappa)(\kappa\text{ is }\mathfrak{M}_{\mathbb{M}}^\gamma\text{-}\Pi_0^1\text{-indesc.}) \\
+  C(\beta) & =\{\alpha|\alpha\in C(\alpha,\beta)\} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{K_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma,R\mathbb{X}\lt\alpha\} \\
-  A_\pi \varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  A_\pi(\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\Pi_0^1\text{ indescr onto } A_\pi(\xi))\} \\
-  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in A_\pi \mathbb{X}\}\cup\{\pi\})
+  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\mathbb{X}^\gamma|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\land\Psi_\mathbb{X}^\gamma\text{ is well-defined}\} \\
+  \mathfrak{M}_\mathbb{X}^\alpha & =\{\kappa\lt\pi|C(\alpha,\kappa)\cap\pi=\kappa\land\alpha,\mathbb{X}\in C(\kappa)\land\kappa\models M_\mathbb{M}^{\lt\alpha}\} \\
+  \Psi_\mathbb{X}^\alpha & =\min(\mathfrak{M}_\mathbb{X}^\alpha)
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing \(\Pi_2^1\)-indescr cardinals</p>
   $$\begin{align}
   \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } \mathcal{K}_\alpha \text{ be } \alpha\text{th }\Pi_2^1\text{-indescribable.} \\
   \varnothing & \in\mathrm{RI} \\
-  \forall\mathbb{X},\mathbb{Y} & \in\mathrm{RI}\land\alpha\in\mathrm{Ord}\land m\in 2((m;\mathbb{X};\mathbb{Y};\alpha)\in\mathrm{RI}) \\
-  R(m;\mathbb{X};\mathbb{Y};\alpha) & = \alpha \\
+  (\pi;M_\mathbb{M}^{\lt\alpha}-P_n;\delta) & \in\mathrm{RI} \\
+  i(\mathbb{X})=i(\mathbb{F}) & =\pi \\
+  o(\mathbb{X})=o(\mathbb{F}) & =\delta \\
+  \kappa\models M_\mathbb{M}^{\lt o(\mathbb{M})}-P_n & :\Leftrightarrow\kappa\text{ is }\Pi_n^1\text{-indesc.} \\
+  \kappa\models M_\mathbb{M}^{\lt\alpha}-P_n & :\Leftrightarrow\forall\gamma\in[o(\mathbb{M}),\alpha)\land\gamma\in C(\kappa)(\kappa\text{ is }\mathfrak{M}_{\mathbb{M}}^\gamma\text{-}\Pi_n^1\text{-indesc.}) \\
+  \kappa\models M_\mathbb{G}^{\lt\alpha}-P_n & :\Leftrightarrow\forall\gamma,\vec{\eta}\in[o(\mathbb{G}),\alpha),\mathrm{dom}(\mathbb{G})\land\gamma,\vec{\eta}\in C(\kappa)(\kappa\text{ is }\mathfrak{M}_{\mathbb{G}(\vec{\eta})}^\gamma\text{-}\Pi_n^1\text{-indesc.}) \\
+  C(\beta) & =\{\alpha|\alpha\in C(\alpha,\beta)\} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\mathcal{K}_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma,R\mathbb{X}\lt\alpha\} \\
-  A_\pi \varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  A_\pi(m;\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\Pi_m^1\text{-indescr onto } A_\pi(m;\varnothing;\varnothing;\xi))\} \\
-  A_\pi(m;\mathbb{X};\varnothing;\alpha) & = \{\gamma\in\pi|\gamma\text{ is }A_\pi \mathbb{X}\text{ onto }A_\pi(m;\varnothing;\varnothing;\alpha)\} \\
-  A_\pi(m;\mathbb{X};\mathbb{Y};\alpha) & = A_\pi \mathbb{Y}\cap A_\pi(m;\mathbb{X};\varnothing;\alpha) \\
-  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|C(\alpha,\beta)\cap\pi\subseteq\beta\land\beta\in A_\pi \mathbb{X}\}\cup\{\pi\})
+  & \mspace{2mu}\cup\mspace{1mu}\{K_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\mathbb{X}^\gamma|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\land\Psi_\mathbb{X}^\gamma\text{ is well-defined}\} \\
+  \mathfrak{M}_\mathbb{X}^\alpha & =\{\kappa\lt\pi|C(\alpha,\kappa)\cap\pi=\kappa\land\alpha,\mathbb{X}\in C(\kappa)\land\kappa\models M_\mathbb{M}^{\lt\alpha}\} \\
+  \Psi_\mathbb{X}^\alpha & =\min(\mathfrak{M}_\mathbb{X}^\alpha)
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing \(\Pi_0^2\)-indescr cardinals</p>
   $$\begin{align}
