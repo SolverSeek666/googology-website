@@ -25,20 +25,38 @@
   Work in progress.<br>
   <p style="font-size: 40px; text-align: center;">Collapsing uncountable cardinals</p>
   $$\begin{align}
-  \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } \Omega_\alpha \text{ be } \alpha\text{th uncountable.} \\
+  \text{Let } & \mathrm{RI} \text{ be a set of reflection instances.} \\
   \varnothing & \in\mathrm{RI} \\
-  (\pi) & \in\mathrm{RI} \\
-  i(\mathbb{X}) & =\pi \\
-  C(\beta) & =\{\alpha|\alpha\in C(\alpha,\beta)\} \\
-  C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
-  C_0(\alpha,\beta) & =\{0\}\cup\beta \\
-  C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+  (\pi;\delta) & \in\mathrm{RI} \\
+  i(\mathbb{X}) & :=\pi \\
+  C(\beta) & :=\{\alpha|\alpha\in C(\alpha,\beta)\} \\
+  C(\alpha,\beta) & :=\bigcup_{n\in\omega} C_n(\alpha,\beta) \\
+  C_0(\alpha,\beta) & :=\{0\}\cup\beta \\
+  C_{n+1}(\alpha,\beta) & :=\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\cap\mathrm{Card}\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\mathbb{X}^\gamma|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\land\Psi_\mathbb{X}^\gamma\text{ is well-defined}\} \\
-  \mathfrak{M}_\mathbb{X}^\alpha & =\{\kappa\lt\pi|C(\alpha,\kappa)\cap\pi=\kappa\land\alpha,\mathbb{X}\in C(\kappa)\} \\
-  \Psi_\mathbb{X}^\alpha & =\min(\mathfrak{M}_\mathbb{X}^\alpha)
+  0.1. & \text{ For all }\kappa\in\mathem{Card}\text{, we define the 0-ary reflection configuration and reflection instance }\mathbb{F}:=(\kappa^+;0)\to 1. \\
+  1. & \text{Let }\mathbb{X}:=\mathbb{F}=(\pi;\delta). \\
+  & \text{For }\alpha\ge\delta\text{, }\mathfrak{M}_\mathbb{X}^\alpha:=\{\kappa\lt\pi|C(\alpha,\kappa)\cap\pi=\kappa\land\alpha,\mathbb{X}\in C(\kappa)\} \\
+  & \text{If } \mathfrak{M}_\mathbb{X}^\alpha\neq\varnothing\text{, then }\Psi_\mathbb{X}^\alpha & :=\min(\mathfrak{M}_\mathbb{X}^\alpha)
   \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Collapsing inaccessible cardinals</p>
+  <p style="font-size: 40px; text-align: center;">Collapsing inaccessible cardinals /WIP/</p>
+  $$\begin{align}
+  \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } I \text{ be the minimum inaccessible cardinal.} \\
+  \varnothing & \in\mathrm{RI} \\
+  (\pi;M-P;\delta) & \in\mathrm{RI} \\
+  i(\mathbb{X}) & :=\pi \\
+  C(\beta) & :=\{\alpha|\alpha\in C(\alpha,\beta)\} \\
+  C(\alpha,\beta) & :=\bigcup_{n\in\omega} C_n(\alpha,\beta) \\
+  C_0(\alpha,\beta) & :=\{0\}\cup\beta \\
+  C_{n+1}(\alpha,\beta) & :=\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\cap\mathrm{Card}\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\mathbb{X}^\gamma|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\land\Psi_\mathbb{X}^\gamma\text{ is well-defined}\} \\
+  0.1. & \text{ For all }\kappa\in\mathem{Card}\text{, we define the 0-ary reflection configuration and reflection instance }\mathbb{F}:=(\kappa^+,0)\to 1. \\
+  1. & \text{Let }\mathbb{X}:=\mathbb{F}=(\pi,\delta). \\
+  & \text{For }\alpha\ge\delta\text{, }\mathfrak{M}_\mathbb{X}^\alpha:=\{\kappa\lt\pi|C(\alpha,\kappa)\cap\pi=\kappa\land\alpha,\mathbb{X}\in C(\kappa)\} \\
+  & \text{If } \mathfrak{M}_\mathbb{X}^\alpha\neq\varnothing\text{, then }\Psi_\mathbb{X}^\alpha & :=\min(\mathfrak{M}_\mathbb{X}^\alpha)
+  \end{align}$$
   $$\begin{align}
   \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } I_\alpha \text{ be } \alpha\text{th inaccessible.} \\
   \varnothing & \in\mathrm{RI} \\
@@ -46,10 +64,9 @@
   i(\mathbb{X}) & =\pi \\
   C(\beta) & =\{\alpha|\alpha\in C(\alpha,\beta)\} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
-  C_0(\alpha,\beta) & =\{0\}\cup\beta \\
+  C_0(\alpha,\beta) & =\{0,I\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\Omega_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{I_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\cap\mathrm{Card}\cap I\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\mathbb{X}^\gamma|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\land\Psi_\mathbb{X}^\gamma\text{ is well-defined}\} \\
   \mathfrak{M}_\mathbb{X}^\alpha & =\{\kappa\lt\pi|C(\alpha,\kappa)\cap\pi=\kappa\land\alpha,\mathbb{X}\in C(\kappa)\} \\
   \Psi_\mathbb{X}^\alpha & =\min(\mathfrak{M}_\mathbb{X}^\alpha)
