@@ -22,15 +22,16 @@
   <h1>Note</h1>
   idk.<br>
   Work in progress.<br>
-  <p style="font-size: 40px; text-align: center;">Collapsing uncountable cardinals</p>
+  <p style="font-size: 40px; text-align: center;">Collapsing successor cardinals</p>
   $$\begin{align}
-  \text{Let } & \Omega_\alpha \text{ be } \alpha\text{th uncountable.} \\
+  \text{Let } & \alpha^+ \text{ be the next cardinal after } \alpha\text{.} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
-  \psi_\pi(\alpha) & =\min\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}
+  \mathfrak{M}_\pi(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\} \\
+  \psi_\pi(\alpha) & =\min(\mathfrak{M}_\pi(\alpha))
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing inaccessible cardinals</p>
   $$\begin{align}
@@ -41,59 +42,63 @@
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{I_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
-  \psi_\pi(\alpha) & =\min\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}
+  \mathfrak{M}_\pi(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\} \\
+  \psi_\pi(\alpha) & =\min(\mathfrak{M}_\pi(\alpha))
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing Mahlo cardinals</p>
   $$\begin{align}
-  \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } M_\alpha \text{ be } \alpha\text{th Mahlo.} \\
-  \varnothing & \in\mathrm{RI} \\
-  (0) & \in\mathrm{RI} \\
+  \text{Let } & \mathfrak{R} \text{ be a set of reflection instances, } M_\alpha \text{ be } \alpha\text{th Mahlo.} \\
+  \varnothing & \in\mathfrak{R} \\
+  (0) & \in\mathfrak{R} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{I_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{M_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
-  A_\pi \varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  A_\pi(0) & = \{\gamma\in\pi|\gamma\text{ is }\Pi_0^1\text{ indescr}\} \\
-  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\land\beta\in A_\pi \mathbb{X}\}\cup\{\pi\})
+  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
+  \mathcal{L}_\pi^\varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
+  \mathcal{L}_\pi^{(0)}& = \{\gamma\in\pi|\gamma\text{ is }\Pi_0^1\text{-indescr}\} \\
+  \mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\land\beta\in \mathcal{L}_\pi^\mathbb{X}\} \\
+  \psi_\pi^\mathbb{X}(\alpha) & =\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha))
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing weakly compact cardinals</p>
   $$\begin{align}
-  \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } K_\alpha \text{ be } \alpha\text{th weakly compact.} \\
-  \varnothing & \in\mathrm{RI} \\
-  \forall\alpha\in\mathrm{Ord}((\alpha) & \in\mathrm{RI}) \\
-  R(\alpha) & = \alpha \\
+  \text{Let } & \mathfrak{R} \text{ be a set of reflection instances, } K_\alpha \text{ be } \alpha\text{th weakly compact.} \\
+  \varnothing & \in\mathfrak{R} \\
+  \forall\alpha & \in\mathrm{Ord}((\alpha)\in\mathfrak{R}) \\
+  V(\alpha) & = \alpha \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{K_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma,R\mathbb{X}\lt\alpha\} \\
-  A_\pi \varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  A_\pi(\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\Pi_0^1\text{ indescr onto } A_\pi(\xi))\} \\
-  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\land\beta\in A_\pi \mathbb{X}\}\cup\{\pi\})
+  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma,V\mathbb{X}\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
+  \mathcal{L}_\pi^\varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
+  \mathcal{L}_\pi^{(\alpha)} & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\Pi_0^1\text{-indescr onto } \mathcal{L}_\pi^{(\xi)})\} \\
+  \mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\land\beta\in \mathcal{L}_\pi^\mathbb{X}\} \\
+  \psi_\pi^\mathbb{X}(\alpha) & =\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha))
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing \(\Pi_2^1\)-indescr cardinals</p>
   $$\begin{align}
-  \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } \mathcal{K}_\alpha \text{ be } \alpha\text{th }\Pi_2^1\text{-indescribable.} \\
-  \varnothing & \in\mathrm{RI} \\
-  \forall\mathbb{X},\mathbb{Y} & \in\mathrm{RI}\land\alpha\in\mathrm{Ord}\land m\in 2((m;\mathbb{X};\mathbb{Y};\alpha)\in\mathrm{RI}) \\
-  R(m;\mathbb{X};\mathbb{Y};\alpha) & = \alpha \\
+  \text{Let } & \mathfrak{R} \text{ be a set of reflection instances, } \mathcal{K}_\alpha \text{ be } \alpha\text{th }\Pi_2^1\text{-indescribable.} \\
+  \varnothing & \in\mathfrak{R} \\
+  \forall\mathbb{X},\mathbb{Y} & \in\mathfrak{R}\land\alpha\in\mathrm{Ord}\land m\in 2((m;\mathbb{X};\mathbb{Y};\alpha)\in\mathfrak{R}) \\
+  V(m;\mathbb{X};\mathbb{Y};\alpha) & = \alpha \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\mathcal{K}_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma,R\mathbb{X}\lt\alpha\} \\
-  A_\pi \varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  A_\pi(m;\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\Pi_m^1\text{-indescr onto } A_\pi(m;\varnothing;\varnothing;\xi))\} \\
-  A_\pi(m;\mathbb{X};\varnothing;\alpha) & = \{\gamma\in\pi|\gamma\text{ is }A_\pi \mathbb{X}\text{ onto }A_\pi(m;\varnothing;\varnothing;\alpha)\} \\
-  A_\pi(m;\mathbb{X};\mathbb{Y};\alpha) & = A_\pi \mathbb{Y}\cap A_\pi(m;\mathbb{X};\varnothing;\alpha) \\
-  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\land\beta\in A_\pi \mathbb{X}\}\cup\{\pi\})
+  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma,V\mathbb{X}\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
+  \mathcal{L}_\pi^\varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
+  \mathcal{L}_\pi^{(m;\varnothing;\varnothing;\alpha)} & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\Pi_m^1\text{-indescr onto } \mathcal{L}_\pi^{(m;\varnothing;\varnothing;\xi)})\} \\
+  \mathcal{L}_\pi^{(m;\mathbb{X};\varnothing;\alpha)} & = \{\gamma\in\pi|\gamma\text{ is }\mathcal{L}_\pi^\mathbb{X}\text{ onto }\mathcal{L}_\pi^{(m;\varnothing;\varnothing;\alpha)}\} \\
+  \mathcal{L}_\pi^{(m;\mathbb{X};\mathbb{Y};\alpha)} & = \mathcal{L}_\pi^\mathbb{Y}\cap \mathcal{L}_\pi^{(m;\mathbb{X};\varnothing;\alpha)} \\
+  \mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\land\beta\in \mathcal{L}_\pi^\mathbb{X}\} \\
+  \psi_\pi^\mathbb{X}(\alpha) & =\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha))
   \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Collapsing \(\Pi_0^2\)-indescr cardinals</p>
+  <p style="font-size: 40px; text-align: center;">Collapsing \(\Pi_0^2\)-indescr cardinals /WIP/</p>
   $$\begin{align}
   \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } \Xi_\alpha \text{ be } \alpha\text{th }\Pi_0^2\text{-indescribable.} \\
   \varnothing & \in\mathrm{RI} \\
@@ -111,7 +116,7 @@
   A_\pi(m;\mathbb{X};\mathbb{Y};\alpha) & = A_\pi \mathbb{Y}\cap A_\pi(m;\mathbb{X};\varnothing;\alpha) \\
   \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\land\beta\in A_\pi\mathbb{X}\}\cup\{\pi\})
   \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Collapsing \(\alpha\)-shrewd cardinals</p>
+  <p style="font-size: 40px; text-align: center;">Collapsing \(\alpha\)-shrewd cardinals /WIP/</p>
   $$\begin{align}
   \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } \Sigma_\alpha^\tau \text{ be }\alpha\text{th }\tau\text{-shrewd.} \\
   \varnothing & \in\mathrm{RI} \\
@@ -131,7 +136,7 @@
   A_\pi(f;m;\mathbb{X};\mathbb{Y};\alpha) & = A_\pi \mathbb{Y}\cap A_\pi(f;m;\mathbb{X};\varnothing;\alpha) \\
   \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\land\beta\in A_\pi \mathbb{X}\}\cup\{\pi\})
   \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Collapsing \(f\)-shrewd cardinals</p>
+  <p style="font-size: 40px; text-align: center;">Collapsing \(f\)-shrewd cardinals /WIP/</p>
   $$\begin{align}
   \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } \Sigma_\alpha^f \text{ be }\alpha\text{th }f\text{-shrewd.} \\
   & \text{For a function } f \text{,} \\
@@ -162,7 +167,7 @@
   \mathbb{X}[\alpha] & = \alpha\text{th }A_\mathrm{Ord}\mathbb{X}\\
   \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\land\beta\in A_\pi \mathbb{X}\}\cup\{\pi\})
   \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Collapsing nonprojectible cardinals</p>
+  <p style="font-size: 40px; text-align: center;">Collapsing nonprojectible cardinals /WIP/</p>
   $$\begin{align}
   & \text{For an cardinal }\pi\text{, }\pi\text{ is nonprojectible iff,} \\
   & \text{for all }\kappa\text{ is }\pi\text{-shrewd, then }\pi\cap\kappa\text{ is stationary in }\kappa\text{.}  \\
