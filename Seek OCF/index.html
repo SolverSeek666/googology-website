@@ -29,9 +29,9 @@
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
   \mathfrak{M}_\pi(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\} \\
-  \psi_\pi(\alpha) & =\min(\mathfrak{M}_\pi(\alpha))
+  \Psi_\pi(\alpha) & =\min(\mathfrak{M}_\pi(\alpha))
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing inaccessible cardinals</p>
   $$\begin{align}
@@ -41,9 +41,9 @@
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{I_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\pi(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\} \\
   \mathfrak{M}_\pi(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\} \\
-  \psi_\pi(\alpha) & =\min(\mathfrak{M}_\pi(\alpha))
+  \Psi_\pi(\alpha) & =\min(\mathfrak{M}_\pi(\alpha))
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing Mahlo cardinals</p>
   $$\begin{align}
@@ -56,28 +56,29 @@
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{I_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{M_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
   \mathfrak{M}_\pi^\varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
   \mathfrak{M}_\pi^{(0)}& = \{\gamma\in\pi|\gamma\text{ is }\Pi_0^1\text{-indescr}\} \\
   \mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}\cap\mathfrak{M}_\pi^\mathbb{X} \\
-  \psi_\pi^\mathbb{X}(\alpha) & =\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha))
+  \Psi_\pi^\mathbb{X}(\alpha) & =\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha))
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing weakly compact cardinals</p>
   $$\begin{align}
   \text{Let } & \mathfrak{R} \text{ be a set of reflection instances, } K_\alpha \text{ be } \alpha\text{th weakly compact.} \\
   \varnothing & \in\mathfrak{R} \\
   \forall\alpha & \in\mathrm{Ord}((\alpha)\in\mathfrak{R}) \\
-  V(\alpha) & = \alpha \\
+  V\varnothing & = \varnothing \\
+  V(\alpha) & = \{\alpha\} \\
   o(\pi) & =\begin{cases}\delta+1 & \text{if }\pi=\Psi_\kappa^\mathbb{Y}(\delta) \\ 0 & \text{if }\pi=\kappa^+\text{ or }K_\alpha\end{cases} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{K_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma,V\mathbb{X}\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land V\mathbb{X}\subseteq C_n(\alpha,\beta)\land V\mathbb{X}\subseteq\gamma+1\in\alpha+1\land\mathbb{X}\in\mathfrak{R}\} \\
   \mathfrak{M}_\pi^\varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
   \mathfrak{M}_\pi^{(\alpha)} & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\Pi_0^1\text{-indesc. onto } \mathfrak{M}_\pi^{(\xi)})\} \\
-  \text{If }\alpha\ge o(\pi)\text{, }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}\cap\mathfrak{M}_\pi^\mathbb{X} \\
+  \text{For }\alpha\ge o(\pi)\text{, }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}\cap\mathfrak{M}_\pi^\mathbb{X} \\
   \text{If }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & \neq\varnothing\text{, }\Psi_\pi^\mathbb{X}(\alpha)=\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha))
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing \(\Pi_2^1\)-indescr cardinals</p>
@@ -85,36 +86,38 @@
   \text{Let } & \mathfrak{R} \text{ be a set of reflection instances, } \mathcal{K}_\alpha \text{ be } \alpha\text{th }\Pi_2^1\text{-indescribable.} \\
   \varnothing & \in\mathfrak{R} \\
   \forall\mathbb{X},\mathbb{Y} & \in\mathfrak{R}\land\alpha\in\mathrm{Ord}\land m\in 2((m;\mathbb{X};\mathbb{Y};\alpha)\in\mathfrak{R}) \\
-  V(m;\mathbb{X};\mathbb{Y};\alpha) & = \alpha \\
+  V\varnothing & = \varnothing \\
+  V(m;\mathbb{X};\mathbb{Y};\alpha) & = V\mathbb{X}\cup V\mathbb{Y}\cup\{\alpha\} \\
   o(\pi) & =\begin{cases}\delta+1 & \text{if }\pi=\Psi_\kappa^\mathbb{Y}(\delta) \\ 0 & \text{if }\pi=\kappa^+\text{ or }\mathcal{K}_\alpha\end{cases} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\mathcal{K}_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land V\mathbb{X}\subseteq C_n(\alpha,\beta)\land\gamma\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land V\mathbb{X}\subseteq C_n(\alpha,\beta)\land V\mathbb{X}\subseteq\gamma+1\in\alpha+1\land\mathbb{X}\in\mathfrak{R}\} \\
   \mathfrak{M}_\pi^\varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
   \mathfrak{M}_\pi^{(m;\mathbb{X};\mathbb{Y};\alpha)} & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\Pi_m^1\text{-indesc.}\cap\mathfrak{M}_\pi^\mathbb{Y}\text{ onto } \mathfrak{M}_\pi^{(m;\varnothing;\mathbb{Y};\xi)})\} \text{ onto }\mathfrak{M}_\pi^\mathbb{X} \\
-  \text{If }\alpha\ge o(\pi)\text{, }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}\cap\mathfrak{M}_\pi^\mathbb{X} \\
-  \text{If }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & \neq\varnothing\text{, }\psi_\pi^\mathbb{X}(\alpha)=\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha))
+  \text{For }\alpha\ge o(\pi)\text{, }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}\cap\mathfrak{M}_\pi^\mathbb{X} \\
+  \text{If }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & \neq\varnothing\text{, }\Psi_\pi^\mathbb{X}(\alpha)=\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha))
   \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Collapsing \(\Pi_0^2\)-indescr cardinals /WIP/</p>
+  <p style="font-size: 40px; text-align: center;">Collapsing \(\Pi_0^2\)-indescr cardinals</p>
   $$\begin{align}
-  \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } \Xi_\alpha \text{ be } \alpha\text{th }\Pi_0^2\text{-indescribable.} \\
-  \varnothing & \in\mathrm{RI} \\
-  \forall\mathbb{X},\mathbb{Y} & \in\mathrm{RI}\land\alpha\in\mathrm{Ord}\land m\in\omega((m;\mathbb{X};\mathbb{Y};\alpha)\in\mathrm{RI}) \\
-  R(m;\mathbb{X};\mathbb{Y};\alpha) & = \alpha \\
+  \text{Let } & \mathfrak{R} \text{ be a set of reflection instances, } \Xi_\alpha \text{ be } \alpha\text{th }\Pi_0^2\text{-indescribable.} \\
+  \varnothing & \in\mathfrak{R} \\
+  \forall\mathbb{X},\mathbb{Y} & \in\mathfrak{R}\land\alpha\in\mathrm{Ord}\land m\in\omega((m;\mathbb{X};\mathbb{Y};\alpha)\in\mathfrak{R}) \\
+  V\varnothing & = \varnothing \\
+  V(m;\mathbb{X};\mathbb{Y};\alpha) & = V\mathbb{X}\cup V\mathbb{Y}\cup\{\alpha\} \\
+  o(\pi) & =\begin{cases}\delta+1 & \text{if }\pi=\Psi_\kappa^\mathbb{Y}(\delta) \\ 0 & \text{if }\pi=\kappa^+\text{ or }\Xi_\alpha\end{cases} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Xi_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma,R\mathbb{X}\lt\alpha\} \\
-  A_\pi \varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  A_\pi(m;\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\Pi_m^1\text{-indescr onto } A_\pi(m;\varnothing;\varnothing;\xi))\} \\
-  A_\pi(m;\mathbb{X};\varnothing;\alpha) & = \{\gamma\in\pi|\gamma\text{ is }A_\pi \mathbb{X}\text{ onto }A_\pi(m;\varnothing;\varnothing;\alpha)\} \\
-  A_\pi(m;\mathbb{X};\mathbb{Y};\alpha) & = A_\pi \mathbb{Y}\cap A_\pi(m;\mathbb{X};\varnothing;\alpha) \\
-  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\land\beta\in A_\pi\mathbb{X}\}\cup\{\pi\})
+  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land V\mathbb{X}\subseteq C_n(\alpha,\beta)\land V\mathbb{X}\subseteq\gamma+1\in\alpha+1\land\mathbb{X}\in\mathfrak{R}\} \\
+  \mathfrak{M}_\pi^\varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
+  \mathfrak{M}_\pi^{(m;\mathbb{X};\mathbb{Y};\alpha)} & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\Pi_m^1\text{-indesc.}\cap\mathfrak{M}_\pi^\mathbb{Y}\text{ onto } \mathfrak{M}_\pi^{(m;\varnothing;\mathbb{Y};\xi)})\} \text{ onto }\mathfrak{M}_\pi^\mathbb{X} \\
+  \text{For }\alpha\ge o(\pi)\text{, }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}\cap\mathfrak{M}_\pi^\mathbb{X} \\
+  \text{If }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & \neq\varnothing\text{, }\Psi_\pi^\mathbb{X}(\alpha)=\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha))
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing \(\alpha\)-shrewd cardinals /WIP/</p>
   $$\begin{align}
