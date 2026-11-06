@@ -119,97 +119,36 @@
   \text{For }\alpha\ge o(\pi)\text{, }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}\cap\mathfrak{M}_\pi^\mathbb{X} \\
   \text{If }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & \neq\varnothing\text{, }\Psi_\pi^\mathbb{X}(\alpha)=\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha))
   \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Collapsing \(\alpha\)-shrewd cardinals /WIP/</p>
+  <p style="font-size: 40px; text-align: center;">Collapsing nonprojectible cardinals</p>
   $$\begin{align}
-  \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } \Sigma_\alpha^\tau \text{ be }\alpha\text{th }\tau\text{-shrewd.} \\
-  \varnothing & \in\mathrm{RI} \\
-  \forall\mathbb{X},\mathbb{Y} & \in\mathrm{RI}\land\alpha,f\in\mathrm{Ord}\land m\in\omega((f;m;\mathbb{X};\mathbb{Y};\alpha)\in\mathrm{RI}) \\
-  R(f;m;\mathbb{X};\mathbb{Y};\alpha) & = \alpha \\
+  \text{Let } & \mathfrak{R} \text{ be a set of reflection instances, } \\
+  & \rho \text{ be a cardinal such that } \rho\text{ is }\lambda\text{-reducible for }\rho\le\lambda\text{,} \\
+  & \varpi_\alpha \text{ be } \alpha\text{th nonprojectible.} \\
+  \varnothing & \in\mathfrak{R} \\
+  \forall\mathbb{X},\mathbb{Y} & \in\mathfrak{R}\land\alpha\in\mathrm{Ord}\land m\in\omega((\lambda;m;\mathbb{X};\mathbb{Y};\alpha)\in\mathfrak{R}) \\
+  V\varnothing & = \varnothing \\
+  V(\lambda;m;\mathbb{X};\mathbb{Y};\alpha) & = V\mathbb{X}\cup V\mathbb{Y}\cup\{\alpha\} \\
+  o(\pi) & =\begin{cases}\delta+1 & \text{if }\pi=\Psi_\kappa^\mathbb{Y}(\delta) \\ 0 & \text{if }\pi=\kappa^+\text{ or }\varpi_\alpha\end{cases} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\Sigma^g_\gamma|\gamma,g\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma,R\mathbb{X}\lt\alpha\} \\
-  A_\pi \varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  A_\pi(0;m;\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\Pi_n^1\text{-indescribable onto } A_\pi(0;m;\varnothing;\varnothing;\xi))\} \\
-  A_\pi(f;m;\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }f\text{-}\Pi_n^1\text{-shrewd onto } A_\pi(f;m;\varnothing;\varnothing;\xi))\} \\
-  A_\pi(f;0;\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }f\text{-shrewd onto } A_\pi(f;0;\varnothing;\varnothing;\xi))\} \\
-  A_\pi(f;m;\mathbb{X};\varnothing;\alpha) & = \{\gamma\in\pi|\gamma\text{ is }A_\pi \mathbb{X}\text{ onto }A_\pi(f;m;\varnothing;\varnothing;\alpha)\} \\
-  A_\pi(f;m;\mathbb{X};\mathbb{Y};\alpha) & = A_\pi \mathbb{Y}\cap A_\pi(f;m;\mathbb{X};\varnothing;\alpha) \\
-  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\land\beta\in A_\pi \mathbb{X}\}\cup\{\pi\})
-  \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Collapsing \(f\)-shrewd cardinals /WIP/</p>
-  $$\begin{align}
-  \text{Let } & \mathrm{RI} \text{ be a set of reflection instances, } \Sigma_\alpha^f \text{ be }\alpha\text{th }f\text{-shrewd.} \\
-  & \text{For a function } f \text{,} \\
-  & \text{if } f(\alpha)=\beta \text{ and } \beta\lt\alpha \text{, then it is noted as } \beta \\
-  & \text{if } f(\alpha)=\beta \text{ and } \beta\gt\alpha \text{, then it is noted as } \alpha\to\beta \\
-  \varnothing & \in\mathrm{RI} \\
-  \forall\mathbb{X},\mathbb{Y} & \in\mathrm{RI}\land\alpha\in\mathrm{Ord}\land m\in\omega\land f\text{ is a function}((f;m;\mathbb{X};\mathbb{Y};\alpha)\in\mathrm{RI}) \\
-  R(f;m;\mathbb{X};\mathbb{Y};\alpha) & = \alpha \\
-  S(f;m;\mathbb{X};\mathbb{Y};\alpha) & = f \\
-  C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
-  C_0(\alpha,\beta) & =\{0\}\cup\beta \\
-  C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\Sigma^g_\gamma|\gamma,g\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma,R\mathbb{X},S\mathbb{X}\lt\alpha\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\varpi_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land V\mathbb{X}\subseteq C_n(\alpha,\beta)\land V\mathbb{X}\in\alpha+1\land\gamma\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
+  \mathfrak{M}_\pi^\varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
+  \mathfrak{M}_\pi^{(\lambda;m;\mathbb{X};\mathbb{Y};\alpha)} & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\lambda\text{-}\Pi_m^1\text{-reducible}\cap\mathfrak{M}_\pi^\mathbb{Y}\text{ onto } \mathfrak{M}_\pi^{(\lambda;m;\varnothing;\mathbb{Y};\xi)})\} \text{ onto }\mathfrak{M}_\pi^\mathbb{X} \\
+  \text{For }\alpha\ge o(\pi)\text{, }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}\cap\mathfrak{M}_\pi^\mathbb{X} \\
+  \text{If }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & \neq\varnothing\text{, }\Psi_\pi^\mathbb{X}(\alpha)=\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha)) \\
   \\
-  & \text{For a function } f \text{, a cardinal } \kappa \text{ is called } f \text{-shrewd iff,} \\
-  & \text{for all } A\subseteq V_\kappa \text{ and set-theoretic formulae } \varphi(x,y)\text{,} \\
-  & \text{whenever } V_{\kappa+f(\kappa)}\models\varphi(A,\kappa) \text{,} \\
-  & \text{then there exist } 0\lt\alpha,\lambda\lt\kappa \text{ so that } V_{\alpha+\lambda}\models\varphi(A\cap\alpha,\alpha)\text{.} \\
-  \\
-  A_\pi \varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  A_\pi(0;m;\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\Pi_n^1\text{-indescribable onto } A_\pi(0;m;\varnothing;\varnothing;\xi))\} \\
-  A_\pi(f;m;\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }f\text{-}\Pi_n^1\text{-shrewd onto } A_\pi(f;m;\varnothing;\varnothing;\xi))\} \\
-  A_\pi(f;0;\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }f\text{-shrewd onto } A_\pi(f;0;\varnothing;\varnothing;\xi))\} \\
-  A_\pi(f;m;\mathbb{X};\varnothing;\alpha) & = \{\gamma\in\pi|\gamma\text{ is }A_\pi \mathbb{X}\text{ onto }A_\pi(f;m;\varnothing;\varnothing;\alpha)\} \\
-  A_\pi(f;m;\mathbb{X};\mathbb{Y};\alpha) & = A_\pi \mathbb{Y}\cap A_\pi(f;m;\mathbb{X};\varnothing;\alpha) \\
-  \mathbb{X}[\alpha] & = \alpha\text{th }A_\mathrm{Ord}\mathbb{X}\\
-  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\land\beta\in A_\pi \mathbb{X}\}\cup\{\pi\})
-  \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Collapsing nonprojectible cardinals /WIP/</p>
-  $$\begin{align}
-  & \text{For an cardinal }\pi\text{, }\pi\text{ is nonprojectible iff,} \\
-  & \text{for all }\kappa\text{ is }\pi\text{-shrewd, then }\pi\cap\kappa\text{ is stationary in }\kappa\text{.}  \\
-  \\
-  & \text{Let } \mathrm{RI} \text{ be a set of reflection instances, } \sigma_\alpha \text{ be }\alpha\text{th inshrewdable.} \\
-  & \text{For a function } f \text{,} \\
-  & \text{if } f(\alpha)=\beta \text{ and } \beta\lt\alpha \text{, then it is noted as } \beta \\
-  & \text{if } f(\alpha)=\beta \text{ and } \beta\gt\alpha \text{, then it is noted as } \alpha\to\beta \\
-  \varnothing & \in\mathrm{RI} \\
-  \forall\mathbb{X},\mathbb{Y} & \in\mathrm{RI}\land\alpha\in\mathrm{Ord}\land m\in\omega\land f\text{ is a function}((f;m;\mathbb{X};\mathbb{Y};\alpha)\in\mathrm{RI}) \\
-  R(f;m;\mathbb{X};\mathbb{Y};\alpha) & = \alpha \\
-  S(f;m;\mathbb{X};\mathbb{Y};\alpha) & = f \\
-  C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
-  C_0(\alpha,\beta) & =\{0\}\cup\beta \\
-  C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\Sigma^g_\gamma|\gamma\in C_n(\alpha,\beta)\land g\text{ is a function}\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land\gamma,R\mathbb{X},S\mathbb{X}\lt\alpha\land\mathbb{X}\in\mathrm{RI}\} \\
-  \\
-  & \text{For a function } f \text{, a cardinal } \kappa \text{ is called } f \text{-shrewd iff,} \\
-  & \text{for all } A\subseteq V_\kappa \text{ and set-theoretic formulae } \varphi(x,y)\text{,} \\
-  & \text{whenever } V_{\kappa+f(\kappa)}\models\varphi(A,\kappa) \text{,} \\
-  & \text{then there exist } 0\lt\alpha,\lambda\lt\kappa \text{ so that } V_{\alpha+\lambda}\models\varphi(A\cap\alpha,\alpha)\text{.} \\
-  \\
-  A_\pi \varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  A_\pi(0;m;\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }\Pi_n^1\text{-indescribable onto } A_\pi(0;m;\varnothing;\varnothing;\xi))\} \\
-  A_\pi(f;m;\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }f\text{-}\Pi_n^1\text{-shrewd onto } A_\pi(f;m;\varnothing;\varnothing;\xi))\} \\
-  A_\pi(f;0;\varnothing;\varnothing;\alpha) & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\beta)\cap\alpha(\gamma\text{ is }f\text{-shrewd onto } A_\pi(f;0;\varnothing;\varnothing;\xi))\} \\
-  A_\pi(f;m;\mathbb{X};\varnothing;\alpha) & = \{\gamma\in\pi|\gamma\text{ is }A_\pi \mathbb{X}\text{ onto }A_\pi(f;m;\varnothing;\varnothing;\alpha)\} \\
-  A_\pi(f;m;\mathbb{X};\mathbb{Y};\alpha) & = A_\pi \mathbb{Y}\cap A_\pi(f;m;\mathbb{X};\varnothing;\alpha) \\
-  \mathbb{X}[\alpha] & = \alpha\text{th }A_\mathrm{Ord}\mathbb{X}\\
-  \psi_\pi^\mathbb{X}(\alpha) & =\min(\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\land\beta\in A_\pi \mathbb{X}\}\cup\{\pi\}) \\
-  \text{Abbreviations} & : \\
-  I_\alpha & = (0;0;\varnothing;\varnothing;0)[\alpha] \\
-  M_\alpha & = (0;0;\varnothing;\varnothing;1)[\alpha] \\
-  K_\alpha & = (0;1;\varnothing;\varnothing;0)[\alpha] \\
-  \mathcal{K}_\alpha & = (0;2;\varnothing;\varnothing;0)[\alpha] \\
-  \Xi_\alpha & = (1;0;\varnothing;\varnothing;0)[\alpha] \\
-  \Sigma_\alpha^f & = (f;0;\varnothing;\varnothing;0)[\alpha]
+  \hat{C}_0(\alpha,\beta) & =\{0,\rho\}\cup\beta \\
+  \hat{C}_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in \hat{C}_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in \hat{C}_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\varpi_\gamma|\gamma\in \hat{C}_n(\alpha,\beta)\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\hat{\Psi}_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in \hat{C}_n(\alpha,\beta)\land V\mathbb{X}\subseteq \hat{C}_n(\alpha,\beta)\land V\mathbb{X}\in\alpha+1\land\gamma\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
+  \hat{\mathfrak{M}}_\pi^\varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
+  \hat{\mathfrak{M}}_\pi^{(\lambda;m;\mathbb{X};\mathbb{Y};\alpha)} & = \{\gamma\in\pi|\forall\xi\in \hat{C}(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\lambda\text{-}\Pi_m^1\text{-reducible}\cap\hat{\mathfrak{M}}_\pi^\mathbb{Y}\text{ onto } \hat{\mathfrak{M}}_\pi^{(\lambda;m;\varnothing;\mathbb{Y};\xi)})\} \text{ onto }\hat{\mathfrak{M}}_\pi^\mathbb{X} \\
+  \text{For }\alpha\ge o(\pi)\text{, }\hat{\mathfrak{M}}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(\hat{C}(\alpha,\beta)\cap\pi)=\beta\}\cap\hat{\mathfrak{M}}_\pi^\mathbb{X} \\
+  \text{If }\hat{\mathfrak{M}}_\pi^\mathbb{X}(\alpha) & \neq\varnothing\text{, }\hat{\Psi}_\pi^\mathbb{X}(\alpha)=\min(\hat{\mathfrak{M}}_\pi^\mathbb{X}(\alpha))
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">E</p>
   <br>
