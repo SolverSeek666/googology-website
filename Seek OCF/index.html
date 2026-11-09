@@ -141,31 +141,30 @@
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land V\mathbb{X}\subseteq C_n(\alpha,\beta)\land V\mathbb{X}\in\alpha+1\land\gamma\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
   \mathfrak{M}_\pi^\varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  \mathfrak{M}_\pi^{(\lambda;m;\mathbb{X};\mathbb{Y};\alpha)} & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma,\pi\text{ is }\lambda\text{-}\Pi_m^1\text{-reducible}\cap\mathfrak{M}_\pi^\mathbb{Y}\text{ onto } \mathfrak{M}_\pi^{(\lambda;m;\varnothing;\mathbb{Y};\xi)})\} \text{ onto }\mathfrak{M}_\pi^\mathbb{X} \\
+  \mathfrak{M}_\pi^{(\lambda;m;\mathbb{X};\mathbb{Y};\alpha)} & = \{\gamma\in\pi|\gamma,\rho\text{ are }\lambda\text{-}\Pi_m^1\text{-reducible}\land\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\mathfrak{M}_\pi^\mathbb{Y}\text{ onto } \mathfrak{M}_\pi^{(\lambda;m;\varnothing;\mathbb{Y};\xi)})\} \text{ onto }\mathfrak{M}_\pi^\mathbb{X} \\
   \text{For }\alpha\ge o(\pi)\text{, }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}\cap\mathfrak{M}_\pi^\mathbb{X} \\
   \text{If }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & \neq\varnothing\text{, }\Psi_\pi^\mathbb{X}(\alpha)=\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha)) \\
   \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Collapsing reducible cardinals</p>
-  <p style="font-size: 24px; text-align: center;">Limit: \((0)(1,1,1)(2,2,2)(3,2,2)(4,2)(3)\)?</p>
+  <p style="font-size: 40px; text-align: center;">Collapsing nonprojectible? cardinals</p>
+  <p style="font-size: 24px; text-align: center;">Limit: \(\gt(0)(1,1,1)(2,2,2)\)</p>
   $$\begin{align}
   \text{Let } & \mathfrak{R} \text{ be a set of reflection instances} \\
-  \text{Let } & \rho_{\alpha+1}\gt\rho_\alpha\text{ be a cardinal such that }\rho_{\alpha+1}\text{ is }\lambda\text{-reducible for }\rho_{\alpha+1}\le\lambda \\
-  \text{Let } & \rho_0=0 \\
+  \text{Let } & \mathbf{I}\text{ be an inaccessible and }\rho\text{ be a cardinal such that }\rho\text{ is }\lambda\text{-reducible for }\rho\le\lambda\lt\mathbf{I} \\
   \varnothing & \in\mathfrak{R} \\
   \forall\mathbb{X},\mathbb{Y} & \in\mathfrak{R}\land\alpha,\lambda\in\mathrm{Ord}\land m\in\omega((\lambda;m;\mathbb{X};\mathbb{Y};\alpha)\in\mathfrak{R}) \\
   V\varnothing & = \varnothing \\
   V(\lambda;m;\mathbb{X};\mathbb{Y};\alpha) & = V\mathbb{X}\cup V\mathbb{Y}\cup\{\alpha\} \\
-  o(\pi) & =\begin{cases}\delta+1 & \text{if }\pi=\Psi_\kappa^\mathbb{Y}(\delta) \\ 0 & \text{if }\pi=\kappa^+\text{ or }\rho_\alpha\end{cases} \\
+  o(\pi) & =\begin{cases}\delta+1 & \text{if }\pi=\Psi_\kappa^\mathbb{Y}(\delta) \\ 0 & \text{if }\pi=\kappa^+\text{ or }\rho\text{ or }\mathbf{I}\end{cases} \\
+  i(\mathbb{X}) & =\begin{cases}\lambda & \text{if }\mathbb{X}=(\lambda;m;\mathbb{X};\mathbb{Y};\alpha) \\ 0 & \text{if }\mathbb{X}=\varnothing\end{cases} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
-  C_0(\alpha,\beta) & =\{0\}\cup\beta \\
+  C_0(\alpha,\beta) & =\{0,\rho,\mathbf{I}\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\rho_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land V\mathbb{X}\subseteq C_n(\alpha,\beta)\land V\mathbb{X}\in\alpha+1\land\gamma\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
   \mathfrak{M}_\pi^\varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  \mathfrak{M}_\pi^{(\lambda;m;\mathbb{X};\mathbb{Y};\alpha)} & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma,\pi\text{ is }\lambda\text{-}\Pi_m^1\text{-reducible}\cap\mathfrak{M}_\pi^\mathbb{Y}\text{ onto } \mathfrak{M}_\pi^{(\lambda;m;\varnothing;\mathbb{Y};\xi)})\} \text{ onto }\mathfrak{M}_\pi^\mathbb{X} \\
-  \text{For }\alpha\ge o(\pi)\text{, }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}\cap\mathfrak{M}_\pi^\mathbb{X} \\
-  \text{If }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & \neq\varnothing\text{, }\Psi_\pi^\mathbb{X}(\alpha)=\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha)) \\
+  \mathfrak{M}_\pi^{(\lambda;m;\mathbb{X};\mathbb{Y};\alpha)} & = \{\gamma\in\pi|\gamma,\rho\text{ are }\lambda\text{-}\Pi_m^1\text{-reducible}\land\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\mathfrak{M}_\pi^\mathbb{Y}\text{ onto } \mathfrak{M}_\pi^{(\lambda;m;\varnothing;\mathbb{Y};\xi)})\} \text{ onto }\mathfrak{M}_\pi^\mathbb{X} \\
+  \text{For }\alpha\ge o(\pi)\text{ and }\alpha\ge i(\mathbb{X})\text{, }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}\cap\mathfrak{M}_\pi^\mathbb{X} \\
+  \text{If }\mathfrak{M}_\pi^\mathbb{X}(\alpha)\neq\varnothing\text{, }\Psi_\pi^\mathbb{X}(\alpha) & =\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha)) \\
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">E</p>
   <br>
