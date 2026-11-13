@@ -126,44 +126,47 @@
   \text{If }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & \neq\varnothing\text{, }\Psi_\pi^\mathbb{X}(\alpha)=\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha))
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">Collapsing reducible cardinals</p>
-  <p style="font-size: 24px; text-align: center;">Limit: \((0)(1,1,1)(2,2,1)(3)\)</p>
+  <p style="font-size: 24px; text-align: center;">Limit: \((0)(1,1,1)(2,2,1)(3)(2,1)(3,2,1)\)</p>
   $$\begin{align}
   \text{Let } & \mathfrak{R} \text{ be a set of reflection instances} \\
-  \text{Let } & \rho\text{ be a cardinal such that }\rho\text{ is }\lambda\text{-reducible for }\rho\le\lambda \\
+  \text{Let } & \Upsilon\text{ be a cardinal such that }\Upsilon\text{ is }\lambda\text{-}\Pi_m^1\text{-reducible for }\Upsilon\le\lambda\text{ and }m\in\omega \\
+  \text{Let } & \beta_{[\alpha]}\text{ be the ordinal such that }\beta_{[\alpha]}\text{ in base }\alpha\text{ is }\beta \\
   \varnothing & \in\mathfrak{R} \\
-  \forall\mathbb{X},\mathbb{Y} & \in\mathfrak{R}\land\alpha,\lambda\in\mathrm{Ord}\land m\in\omega((\lambda;m;\mathbb{X};\mathbb{Y};\alpha)\in\mathfrak{R}) \\
+  \forall\mathbb{X},\mathbb{Y} & \in\mathfrak{R}\land\alpha,\lambda\in\mathrm{Ord}\land m\in\omega((\lambda;m;\mathbb{X};\alpha;\mathbb{Y})\in\mathfrak{R}) \\
   V\varnothing & = \varnothing \\
-  V(\lambda;m;\mathbb{X};\mathbb{Y};\alpha) & = V\mathbb{X}\cup V\mathbb{Y}\cup\{\alpha\} \\
-  o(\pi) & =\begin{cases}\delta+1 & \text{if }\pi=\Psi_\kappa^\mathbb{Y}(\delta) \\ 0 & \text{if }\pi=\kappa^+\text{ or }\rho\end{cases} \\
+  V(\lambda;m;\mathbb{X};\alpha;\mathbb{Y}) & = V\mathbb{X}\cup V\mathbb{Y}\cup\{\alpha\} \\
+  o(\pi) & =\begin{cases}\delta+1 & \text{if }\pi=\Psi_\kappa^\mathbb{Y}(\delta) \\ 0 & \text{if }\pi=\kappa^+\text{ or }\Upsilon\end{cases} \\
+  \Theta_\pi(\beta_{[\pi]},\gamma) & = \beta_{[\gamma]} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
-  C_0(\alpha,\beta) & =\{0,\rho\}\cup\beta \\
+  C_0(\alpha,\beta) & =\{0,\Upsilon\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land V\mathbb{X}\subseteq C_n(\alpha,\beta)\land V\mathbb{X}\in\alpha+1\land\gamma\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
   \mathfrak{M}_\pi^\varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  \mathfrak{M}_\pi^{(\lambda;m;\mathbb{X};\mathbb{Y};\alpha)} & = \{\gamma\in\pi|\gamma,\rho\text{ are }\lambda\text{-}\Pi_m^1\text{-reducible}\land\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\mathfrak{M}_\pi^\mathbb{Y}\text{ onto } \mathfrak{M}_\pi^{(\lambda;m;\varnothing;\mathbb{Y};\xi)})\} \text{ onto }\mathfrak{M}_\pi^\mathbb{X} \\
+  \text{For }\lambda\ge\pi\text{, }\mathfrak{M}_\pi^{(\lambda;m;\mathbb{X};\alpha;\mathbb{Y})} & = \{\gamma\in\pi|\gamma\text{ is }\Theta_\pi(\lambda,\gamma)\text{-}\Pi_m^1\text{-reducible}\land\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\mathfrak{M}_\pi^\mathbb{X}\text{ onto } \mathfrak{M}_\pi^{(\lambda;m;\mathbb{X};\xi;\varnothing)})\} \text{ onto }\mathfrak{M}_\pi^\mathbb{Y} \\
   \text{For }\alpha\ge o(\pi)\text{, }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}\cap\mathfrak{M}_\pi^\mathbb{X} \\
-  \text{If }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & \neq\varnothing\text{, }\Psi_\pi^\mathbb{X}(\alpha)=\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha)) \\
+  \text{If }\mathfrak{M}_\pi^\mathbb{X}(\alpha)\neq\varnothing\text{, }\Psi_\pi^\mathbb{X}(\alpha) & =\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha)) \\
   \end{align}$$
-  <p style="font-size: 40px; text-align: center;">Collapsing nonprojectible? cardinals</p>
-  <p style="font-size: 24px; text-align: center;">Limit: \(\gt(0)(1,1,1)(2,2,2)\)</p>
+  <p style="font-size: 40px; text-align: center;">Collapsing ?̶̘͈̬̌̀̕?̸̨̦̊̅͆̽͗?̷̮̈͂͗͒͘͠ cardinals</p>
+  <p style="font-size: 24px; text-align: center;">Limit: \((0)(1,1,1)(2,2,2)(3,1)(4,2,1)(2,1)(3,2,1)\)</p>
   $$\begin{align}
   \text{Let } & \mathfrak{R} \text{ be a set of reflection instances} \\
-  \text{Let } & \mathbf{I}\text{ be an inaccessible and }\rho\text{ be a cardinal such that }\rho\text{ is }\lambda\text{-reducible for }\rho\le\lambda\lt\mathbf{I} \\
+  \text{Let } & \mathbf{I}\text{ be an inaccessible and }\Upsilon\text{ be a cardinal such that }\Upsilon\text{ is }\lambda\text{-}\Pi_m^1\text{-reducible for }\Upsilon\le\lambda\lt\mathbf{I}\text{ and }m\in\omega \\
+  \text{Let } & \beta_{[\alpha]}\text{ be the ordinal such that }\beta_{[\alpha]}\text{ in base }\alpha\text{ is }\beta \\
   \varnothing & \in\mathfrak{R} \\
-  \forall\mathbb{X},\mathbb{Y} & \in\mathfrak{R}\land\alpha,\lambda\in\mathrm{Ord}\land m\in\omega((\lambda;m;\mathbb{X};\mathbb{Y};\alpha)\in\mathfrak{R}) \\
+  \forall\mathbb{X},\mathbb{Y} & \in\mathfrak{R}\land\alpha\in\mathrm{Ord}\land\lambda\in\mathbf{I}\land m\in\omega((\lambda;m;\mathbb{X};\alpha;\mathbb{Y})\in\mathfrak{R}) \\
   V\varnothing & = \varnothing \\
-  V(\lambda;m;\mathbb{X};\mathbb{Y};\alpha) & = V\mathbb{X}\cup V\mathbb{Y}\cup\{\alpha\} \\
-  o(\pi) & =\begin{cases}\delta+1 & \text{if }\pi=\Psi_\kappa^\mathbb{Y}(\delta) \\ 0 & \text{if }\pi=\kappa^+\text{ or }\rho\text{ or }\mathbf{I}\end{cases} \\
-  i(\mathbb{X}) & =\begin{cases}\lambda & \text{if }\mathbb{X}=(\lambda;m;\mathbb{X};\mathbb{Y};\alpha) \\ 0 & \text{if }\mathbb{X}=\varnothing\end{cases} \\
-  C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
-  C_0(\alpha,\beta) & =\{0,\rho,\mathbf{I}\}\cup\beta \\
+  V(\lambda;m;\mathbb{X};\alpha;\mathbb{Y}) & = V\mathbb{X}\cup V\mathbb{Y}\cup\{\alpha\} \\
+  o(\pi) & =\begin{cases}\delta+1 & \text{if }\pi=\Psi_\kappa^\mathbb{Y}(\delta) \\ 0 & \text{if }\pi=\kappa^+\text{ or }\Upsilon\text{ or }\mathbf{I}\end{cases} \\
+  \Theta_\pi(\beta_{[\pi]},\gamma) & = \beta_{[\gamma]} \\
+  C(\alpha,\beta) & =\bigcup_{n\in\omega} C_n(\alpha,\beta) \\
+  C_0(\alpha,\beta) & =\{0,\Upsilon,\mathbf{I}\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land V\mathbb{X}\subseteq C_n(\alpha,\beta)\land V\mathbb{X}\in\alpha+1\land\gamma\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
   \mathfrak{M}_\pi^\varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  \mathfrak{M}_\pi^{(\lambda;m;\mathbb{X};\mathbb{Y};\alpha)} & = \{\gamma\in\pi|\gamma,\rho\text{ are }\lambda\text{-}\Pi_m^1\text{-reducible}\land\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\mathfrak{M}_\pi^\mathbb{Y}\text{ onto } \mathfrak{M}_\pi^{(\lambda;m;\varnothing;\mathbb{Y};\xi)})\} \text{ onto }\mathfrak{M}_\pi^\mathbb{X} \\
-  \text{For }\alpha\ge o(\pi)\text{ and }\alpha\ge i(\mathbb{X})\text{, }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}\cap\mathfrak{M}_\pi^\mathbb{X} \\
+  \text{For }\lambda\ge\pi\text{, }\mathfrak{M}_\pi^{(\lambda;m;\mathbb{X};\alpha;\mathbb{Y})} & = \{\gamma\in\pi|\gamma\text{ is }\Theta_\pi(\lambda,\gamma)\text{-}\Pi_m^1\text{-reducible}\land\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\mathfrak{M}_\pi^\mathbb{X}\text{ onto } \mathfrak{M}_\pi^{(\lambda;m;\mathbb{X};\xi;\varnothing)})\} \text{ onto }\mathfrak{M}_\pi^\mathbb{Y} \\
+  \text{For }\alpha\ge o(\pi)\text{, }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}\cap\mathfrak{M}_\pi^\mathbb{X} \\
   \text{If }\mathfrak{M}_\pi^\mathbb{X}(\alpha)\neq\varnothing\text{, }\Psi_\pi^\mathbb{X}(\alpha) & =\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha)) \\
   \end{align}$$
   <p style="font-size: 40px; text-align: center;">E</p>
