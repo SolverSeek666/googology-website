@@ -90,18 +90,19 @@
   $$\begin{align}
   \text{Let } & \mathfrak{R} \text{ be a set of reflection instances, } \mathcal{K}_\alpha \text{ be } \alpha\text{th }\Pi_2^1\text{-indescribable.} \\
   \varnothing & \in\mathfrak{R} \\
-  \forall\mathbb{X},\mathbb{Y} & \in\mathfrak{R}\land\alpha\in\mathrm{Ord}\land m\in 2((m;\mathbb{X};\mathbb{Y};\alpha)\in\mathfrak{R}) \\
+  \forall\mathbb{X},\mathbb{Y} & \in\mathfrak{R}\land\alpha\in\mathrm{Ord}\land m\in 2((m;\mathbb{X};\alpha;\mathbb{Y})\in\mathfrak{R}) \\
   V\varnothing & = \varnothing \\
-  V(m;\mathbb{X};\mathbb{Y};\alpha) & = V\mathbb{X}\cup V\mathbb{Y}\cup\{\alpha\} \\
+  V(m;\mathbb{X};\alpha;\mathbb{Y}) & = V\mathbb{X}\cup V\mathbb{Y}\cup\{\alpha\} \\
   o(\pi) & =\begin{cases}\delta+1 & \text{if }\pi=\Psi_\kappa^\mathbb{Y}(\delta) \\ 0 & \text{if }\pi=\kappa^+\text{ or }\mathcal{K}_\alpha\end{cases} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\mathcal{K}_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land V\mathbb{X}\subseteq C_n(\alpha,\beta)\land V\mathbb{X}\in\alpha+1\land\gamma\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land V\mathbb{X}\subseteq C_n(\alpha,\beta)\cap\alpha\land\gamma\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
   \mathfrak{M}_\pi^\varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  \mathfrak{M}_\pi^{(m;\mathbb{X};\mathbb{Y};\alpha)} & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\Pi_m^1\text{-indesc.}\cap\mathfrak{M}_\pi^\mathbb{Y}\text{ onto } \mathfrak{M}_\pi^{(m;\varnothing;\mathbb{Y};\xi)})\} \text{ onto }\mathfrak{M}_\pi^\mathbb{X} \\
+  \mathfrak{M}_\pi^{(m;\mathbb{X};0;\mathbb{Y})} & = \mathfrak{M}_\pi^\mathbb{X}\cap\mathfrak{M}_\pi^\mathbb{Y} \\
+  \mathfrak{M}_\pi^{(m;\mathbb{X};\alpha;\mathbb{Y})} & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\mathfrak{M}_\pi^{(m;\varnothing;\mathbb{Y};\xi)}\text{-}\Pi_m^1\text{-indesc.})\} \\
   \text{For }\alpha\ge o(\pi)\text{, }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}\cap\mathfrak{M}_\pi^\mathbb{X} \\
   \text{If }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & \neq\varnothing\text{, }\Psi_\pi^\mathbb{X}(\alpha)=\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha))
   \end{align}$$
@@ -110,18 +111,19 @@
   $$\begin{align}
   \text{Let } & \mathfrak{R} \text{ be a set of reflection instances, } \Xi_\alpha \text{ be } \alpha\text{th }\Pi_0^2\text{-indescribable.} \\
   \varnothing & \in\mathfrak{R} \\
-  \forall\mathbb{X},\mathbb{Y} & \in\mathfrak{R}\land\alpha\in\mathrm{Ord}\land m\in\omega((m;\mathbb{X};\mathbb{Y};\alpha)\in\mathfrak{R}) \\
+  \forall\mathbb{X},\mathbb{Y} & \in\mathfrak{R}\land\alpha\in\mathrm{Ord}\land m\in\omega((m;\mathbb{X};\alpha;\mathbb{Y})\in\mathfrak{R}) \\
   V\varnothing & = \varnothing \\
-  V(m;\mathbb{X};\mathbb{Y};\alpha) & = V\mathbb{X}\cup V\mathbb{Y}\cup\{\alpha\} \\
+  V(m;\mathbb{X};\alpha;\mathbb{Y}) & = V\mathbb{X}\cup V\mathbb{Y}\cup\{\alpha\} \\
   o(\pi) & =\begin{cases}\delta+1 & \text{if }\pi=\Psi_\kappa^\mathbb{Y}(\delta) \\ 0 & \text{if }\pi=\kappa^+\text{ or }\Xi_\alpha\end{cases} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\Xi_\gamma|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land V\mathbb{X}\subseteq C_n(\alpha,\beta)\land V\mathbb{X}\in\alpha+1\land\gamma\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land V\mathbb{X}\subseteq C_n(\alpha,\beta)\cap\alpha\land\gamma\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
   \mathfrak{M}_\pi^\varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  \mathfrak{M}_\pi^{(m;\mathbb{X};\mathbb{Y};\alpha)} & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\Pi_m^1\text{-indesc.}\cap\mathfrak{M}_\pi^\mathbb{Y}\text{ onto } \mathfrak{M}_\pi^{(m;\varnothing;\mathbb{Y};\xi)})\} \text{ onto }\mathfrak{M}_\pi^\mathbb{X} \\
+  \mathfrak{M}_\pi^{(m;\mathbb{X};0;\mathbb{Y})} & = \mathfrak{M}_\pi^\mathbb{X}\cap\mathfrak{M}_\pi^\mathbb{Y} \\
+  \mathfrak{M}_\pi^{(m;\mathbb{X};\alpha;\mathbb{Y})} & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\mathfrak{M}_\pi^{(m;\varnothing;\mathbb{Y};\xi)}\text{-}\Pi_m^1\text{-indesc.})\} \\
   \text{For }\alpha\ge o(\pi)\text{, }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}\cap\mathfrak{M}_\pi^\mathbb{X} \\
   \text{If }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & \neq\varnothing\text{, }\Psi_\pi^\mathbb{X}(\alpha)=\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha))
   \end{align}$$
@@ -141,9 +143,10 @@
   C_0(\alpha,\beta) & =\{0,\Upsilon\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land V\mathbb{X}\subseteq C_n(\alpha,\beta)\land V\mathbb{X}\in\alpha+1\land\gamma\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land V\mathbb{X}\subseteq C_n(\alpha,\beta)\cap\alpha\land\gamma\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
   \mathfrak{M}_\pi^\varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  \text{For }\lambda\ge\pi\text{, }\mathfrak{M}_\pi^{(\lambda;m;\mathbb{X};\alpha;\mathbb{Y})} & = \{\gamma\in\pi|\gamma\text{ is }\Theta_\pi(\lambda,\gamma)\text{-}\Pi_m^1\text{-reducible}\land\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\mathfrak{M}_\pi^\mathbb{X}\text{ onto } \mathfrak{M}_\pi^{(\lambda;m;\mathbb{X};\xi;\varnothing)})\} \text{ onto }\mathfrak{M}_\pi^\mathbb{Y} \\
+  \text{For }\lambda\ge\pi\text{, }\mathfrak{M}_\pi^{(\lambda;m;\mathbb{X};0;\mathbb{Y})} & = \mathfrak{M}_\pi^\mathbb{X}\cap\mathfrak{M}_\pi^\mathbb{Y} \\
+  \text{For }\lambda\ge\pi\text{, }\mathfrak{M}_\pi^{(\lambda;m;\mathbb{X};\alpha;\mathbb{Y})} & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\mathfrak{M}_\pi^{(\lambda;m;\varnothing;\mathbb{Y};\xi)}\text{-}\Theta_\pi(\lambda,\gamma)\text{-}\Pi_m^1\text{-reducible})\} \\
   \text{For }\alpha\ge o(\pi)\text{, }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}\cap\mathfrak{M}_\pi^\mathbb{X} \\
   \text{If }\mathfrak{M}_\pi^\mathbb{X}(\alpha)\neq\varnothing\text{, }\Psi_\pi^\mathbb{X}(\alpha) & =\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha)) \\
   \end{align}$$
@@ -159,15 +162,15 @@
   V\varnothing & = \varnothing \\
   V(\lambda;m;\mathbb{X};\alpha;\mathbb{Y}) & = V\mathbb{X}\cup V\mathbb{Y}\cup\{\alpha\} \\
   o(\pi) & =\begin{cases}\delta+1 & \text{if }\pi=\Psi_\kappa^\mathbb{Y}(\delta) \\ 0 & \text{if }\pi=\kappa^+\text{ or }\Upsilon\text{ or }\Sigma\end{cases} \\
-  \Theta_\pi(\beta_{[\pi]},\gamma) & = \beta_{[\gamma]} \\
+  \Theta_\pi(\beta_{[\pi]},\gamma) & = \begin{cases}\Theta_\Upsilon(\beta_{[\Upsilon]},\gamma) & \text{if }\pi=\Sigma \\ \beta_{[\gamma]} & \text{otherwise}\end{cases} \\
   C(\alpha,\beta) & =\bigcup_{n\lt\omega} C_n(\alpha,\beta) \\
   C_0(\alpha,\beta) & =\{0,\Upsilon,\Sigma\}\cup\beta \\
   C_{n+1}(\alpha,\beta) & =\{\gamma+\delta|\gamma,\delta\in C_n(\alpha,\beta)\} \\
   & \mspace{2mu}\cup\mspace{1mu}\{\gamma^+|\gamma\in C_n(\alpha,\beta)\} \\
-  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land V\mathbb{X}\subseteq C_n(\alpha,\beta)\land V\mathbb{X}\in\alpha+1\land\gamma\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
+  & \mspace{2mu}\cup\mspace{1mu}\{\Psi_\pi^\mathbb{X}(\gamma)|\gamma,\pi\in C_n(\alpha,\beta)\land V\mathbb{X}\subseteq C_n(\alpha,\beta)\cap\alpha\land\gamma\lt\alpha\land\mathbb{X}\in\mathfrak{R}\} \\
   \mathfrak{M}_\pi^\varnothing & = \{\gamma\in\pi|\gamma\in\mathrm{Ord}\} \\
-  \text{For }\pi\le\lambda\text{, }\mathfrak{M}_\pi^{(\lambda;m;\mathbb{X};\alpha;\mathbb{Y})} & = \{\gamma\in\pi|\gamma\text{ is }\Theta_\pi(\lambda,\gamma)\text{-}\Pi_m^1\text{-reducible}\land\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\mathfrak{M}_\pi^\mathbb{X}\text{ onto } \mathfrak{M}_\pi^{(\lambda;m;\mathbb{X};\xi;\varnothing)})\} \text{ onto }\mathfrak{M}_\pi^\mathbb{Y} \\
-  \text{For }\Upsilon\le\lambda\text{, }\mathfrak{M}_\Sigma^{(\lambda;m;\mathbb{X};\alpha;\mathbb{Y})} & = \{\gamma\in\Sigma|\gamma\text{ is }\Theta_\Upsilon(\lambda,\gamma)\text{-}\Pi_m^1\text{-reducible}\land\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\mathfrak{M}_\Sigma^\mathbb{X}\text{ onto } \mathfrak{M}_\Sigma^{(\lambda;m;\mathbb{X};\xi;\varnothing)})\} \text{ onto }\mathfrak{M}_\Sigma^\mathbb{Y} \\
+  \text{For }\lambda\ge\pi\text{, }\mathfrak{M}_\pi^{(\lambda;m;\mathbb{X};0;\mathbb{Y})} & = \mathfrak{M}_\pi^\mathbb{X}\cap\mathfrak{M}_\pi^\mathbb{Y} \\
+  \text{For }\lambda\ge\pi\text{, }\mathfrak{M}_\pi^{(\lambda;m;\mathbb{X};\alpha;\mathbb{Y})} & = \{\gamma\in\pi|\forall\xi\in C(\alpha,\gamma)\cap\alpha(\gamma\text{ is }\mathfrak{M}_\pi^{(\lambda;m;\varnothing;\mathbb{Y};\xi)}\text{-}\Theta_\pi(\lambda,\gamma)\text{-}\Pi_m^1\text{-reducible})\} \\
   \text{For }\alpha\ge o(\pi)\text{, }\mathfrak{M}_\pi^\mathbb{X}(\alpha) & =\{\beta\lt\pi|\sup(C(\alpha,\beta)\cap\pi)=\beta\}\cap\mathfrak{M}_\pi^\mathbb{X} \\
   \text{If }\mathfrak{M}_\pi^\mathbb{X}(\alpha)\neq\varnothing\text{, }\Psi_\pi^\mathbb{X}(\alpha) & =\min(\mathfrak{M}_\pi^\mathbb{X}(\alpha)) \\
   \end{align}$$
