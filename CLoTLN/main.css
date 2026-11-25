@@ -1,0 +1,26 @@
+body {
+  font-family: "JetBrains Mono", monospace;
+  background-color: #434343;
+  color: #ffffff;
+  padding: 20px;
+}
+
+a {
+  color: #b4c8ff;
+  text-decoration: none;
+}
+body {
+  font-family: "JetBrains Mono", monospace;
+  background-color: #434343;
+  color: #ffffff;
+}
+a {
+  color: #b4c8ff;
+  text-decoration: none;
+}
+.golden-ratio {
+  color: #f1c232;
+}
+.silver-ratio {
+  color: #cccccc;
+}
