@@ -1,26 +1,16 @@
+<!DOCTYPE html>
 <html>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
-<meta name="format-detection" content="telephone=no">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="format-detection" content="telephone=no">
   <title>Cosmical List of Tremendously Large Numbers</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <style>
-    body {
-      font-family: "JetBrains Mono", monospace;
-      background-color: #434343;
-      color: #ffffff;
-    }
-    a {
-      color: #b4c8ff;
-      text-decoration: none;
-    }
-    .golden-ratio {
-      color: #f1c232;
-    }
-    .silver-ratio {
-      color: #cccccc;
-    }
-  </style>
+
+  <script src="main.js"></script>
+  <link rel="stylesheet" href="main.css">
 </head>
 <body>
   <p style="font-size: 48px; text-align: center;"><b>Cosmical List of Tremendously Large Numbers</b></p>
@@ -3498,13 +3488,5 @@
   <br>
   <br>
   <br>
-<script>
-    let stages = document.getElementsByClassName("stage");
-    let cIndex = 0;
-    for (let i = 0; i < stages.length; i++) {
-		cIndex += 0.5;
-		stages[i].style.color = cIndex > 35 ? `hsl(300,${Math.max(0,975-cIndex*25)}%,${Math.max(0, 250-cIndex*5)}%)` : `hsl(${Math.max(0,cIndex*10-50)}, 100%, ${Math.max(75, 100-cIndex*5)}%)`;
-	}
-</script>
 </body>
 </html>
