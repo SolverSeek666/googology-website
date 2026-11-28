@@ -1,7 +1,6 @@
 body {
-  font-family: 'JetBrains Mono', monospace;
-  font-variant-ligatures: none;
-  font-feature-settings: "liga" 0, "calt" 0;
+  font-family: 'JetBrains Mono NL';
+  src: url('https://jsdelivr.net') format('woff2');
   background-color: #434343;
   color: #ffffff;
 }
