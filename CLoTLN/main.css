@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'JetBrains Mono NL';
-  src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono@2.304/fonts/webfonts/JetBrainsMonoNL-Regular.woff2') format('woff2');
+  src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMonoNL-Regular.woff2') format('woff2');
 }
 
 body {
