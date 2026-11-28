@@ -1,6 +1,6 @@
 body {
   font-family: "JetBrains Mono", monospace;
-  background-color: #434343;
+  background-color: #000000;
   color: #ffffff;
   padding: 20px;
 }
@@ -10,7 +10,7 @@ a {
   text-decoration: none;
 }
 body {
-  font-family: "JetBrains Mono", monospace;
+  font-family: 'Ubuntu Mono', monospace;
   background-color: #434343;
   color: #ffffff;
 }
