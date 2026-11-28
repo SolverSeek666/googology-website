@@ -1,6 +1,10 @@
-body {
+@font-face {
   font-family: 'JetBrains Mono NL';
   src: url('https://jsdelivr.net') format('woff2');
+}
+
+body {
+  font-family: 'JetBrains Mono NL';
   background-color: #434343;
   color: #ffffff;
 }
